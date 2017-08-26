@@ -3,19 +3,8 @@
 <head>
     <title><fmt:message key="userList.title"/></title>
     <meta name="menu" content="AdminMenu"/>
-
-
-   
-
 </head>
-<!--<div >
-    <div id="tree" class="col-sm-4">
-    </div>
-    <div class="col-sm-8">
-        <div id="searchPanel">    </div>
-        <div id="userGrid">    </div>
-    </div>
-</div>-->
+
 <script>
     var search = new Ext.create('Ext.form.Panel', {
         xtype: 'form-hboxlayout',
@@ -68,11 +57,46 @@
         listeners: {
             'afterrender': function () {
                 //TODO function fo afterender
-            },            
+            },
         }
     });
-    Ext.onReady(function () {
 
+//  --------------------------Items per Page------------------------
+
+    var pagesize = 20;
+    var combo = new Ext.form.ComboBox({
+        name: 'perpage',
+        width: 60,
+        store: new Ext.data.ArrayStore({
+            fields: ['id'],
+            data: [
+                ['20'],
+                ['50'],
+                ['100']
+            ]
+        }),
+        mode: 'local',
+        value: '15',
+        listWidth: 40,
+        triggerAction: 'all',
+        displayField: 'id',
+        valueField: 'id',
+        editable: false,
+        forceSelection: true,
+        listeners: {
+            select: function (combo, record, eOpts) {
+                pagesize = record.id;
+                Ext.getStore('userstore').reload({start: 0, limit: pagesize});
+                Ext.apply(Ext.getStore('userstore'), {pageSize: pagesize});
+            },
+            afterrender: function (field, opts) {
+                field.setValue(pagesize);
+            }
+        }
+    });
+
+//--------------------------------------------------------
+    Ext.onReady(function () {
 
         Ext.create('Ext.container.Viewport', {
             layout: 'border',
@@ -107,10 +131,6 @@
             listeners: {
                 resize: function (width, height, oldWidth, oldHeight, eOpts) {
                     setTimeout(function () {
-//                        console.log("Resize viewport");
-//                        console.log($(window).height());
-//                        console.log($(window).width());
-
                         Ext.getCmp('tabid').setHeight($(window).height());
                         Ext.getCmp('gridId').setHeight($(window).height() - 142 - search.getHeight());
                         Ext.getCmp('sidelefttree').setHeight($(window).height() - 142);
@@ -123,6 +143,8 @@
                 },
             },
         });
+        
+ //---------------------------Display tab panel--------------------------------------------------------------------
         var tab = Ext.create('Ext.tab.Panel', {
             renderTo: "rightPanel",
             id: "tabid",
@@ -143,13 +165,15 @@
                 }
             }
         });
+        
+//-----------------------------------------Grid---------------------------------------------------------------
         Ext.define('User', {
             extend: 'Ext.data.Model',
             fields: ['UserName', 'Email', 'PhoneNumber']
         });
         var myStore = Ext.create('Ext.data.Store', {
             model: 'User',
-            storeId: 'customerNameStore',
+            storeId: 'userstore',
             pageSize: 20,
             autoLoad: true,
             proxy: {
@@ -199,7 +223,9 @@
             },
             dockedItems: [{
                     xtype: 'pagingtoolbar',
+                    id: 'userpagingid',
                     dock: 'bottom',
+                    //store: myStore,
                     displayInfo: true
                 },
                 {
@@ -227,7 +253,9 @@
                                     console.log(el);
                                 }
                             }//end of listeners
-                        }
+                        },
+                        'Per Page: ',
+                        combo
                     ]
                 }],
             listeners: {
@@ -243,6 +271,5 @@
 
 </script>
 
-
-
+<!--include other file-->
 <jsp:include page="../common/treeDemo.jsp" />
