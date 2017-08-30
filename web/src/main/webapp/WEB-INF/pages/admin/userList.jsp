@@ -8,7 +8,8 @@
 <script>
     var search = new Ext.create('Ext.form.Panel', {
         xtype: 'form-hboxlayout',
-        // title: 'Search',
+        title: 'Search',
+        collapsible: true,
         id: 'searchform',
         fullscreen: true,
         padding: '5 5 5 5',
@@ -55,10 +56,24 @@
                 text: 'Cancel'
             }],
         listeners: {
-            'afterrender': function () {
-                //TODO function fo afterender
+            afterRender: function (thisForm, options) {
+                this.keyNav = Ext.create('Ext.util.KeyNav', this.el, {
+                    enter: function () {
+                        searchServer();
+                    }
+                });
             },
-        }
+//            'collapse': function (p, eOpts) {            
+//                Ext.getCmp("searchform").updateLayout();
+//                Ext.getCmp("gridId").setHeight(Ext.getCmp("rightPanel").getHeight() - Ext.getCmp("searchform").getHeight());
+//                Ext.getCmp("gridId").updateLayout();
+//            },
+//            'expand': function (p, eOpts) {
+//                Ext.getCmp("searchform").updateLayout();
+//                Ext.getCmp("gridId").setHeight(Ext.getCmp("rightPanel").getHeight() - Ext.getCmp("searchform").getHeight());
+//                Ext.getCmp("gridId").updateLayout();
+//            }
+        } //end of listeners
     });
 
 //  --------------------------Items per Page------------------------
@@ -143,8 +158,8 @@
                 },
             },
         });
-        
- //---------------------------Display tab panel--------------------------------------------------------------------
+
+        //---------------------------Display tab panel--------------------------------------------------------------------
         var tab = Ext.create('Ext.tab.Panel', {
             renderTo: "rightPanel",
             id: "tabid",
@@ -165,7 +180,7 @@
                 }
             }
         });
-        
+
 //-----------------------------------------Grid---------------------------------------------------------------
         Ext.define('User', {
             extend: 'Ext.data.Model',

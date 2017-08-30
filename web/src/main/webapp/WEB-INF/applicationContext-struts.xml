@@ -30,4 +30,11 @@
         <property name="mailEngine" ref="mailEngine"/>
         <property name="mailMessage" ref="mailMessage"/>
     </bean>
+    
+    
+    <!--Item-->
+    <bean id="itemAction" class="com.cmms.webapp.action.ItemAction" scope="prototype">
+        <property name="itemTypeDao" ref="itemTypeDao"/>
+        <property name="machineDao" ref="machineDao"/>
+    </bean>
 </beans>

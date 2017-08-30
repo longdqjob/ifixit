@@ -12,6 +12,10 @@
     <context:component-scan base-package="com.cmms"/>
 
     <!-- Add new DAOs here -->
-
+    <bean id="companyDao" class="com.cmms.dao.hibernate.CompanyDaoHibernate"></bean>
+    <bean id="groupEngineerDao" class="com.cmms.dao.hibernate.GroupEngineerDaoHibernate"></bean>
+    <bean id="itemTypeDao" class="com.cmms.dao.hibernate.ItemTypeDaoHibernate"></bean>
+    <bean id="machineDao" class="com.cmms.dao.hibernate.MachineDaoHibernate"></bean>
+    <bean id="supplierDao" class="com.cmms.dao.hibernate.SupplierDaoHibernate"></bean>
     <!-- Add new Managers here -->
 </beans>

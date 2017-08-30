@@ -38,6 +38,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.3.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>org.appfuse</groupId>
             <artifactId>appfuse-data-common</artifactId>
             <version>${appfuse.version}</version>
@@ -60,6 +66,13 @@
             <artifactId>appfuse-${dao.framework}</artifactId>
             <version>${appfuse.version}</version>
             <type>pom</type>
+        </dependency>
+        
+        <!-- Hibernate c3p0 connection pool -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-c3p0</artifactId>
+            <version>3.6.3.Final</version>
         </dependency>
     </dependencies>
 </project>
