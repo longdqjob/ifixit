@@ -3,20 +3,24 @@
     var store = Ext.create('Ext.data.TreeStore', {
         fields: [
             {name: 'id', type: 'int'},
-            {name: 'text', type: 'string'}
+            {name: 'parentId', type: 'int'},
+            {name: 'code', type: 'string'},
+            {name: 'name', type: 'string'},
+            {name: 'state', type: 'int'},
+            {name: 'description', type: 'string'},
         ],
         proxy: {
             type: 'ajax',
-            url: '/itemType/getListItem'
+            url: '/company/getTreeCompany'
         },
         root: {
-            text: '<fmt:message key="itemType"/>',
+            text: '<fmt:message key="company"/>',
             id: '0',
             expanded: true
         },
         folderSort: true,
         sorters: [{
-                property: 'text',
+                property: 'name',
                 direction: 'ASC'
             }],
 //        listeners: {
@@ -50,26 +54,16 @@
 //        }
     });
 
-    var singleClickTask = new Ext.util.DelayedTask(singleClickAction), // our delayed task for single click
-            singleClickDelay = 200; // delay in milliseconds
-    function onClick(view, node) {
-        singleClickTask.delay(singleClickDelay);
+    function resetHeight(cmp) {
+        setTimeout(function () {
+            var innerElement = cmp.getEl().down('table.x-grid-table');
+            if (innerElement) {
+                var height = innerElement.getHeight();
+                cmp.setHeight(height);
+            }
+        }, 200);
     }
 
-    function onDblClick(id) {
-        // double click detected - trigger double click action
-        doubleClickAction(id);
-        // and don't forget to cancel single click task!
-        singleClickTask.cancel();
-    }
-
-    function singleClickAction() {
-        alert("singleClickAction");
-    }
-
-    function doubleClickAction(id) {
-        loadMachine(id);
-    }
     //Ext.ux.tree.TreeGrid is no longer a Ux. You can simply use a tree.TreePanel
     var tree = Ext.create('Ext.tree.Panel', {
         id: 'sidelefttree',
@@ -81,32 +75,33 @@
         multiSelect: true,
         border: true,
         store: store,
+        minHeight: 500,
         columns: [{
                 xtype: 'treecolumn', //this is so we know which column will show the tree
                 width: 345,
                 sortable: true,
-                dataIndex: 'text',
+                dataIndex: 'name',
             }
         ],
         listeners: {
-            itemclick: function (view, node) {
-                onClick();
-//                console.log(node);
-//                console.log("isLeaf: " + node.isLeaf());
-//                console.log("children " + node.data.childNodes);
-//                if (node.isLeaf()) {
-//                    // some functionality to open the leaf(document) in a tabpanel
-//                    alert(node.get("text"));
-//                } else if (node.isExpanded()) {
-//                    node.collapse();
-//                } else {
-//                    node.expand();
-//                }
+            load: function () {
+                resetHeight(this);
             },
-            itemdblclick: function (tree, record, index) {
-                onDblClick(record.get("id"));
-//                console.log("dblclicked");
-//                event.preventDefault();
+            afterrender: function () {
+                this.getEl().setStyle('height', 'auto');
+                this.body.setStyle('height', 'auto');
+                this.getView().getEl().setStyle('height', 'auto');
+            },
+            itemclick: function (view, node) {
+                console.log(node);
+                if (node.isLeaf()) {
+                    // some functionality to open the leaf(document) in a tabpanel
+                    alert(node.get("text"));
+                } else if (node.isExpanded()) {
+                    node.collapse();
+                } else {
+                    node.expand();
+                }
             },
             itemcontextmenu: function (tree, record, item, index, e, eOpts) {
                 // Optimize : create menu once
@@ -114,15 +109,25 @@
                             text: '<fmt:message key="loadData"/>',
                             handler: function () {
                                 loadMachine(record.get("id"));
-                                console.log("Load data " + record.get("id") + " - " + record.get("text"));
+                                console.log("Load data " + record.get("id") + " - " + record.get("name"));
+                            }}, {
+                            text: '<fmt:message key="addCompany"/>',
+                            handler: function () {
+                                console.log("addCompany: " + record.get("id") + " - " + record.get("name"));
+                                addCompany(record);
+                            }}, {
+                            text: '<fmt:message key="editCompany"/>',
+                            handler: function () {
+                                console.log("editCompany: " + record.get("id") + " - " + record.get("name"));
+                                editCompany(record);
                             }}, {
                             text: '<fmt:message key="moreDetail"/>',
                             handler: function () {
-                                console.log("Moreils: " + record.get("id") + " - " + record.get("text"));
+                                console.log("Moreils: " + record.get("id") + " - " + record.get("name"));
                             }}, {
                             text: '<fmt:message key="delete"/>',
                             handler: function () {
-                                console.log("Delete " + record.get("id") + " - " + record.get("text"));
+                                console.log("Delete " + record.get("id") + " - " + record.get("name"));
                             }}]
                 });
                 // HERE IS THE MAIN CHANGE
@@ -139,22 +144,5 @@
             id: id,
         };
         mygrid.getStore().loadPage(1);
-        
-//        Ext.Ajax.request({
-//            url: '/itemType/loadData',
-//            method: "POST",
-//            params: {
-//                id: id,
-//                start: 0,
-//                limit: 10
-//            },
-//            success: function (response) {
-//                var res = JSON.parse(response.responseText);
-//                console.log(res);
-//            },
-//            failure: function (response, opts) {
-//                alert("System Error!");
-//            },
-//        });
     }
 </script>

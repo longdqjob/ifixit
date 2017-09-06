@@ -37,4 +37,8 @@
         <property name="itemTypeDao" ref="itemTypeDao"/>
         <property name="machineDao" ref="machineDao"/>
     </bean>
+    
+    <bean id="companyAction" class="com.cmms.webapp.action.CompanyAction" scope="prototype">
+        <property name="companyDao" ref="companyDao"/>
+    </bean>
 </beans>

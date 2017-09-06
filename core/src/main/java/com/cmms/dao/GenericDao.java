@@ -3,6 +3,7 @@ package com.cmms.dao;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -24,6 +25,7 @@ public interface GenericDao <T, PK extends Serializable> {
      * is the same as lookup up all rows in a table.
      * @return List of populated objects
      */
+    @Transactional
     List<T> getAll();
 
     /**
@@ -32,6 +34,7 @@ public interface GenericDao <T, PK extends Serializable> {
      * classes correctly implement the hashcode/equals methods</p>
      * @return List of populated objects
      */
+    @Transactional
     List<T> getAllDistinct();
 
     /**
@@ -40,6 +43,7 @@ public interface GenericDao <T, PK extends Serializable> {
      * @return the matching records
      * @throws SearchException
      */
+    @Transactional
     List<T> search(String searchTerm) throws SearchException;
 
     /**
@@ -51,6 +55,7 @@ public interface GenericDao <T, PK extends Serializable> {
      * @return a populated object
      * @see org.springframework.orm.ObjectRetrievalFailureException
      */
+    @Transactional
     T get(PK id);
 
     /**
@@ -58,6 +63,7 @@ public interface GenericDao <T, PK extends Serializable> {
      * @param id the id of the entity
      * @return - true if it exists, false if it doesn't
      */
+    @Transactional
     boolean exists(PK id);
 
     /**
@@ -65,6 +71,7 @@ public interface GenericDao <T, PK extends Serializable> {
      * @param object the object to save
      * @return the persisted object
      */
+    @Transactional
     T save(T object);
 
 
@@ -72,12 +79,14 @@ public interface GenericDao <T, PK extends Serializable> {
      * Generic method to delete an object
      * @param object the object to remove
      */
+    @Transactional
     void remove(T object);
 
     /**
      * Generic method to delete an object
      * @param id the identifier (primary key) of the object to remove
      */
+    @Transactional
     void remove(PK id);
 
     /**
@@ -86,16 +95,19 @@ public interface GenericDao <T, PK extends Serializable> {
      * @param queryParams a map of the query names and the values
      * @return a list of the records found
      */
+    @Transactional
     List<T> findByNamedQuery(String queryName, Map<String, Object> queryParams);
 
     /**
      * Generic method to regenerate full text index of the persistent class T
      */
+    @Transactional
     void reindex();
 
     /**
      * Generic method to regenerate full text index of all indexed classes
      * @param async true to perform the reindexing asynchronously
      */
+    @Transactional
     void reindexAll(boolean async);
 }

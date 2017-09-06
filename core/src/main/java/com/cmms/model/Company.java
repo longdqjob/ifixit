@@ -10,6 +10,7 @@ import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "COMPANY")
@@ -21,6 +22,19 @@ public class Company extends BaseObject implements Serializable {
     private String name;
     private String description;
     private Integer state;
+    private Integer parentId;
+    private String parentName;
+
+    @Transient
+    @Column(name="parent_name")
+    public String getParentName() {
+        return parentName;
+    }
+
+    public void setParentName(String parentName) {
+        this.parentName = parentName;
+    }
+    
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -66,6 +80,15 @@ public class Company extends BaseObject implements Serializable {
 
     public void setState(Integer state) {
         this.state = state;
+    }
+
+    @Column(name = "parent_id")
+    public Integer getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
     }
 
     @Override

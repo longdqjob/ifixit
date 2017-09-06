@@ -5,27 +5,41 @@
 --%>
 
 <script>
+
+    function updateLayOut() {
+        Ext.getCmp("sidelefttree").updateLayout();
+        console.log(Ext.getCmp('sidelefttree').getWidth());
+        console.log(Ext.getCmp('navigation').getWidth());
+        Ext.getCmp('sidelefttree').setHeight($(window).height() - 142);
+        Ext.getCmp('gridId').setHeight($(window).height() - 106);
+        Ext.getCmp('gridId').setWidth($(window).width());
+
+        Ext.getCmp("gridId").updateLayout();
+    }
     Ext.onReady(function () {
         Ext.create('Ext.container.Viewport', {
+            id: "viewport",
             layout: 'border',
             renderTo: Ext.getBody(),
+            margin: '10 10 10 10',
+            padding: '55 0 0 0',
             items: [{
                     region: 'west',
+                    id: "navigation",
                     collapsible: true,
                     title: 'Navigation',
-                    padding: '55 0 0 0',
                     width: 350,
                     html: ' <div id="tree"></div>  ',
                     listeners: {
                         collapse: function () {
-//                            Ext.getCmp("tabid").updateLayout();
-//                            Ext.getCmp("gridId").updateLayout();
-//                            Ext.getCmp("searchform").updateLayout();
+                            console.log("-----collapse:--");
+                            this.up().doLayout();
+//                            updateLayOut();
                         },
                         expand: function () {
-//                            Ext.getCmp("tabid").updateLayout();
-//                            Ext.getCmp("gridId").updateLayout();
-//                            Ext.getCmp("searchform").updateLayout();
+                            console.log("-----expand:--");
+                            this.up().doLayout();
+//                            updateLayOut();
                         }
                     }
                 }, {
@@ -35,21 +49,15 @@
             listeners: {
                 resize: function (width, height, oldWidth, oldHeight, eOpts) {
                     setTimeout(function () {
-//                        Ext.getCmp('tabid').setHeight($(window).height());
-//                        Ext.getCmp('gridId').setHeight($(window).height() - 142 - search.getHeight());
-                        Ext.getCmp('sidelefttree').setHeight($(window).height() - 142);
-
-//                        Ext.getCmp("tabid").updateLayout();
-//                        Ext.getCmp("gridId").updateLayout();
-//                        Ext.getCmp("searchform").updateLayout();
-
+                        updateLayOut();
                     }, 1);
                 },
             },
         });
-        
+
         tree.render('tree');
-//        search.render('searchPanel');
+        loadMachine(1);
+        gridPanel.render('rightPanel');
     });//end of OnReady furnciotn
 
 </script>

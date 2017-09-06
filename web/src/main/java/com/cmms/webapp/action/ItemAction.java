@@ -15,7 +15,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 /**
- * Action for facilitating User Management feature.
+ * Action for ItemAction
  */
 public class ItemAction extends BaseAction implements Preparable {
 

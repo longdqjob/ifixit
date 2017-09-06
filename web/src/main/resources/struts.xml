@@ -155,6 +155,12 @@
             <result name="success">/WEB-INF/pages/admin/item/index.jsp</result>
         </action>
         
+        <!--company-->
+        <action name="company" class="companyAction" method="index">
+            <interceptor-ref name="adminCheck"/>
+            <result name="success">/WEB-INF/pages/admin/company/index.jsp</result>
+        </action>
+        
     </package>
     
     <package name="itemType" extends="default" namespace="/itemType">
@@ -167,6 +173,34 @@
         <action name="loadData" class="itemAction">
             <result type="stream">
                 <param name="inputName">loadData</param>
+            </result>
+        </action>
+    </package>
+    
+    <package name="company" extends="default" namespace="/company">
+        <action name="getTreeCompany" class="companyAction">
+            <result type="stream">
+                <param name="inputName">treeCompany</param>
+            </result>
+        </action>
+        <action name="getListCompany" class="companyAction">
+            <result type="stream">
+                <param name="inputName">listCompany</param>
+            </result>
+        </action>
+        <action name="getAllCompany" class="companyAction">
+            <result type="stream">
+                <param name="inputName">allCompany</param>
+            </result>
+        </action>
+        <action name="saveCompany" class="companyAction">
+            <result type="stream">
+                <param name="inputName">saveCompany</param>
+            </result>
+        </action>
+        <action name="deleteCompany" class="companyAction">
+            <result type="stream">
+                <param name="inputName">deleteCompany</param>
             </result>
         </action>
     </package>

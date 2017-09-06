@@ -7,7 +7,7 @@
 
 <jsp:include page="../../common/require.jsp" />
 <jsp:include page="navigation.jsp" />
-<%--<jsp:include page="search.jsp" />
-<jsp:include page="grid.jsp" />--%>
+<%--<jsp:include page="search.jsp" />--%>
+<jsp:include page="grid.jsp" />
 <jsp:include page="layout.jsp" />
 
