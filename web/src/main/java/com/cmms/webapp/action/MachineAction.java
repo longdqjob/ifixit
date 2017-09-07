@@ -1,7 +1,9 @@
 package com.cmms.webapp.action;
 
+import com.cmms.dao.CompanyDao;
 import com.cmms.dao.ItemTypeDao;
 import com.cmms.dao.MachineDao;
+import com.cmms.model.Company;
 import com.cmms.model.Machine;
 import com.cmms.webapp.util.WebUtil;
 import com.opensymphony.xwork2.Preparable;
@@ -15,13 +17,22 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 /**
- * Action for ItemAction
+ * Action for MachineAction
  */
-public class ItemAction extends BaseAction implements Preparable {
+public class MachineAction extends BaseAction implements Preparable {
 
     private static final long serialVersionUID = -1L;
     private ItemTypeDao itemTypeDao;
     private MachineDao machineDao;
+    private CompanyDao companyDao;
+
+    public CompanyDao getCompanyDao() {
+        return companyDao;
+    }
+
+    public void setCompanyDao(CompanyDao companyDao) {
+        this.companyDao = companyDao;
+    }
 
     public ItemTypeDao getItemTypeDao() {
         return itemTypeDao;
@@ -47,40 +58,26 @@ public class ItemAction extends BaseAction implements Preparable {
         return SUCCESS;
     }
 
-    public InputStream getListItem() {
-        try {
-            String idReq = getRequest().getParameter("id");
-            Integer id = null;
-            if (!StringUtils.isBlank(idReq)) {
-                id = Integer.parseInt(idReq);
-            } else {
-                idReq = getRequest().getParameter("node");
-            }
-            if (!StringUtils.isBlank(idReq)) {
-                id = Integer.parseInt(idReq);
-            }
-
-//            String result = "";
-//            JSONObject treeview = new JSONObject();
-//            treeview.put("list", itemTypeDao.getTreeView(id));
-//            result = treeview.toString();
-            return new ByteArrayInputStream(itemTypeDao.getTreeView(id).toString().getBytes("UTF8"));
-        } catch (Exception e) {
-            log.error("ERROR getListItem: ", e);
-            return null;
-        }
-    }
-
     public InputStream getLoadData() {
         try {
             JSONObject result = new JSONObject();
-            String idReq = getRequest().getParameter("id");
-            Integer id = null;
-            if (!StringUtils.isBlank(idReq)) {
-                id = Integer.parseInt(idReq);
+            //itemType
+            String itemType = getRequest().getParameter("itemType");
+            Integer idItemType = null;
+            if (!StringUtils.isBlank(itemType)) {
+                idItemType = Integer.parseInt(itemType);
             }
-            List<Integer> listChildrent = itemTypeDao.getListChildren(id);
-            Map pagingMap = machineDao.getList(listChildrent, null, null, null, start, limit);
+            List<Integer> lstItemType = itemTypeDao.getListChildren(idItemType);
+
+            //companyDao
+            String scompany = getRequest().getParameter("company");
+            Integer companyId = null;
+            if (!StringUtils.isBlank(scompany)) {
+                companyId = Integer.parseInt(scompany);
+            }
+            List<Integer> listCompany = companyDao.getListChildren(companyId);
+
+            Map pagingMap = machineDao.getList(lstItemType, listCompany, null, null, start, limit);
 
             ArrayList<Machine> list = new ArrayList<Machine>();
             if (pagingMap.get("list") != null) {
@@ -92,7 +89,22 @@ public class ItemAction extends BaseAction implements Preparable {
                 count = (Long) pagingMap.get("count");
             }
 
-            JSONArray jSONArray = WebUtil.toJSONArray(list);
+            JSONArray jSONArray = new JSONArray();
+            JSONObject tmp;
+            Company company;
+            for (Machine machine : list) {
+                tmp = new JSONObject();
+                tmp = WebUtil.toJSONObject(machine, "");
+                company = machine.getCompany();
+                if (company != null) {
+                    tmp.put("companyId", company.getId());
+                    tmp.put("companyName", company.getName());
+                } else {
+                    tmp.put("companyId", "");
+                    tmp.put("companyName", "");
+                }
+                jSONArray.put(tmp);
+            }
 
             result.put("list", jSONArray);
             result.put("totalCount", count);

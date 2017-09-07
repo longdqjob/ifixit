@@ -1,7 +1,8 @@
 package com.cmms.webapp.action;
 
-import com.cmms.dao.CompanyDao;
+import com.cmms.dao.SupplierDao;
 import com.cmms.model.Company;
+import com.cmms.model.Supplier;
 import com.cmms.webapp.util.ResourceBundleUtils;
 import com.cmms.webapp.util.WebUtil;
 import com.opensymphony.xwork2.Preparable;
@@ -15,19 +16,19 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 /**
- * Action for CompanyAction
+ * Action for SupplierAction
  */
-public class CompanyAction extends BaseAction implements Preparable {
+public class SupplierAction extends BaseAction implements Preparable {
 
     private static final long serialVersionUID = -1L;
-    private CompanyDao companyDao;
+    private SupplierDao supplierDao;
 
-    public CompanyDao getCompanyDao() {
-        return companyDao;
+    public SupplierDao getSupplierDao() {
+        return supplierDao;
     }
 
-    public void setCompanyDao(CompanyDao companyDao) {
-        this.companyDao = companyDao;
+    public void setSupplierDao(SupplierDao supplierDao) {
+        this.supplierDao = supplierDao;
     }
 
     @Override
@@ -38,44 +39,17 @@ public class CompanyAction extends BaseAction implements Preparable {
         return SUCCESS;
     }
 
-    public InputStream getTreeCompany() {
-        try {
-            String idReq = getRequest().getParameter("id");
-            Integer id = null;
-            if (!StringUtils.isBlank(idReq)) {
-                id = Integer.parseInt(idReq);
-            } else {
-                idReq = getRequest().getParameter("node");
-            }
-            if (!StringUtils.isBlank(idReq)) {
-                id = Integer.parseInt(idReq);
-            }
-
-//            String result = "";
-//            JSONObject treeview = new JSONObject();
-//            treeview.put("list", itemTypeDao.getTreeView(id));
-//            result = treeview.toString();
-            return new ByteArrayInputStream(companyDao.getTreeView(id).toString().getBytes("UTF8"));
-        } catch (Exception e) {
-            log.error("ERROR getTreeCompany: ", e);
-            return null;
-        }
-    }
-
-    public InputStream getListCompany() {
+    public InputStream getLoadData() {
         try {
             JSONObject result = new JSONObject();
-            String idReq = getRequest().getParameter("id");
-            Integer id = null;
-            if (!StringUtils.isBlank(idReq)) {
-                id = Integer.parseInt(idReq);
-            }
-            List<Integer> listChildrent = companyDao.getListChildren(id);
-            Map pagingMap = companyDao.getListCompany(listChildrent, null, null, start, limit);
+            String code = getRequest().getParameter("code");
+            String name = getRequest().getParameter("name");
 
-            ArrayList<Company> list = new ArrayList<Company>();
+            Map pagingMap = supplierDao.getList(code, name, start, limit);
+
+            ArrayList<Supplier> list = new ArrayList<Supplier>();
             if (pagingMap.get("list") != null) {
-                list = (ArrayList<Company>) pagingMap.get("list");
+                list = (ArrayList<Supplier>) pagingMap.get("list");
             }
 
             Long count = 0L;
@@ -84,31 +58,17 @@ public class CompanyAction extends BaseAction implements Preparable {
             }
 
             JSONArray jSONArray = WebUtil.toJSONArray(list);
-
             result.put("list", jSONArray);
             result.put("totalCount", count);
 
             return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
         } catch (Exception ex) {
-            log.error("ERROR getListCompany: ", ex);
+            log.error("ERROR getLoadData: ", ex);
             return null;
         }
     }
-
-    public InputStream getAllCompany() {
-        try {
-            JSONObject result = new JSONObject();
-            List<Company> list = companyDao.getAll();
-            JSONArray jSONArray = WebUtil.toJSONArray(list);
-            result.put("list", jSONArray);
-            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
-        } catch (Exception ex) {
-            log.error("ERROR getAllCompany: ", ex);
-            return null;
-        }
-    }
-
-    public InputStream getSaveCompany() {
+    
+    public InputStream getSave() {
         try {
             JSONObject result = new JSONObject();
             String idReq = getRequest().getParameter("id");
@@ -116,22 +76,21 @@ public class CompanyAction extends BaseAction implements Preparable {
 
             String code = getRequest().getParameter("code");
             String name = getRequest().getParameter("name");
-            String parent = getRequest().getParameter("parent");
-            String description = getRequest().getParameter("description");
+            String contact = getRequest().getParameter("contact");
+            String phone = getRequest().getParameter("phone");
 
-            Company company = new Company();
+            Supplier supplier = new Supplier();
             if (!StringUtils.isBlank(idReq)) {
                 id = Integer.parseInt(idReq);
-                company.setId(id);
+                supplier.setId(id);
             }
-            Company parentObj = companyDao.get(Integer.parseInt(parent));
-            company.setCompany(parentObj);
 //            company.setParentId(Integer.parseInt(parent));
-            company.setCode(code);
-            company.setName(name);
-            company.setDescription(description);
-            company = companyDao.save(company);
-            if (company != null) {
+            supplier.setCode(code);
+            supplier.setName(name);
+            supplier.setContact(contact);
+            supplier.setPhone(phone);
+            supplier = supplierDao.save(supplier);
+            if (supplier != null) {
                 result.put("success", true);
                 result.put("message", ResourceBundleUtils.getName("saveSuccess"));
             } else {
@@ -140,7 +99,7 @@ public class CompanyAction extends BaseAction implements Preparable {
             }
             return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
         } catch (Exception ex) {
-            log.error("ERROR getSaveCompany: ", ex);
+            log.error("ERROR getSave: ", ex);
             return null;
         }
     }
@@ -155,18 +114,18 @@ public class CompanyAction extends BaseAction implements Preparable {
         this.ids = ids;
     }
 
-    public InputStream getDeleteCompany() {
+    public InputStream getDelete() {
         try {
             JSONObject result = new JSONObject();
             if (ids != null && ids.length > 0) {
                 if (ids.length == 1) {
-                    companyDao.remove(Integer.parseInt(ids[0]));
+                    supplierDao.remove(Integer.parseInt(ids[0]));
                 } else {
                     List<Integer> list = new ArrayList<>(ids.length);
                     for (String idTmp : ids) {
                         list.add(Integer.parseInt(idTmp));
                     }
-                    int delete = companyDao.deleteCompany(list);
+                    int delete = supplierDao.delete(list);
                     if (delete != ids.length) {
                         log.warn("deleteCompany rtn: " + delete + " list: " + ids.length);
                         result.put("success", false);
@@ -182,9 +141,8 @@ public class CompanyAction extends BaseAction implements Preparable {
             }
             return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
         } catch (Exception ex) {
-            log.error("ERROR getDeleteCompany: ", ex);
+            log.error("ERROR getDelete: ", ex);
             return null;
         }
     }
-
 }

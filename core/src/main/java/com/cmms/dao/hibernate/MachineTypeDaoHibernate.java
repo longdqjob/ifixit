@@ -1,7 +1,7 @@
 package com.cmms.dao.hibernate;
 
-import com.cmms.dao.SupplierDao;
-import com.cmms.model.Supplier;
+import com.cmms.dao.MachineTypeDao;
+import com.cmms.model.MachineType;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,10 +14,10 @@ import org.hibernate.Query;
  *
  * @author thuyetlv
  */
-public class SupplierDaoHibernate extends GenericDaoHibernate<Supplier, Integer> implements SupplierDao {
+public class MachineTypeDaoHibernate extends GenericDaoHibernate<MachineType, Integer> implements MachineTypeDao {
 
-    public SupplierDaoHibernate() {
-        super(Supplier.class);
+    public MachineTypeDaoHibernate() {
+        super(MachineType.class);
     }
 
     @Override
@@ -31,8 +31,8 @@ public class SupplierDaoHibernate extends GenericDaoHibernate<Supplier, Integer>
             StringBuffer sbCount = new StringBuffer();
             sbCount.setLength(0);
 
-            sb.append("SELECT * FROM supplier WHERE 1=1 ");
-            sbCount.append("SELECT COUNT(id) FROM supplier WHERE 1=1 ");
+            sb.append("SELECT * FROM machine_type WHERE 1=1 ");
+            sbCount.append("SELECT COUNT(id) FROM machine_type WHERE 1=1 ");
             if (!StringUtils.isBlank(code)) {
                 sb.append(" AND code LIKE :code ");
                 sbCount.append(" AND code LIKE :code ");
@@ -62,7 +62,7 @@ public class SupplierDaoHibernate extends GenericDaoHibernate<Supplier, Integer>
             param.put("start", start);
             param.put("limit", limit);
             Query q = getSession().createSQLQuery(sb.toString())
-                    .addEntity(Supplier.class);
+                    .addEntity(MachineType.class);
             for (Map.Entry<String, Object> entrySet : param.entrySet()) {
                 String key = entrySet.getKey();
                 Object value = entrySet.getValue();
@@ -83,8 +83,8 @@ public class SupplierDaoHibernate extends GenericDaoHibernate<Supplier, Integer>
             if (list == null || list.isEmpty()) {
                 return 0;
             }
-            Query q = getSession().createSQLQuery("DELETE FROM supplier WHERE id in (:lstId)")
-                    .addEntity(Supplier.class)
+            Query q = getSession().createSQLQuery("DELETE FROM machine_type WHERE id in (:lstId)")
+                    .addEntity(MachineType.class)
                     .setParameterList("lstId", list);
             return q.executeUpdate();
         } catch (Exception ex) {
@@ -92,5 +92,4 @@ public class SupplierDaoHibernate extends GenericDaoHibernate<Supplier, Integer>
             return null;
         }
     }
-
 }

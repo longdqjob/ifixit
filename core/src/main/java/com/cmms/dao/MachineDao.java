@@ -12,5 +12,5 @@ import org.springframework.transaction.annotation.Transactional;
 public interface MachineDao extends GenericDao<Machine, Long> {
 
     @Transactional
-    Map getList(List<Integer> listParent, String code, String name, Integer start, Integer limit);
+    Map getList(List<Integer> listItemType,List<Integer> listCompany, String code, String name, Integer start, Integer limit);
 }

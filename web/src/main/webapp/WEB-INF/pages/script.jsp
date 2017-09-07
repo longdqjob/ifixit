@@ -1,5 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <script>
+    var maxSpecification = 40;
     Ext.onReady(function () {
 //        myMask = new Ext.LoadMask({
 //            msg: "Please wait...",

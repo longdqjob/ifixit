@@ -8,8 +8,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 @Entity
@@ -22,11 +28,14 @@ public class Company extends BaseObject implements Serializable {
     private String name;
     private String description;
     private Integer state;
-    private Integer parentId;
+//    private Integer parentId;
     private String parentName;
 
+    private Company company;
+    private List<Machine> machines = new ArrayList<Machine>(0);
+
     @Transient
-    @Column(name="parent_name")
+    @Column(name = "parent_name")
     public String getParentName() {
         return parentName;
     }
@@ -34,7 +43,6 @@ public class Company extends BaseObject implements Serializable {
     public void setParentName(String parentName) {
         this.parentName = parentName;
     }
-    
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -82,13 +90,38 @@ public class Company extends BaseObject implements Serializable {
         this.state = state;
     }
 
-    @Column(name = "parent_id")
-    public Integer getParentId() {
-        return parentId;
+//    @Column(name = "parent_id")
+//    public Integer getParentId() {
+//        return parentId;
+//    }
+//    public void setParentId(Integer parentId) {
+//        this.parentId = parentId;
+//    }
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "company")
+    public List<Machine> getMachines() {
+        return machines;
     }
 
-    public void setParentId(Integer parentId) {
-        this.parentId = parentId;
+    public void setMachines(List<Machine> machines) {
+        this.machines = machines;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    public Company getCompany() {
+        return company;
+    }
+
+    @Transient
+    public Integer getParentId() {
+        if (this.company == null) {
+            return null;
+        }
+        return this.company.getId();
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
     }
 
     @Override

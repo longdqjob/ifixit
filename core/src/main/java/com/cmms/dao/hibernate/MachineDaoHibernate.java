@@ -21,7 +21,7 @@ public class MachineDaoHibernate extends GenericDaoHibernate<Machine, Long> impl
     }
 
     @Override
-    public Map getList(List<Integer> listParent, String code, String name, Integer start, Integer limit) {
+    public Map getList(List<Integer> listParent, List<Integer> listCompany, String code, String name, Integer start, Integer limit) {
         try {
             Map result = new HashMap();
             HashMap<String, Object> param = new HashMap<>();
@@ -48,6 +48,11 @@ public class MachineDaoHibernate extends GenericDaoHibernate<Machine, Long> impl
                 sbCount.append("AND item_type_id IN (:item_type_id) ");
                 param.put("item_type_id", listParent);
             }
+            if (listCompany != null && !listCompany.isEmpty()) {
+                sb.append(" AND company_id IN (:company_id) ");
+                sbCount.append("AND company_id IN (:company_id) ");
+                param.put("company_id", listCompany);
+            }
 
             //Count
             Long count = 0L;
@@ -55,7 +60,7 @@ public class MachineDaoHibernate extends GenericDaoHibernate<Machine, Long> impl
             for (Map.Entry<String, Object> entrySet : param.entrySet()) {
                 String key = entrySet.getKey();
                 Object value = entrySet.getValue();
-                if (key.equals("item_type_id")) {
+                if (key.equals("item_type_id") || key.equals("company_id")) {
                     qCount.setParameterList(key, (List<Integer>) value);
                 } else {
                     qCount.setParameter(key, value);
@@ -75,7 +80,7 @@ public class MachineDaoHibernate extends GenericDaoHibernate<Machine, Long> impl
             for (Map.Entry<String, Object> entrySet : param.entrySet()) {
                 String key = entrySet.getKey();
                 Object value = entrySet.getValue();
-                if (key.equals("item_type_id")) {
+                if (key.equals("item_type_id") || key.equals("company_id")) {
                     q.setParameterList(key, (List<Integer>) value);
                 } else {
                     q.setParameter(key, value);

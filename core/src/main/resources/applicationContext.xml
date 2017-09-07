@@ -16,6 +16,7 @@
     <bean id="groupEngineerDao" class="com.cmms.dao.hibernate.GroupEngineerDaoHibernate"></bean>
     <bean id="itemTypeDao" class="com.cmms.dao.hibernate.ItemTypeDaoHibernate"></bean>
     <bean id="machineDao" class="com.cmms.dao.hibernate.MachineDaoHibernate"></bean>
+    <bean id="machineTypeDao" class="com.cmms.dao.hibernate.MachineTypeDaoHibernate"></bean>
     <bean id="supplierDao" class="com.cmms.dao.hibernate.SupplierDaoHibernate"></bean>
     <!-- Add new Managers here -->
 </beans>

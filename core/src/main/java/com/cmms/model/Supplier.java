@@ -16,22 +16,23 @@ import javax.persistence.Column;
 public class Supplier extends BaseObject implements Serializable {
 
     private static final long serialVersionUID = -1L;
-    private Long id;
+    private Integer id;
     private String code;
     private String name;
-    private String taxNo;
     private String contact;
     private String phone;
+    private String email;
+    private String address;
     private String city;
     private String country;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -53,13 +54,22 @@ public class Supplier extends BaseObject implements Serializable {
         this.name = name;
     }
 
-    @Column(name = "tax_no")
-    public String getTaxNo() {
-        return taxNo;
+    @Column(name = "email")
+    public String getEmail() {
+        return email;
     }
 
-    public void setTaxNo(String taxNo) {
-        this.taxNo = taxNo;
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    @Column(name = "address")
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     @Column(name = "contact")

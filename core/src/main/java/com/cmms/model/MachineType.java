@@ -10,29 +10,28 @@ import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 
 @Entity
-@Table(name = "machine")
-public class Machine extends BaseObject implements Serializable {
-
+@Table(name = "machine_type")
+public class MachineType extends BaseObject implements Serializable {
     private static final long serialVersionUID = -1L;
-    private Long id;
+    private Integer id;
     private String code;
     private String name;
     private String description;
-    private Integer parent;
-    private Integer itemTypeId;
-    private Company company;
+    private String specification;
+    private String note;
+
+//    private ItemType parent;
+//    private Set<ItemType> listChild = new HashSet<>(0);
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -63,32 +62,22 @@ public class Machine extends BaseObject implements Serializable {
         this.description = description;
     }
 
-    @Column(name = "parent")
-    public Integer getParent() {
-        return parent;
+    @Column(name = "specification")
+    public String getSpecification() {
+        return specification;
     }
 
-    public void setParent(Integer parent) {
-        this.parent = parent;
+    public void setSpecification(String specification) {
+        this.specification = specification;
     }
 
-    @Column(name = "item_type_id")
-    public Integer getItemTypeId() {
-        return itemTypeId;
+    @Column(name = "note")
+    public String getNote() {
+        return note;
     }
 
-    public void setItemTypeId(Integer itemTypeId) {
-        this.itemTypeId = itemTypeId;
-    }
-
-    @ManyToOne
-    @JoinColumn(name = "company_id", nullable = true)
-    public Company getCompany() {
-        return company;
-    }
-
-    public void setCompany(Company company) {
-        this.company = company;
+    public void setNote(String note) {
+        this.note = note;
     }
     
     
@@ -109,4 +98,30 @@ public class Machine extends BaseObject implements Serializable {
         return 0;
     }
 
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "PARENT_ID")
+//    public ItemType getParent() {
+//        return parent;
+//    }
+//
+//    @Transient
+//    public Integer getParentId() {
+//        if (this.parent == null) {
+//            return null;
+//        }
+//        return this.parent.getId();
+//    }
+//
+//    public void setParent(ItemType parent) {
+//        this.parent = parent;
+//    }
+//
+//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "parent")
+//    public Set<ItemType> getListChild() {
+//        return listChild;
+//    }
+//
+//    public void setListChild(Set<ItemType> listChild) {
+//        this.listChild = listChild;
+//    }
 }

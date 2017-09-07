@@ -19,6 +19,7 @@
         <mapping class="com.cmms.model.GroupEngineer"/>
         <mapping class="com.cmms.model.ItemType"/>
         <mapping class="com.cmms.model.Machine"/>
+        <mapping class="com.cmms.model.MachineType"/>
         <mapping class="com.cmms.model.Role"/>
         <mapping class="com.cmms.model.Supplier"/>
         <mapping class="com.cmms.model.User"/>

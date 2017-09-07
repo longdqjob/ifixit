@@ -20,11 +20,11 @@
     }
 </style>
 
-<jsp:include page="../../common/require.jsp" />
-<jsp:include page="../../script.jsp" />
-<jsp:include page="../../common/treeCompany.jsp" />
-<jsp:include page="js.jsp" />
-<jsp:include page="form.jsp" />
+<jsp:include page="../common/require.jsp" />
+<jsp:include page="../script.jsp" />
+<jsp:include page="../common/treeCompany.jsp" />
+<jsp:include page="functionJs.jsp" />
+<jsp:include page="formCompany.jsp" />
 <jsp:include page="navigation.jsp" />
 <jsp:include page="layout.jsp" />
 <jsp:include page="grid.jsp" />

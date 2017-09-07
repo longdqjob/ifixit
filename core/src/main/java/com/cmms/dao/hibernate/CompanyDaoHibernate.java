@@ -33,12 +33,19 @@ public class CompanyDaoHibernate extends GenericDaoHibernate<Company, Integer> i
     public List<Company> getListItem(Integer id) {
         try {
             List<Company> rtn = new LinkedList<>();
-            id = (id == null) ? 0 : id;
-            String hql = "SELECT * FROM company WHERE parent_id=:parent_id";
-            rtn = getSession().createSQLQuery(hql)
-                    .addEntity(Company.class)
-                    .setParameter("parent_id", id)
-                    .list();
+            String hql = "";
+            if (id == null || id == 0) {
+                hql = "SELECT * FROM company WHERE parent_id IS NULL";
+                rtn = getSession().createSQLQuery(hql)
+                        .addEntity(Company.class)
+                        .list();
+            } else {
+                hql = "SELECT * FROM company WHERE parent_id=:parent_id";
+                rtn = getSession().createSQLQuery(hql)
+                        .addEntity(Company.class)
+                        .setParameter("parent_id", id)
+                        .list();
+            }
             return rtn;
         } catch (Exception ex) {
             log.error("ERROR getListItem: ", ex);

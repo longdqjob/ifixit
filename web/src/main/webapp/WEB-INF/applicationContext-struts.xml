@@ -41,4 +41,18 @@
     <bean id="companyAction" class="com.cmms.webapp.action.CompanyAction" scope="prototype">
         <property name="companyDao" ref="companyDao"/>
     </bean>
+    
+    <bean id="machineAction" class="com.cmms.webapp.action.MachineAction" scope="prototype">
+        <property name="itemTypeDao" ref="itemTypeDao"/>
+        <property name="machineDao" ref="machineDao"/>
+        <property name="companyDao" ref="companyDao"/>
+    </bean>
+    
+    <bean id="supplierAction" class="com.cmms.webapp.action.SupplierAction" scope="prototype">
+        <property name="supplierDao" ref="supplierDao"/>
+    </bean>
+    
+    <bean id="machineTypeAction" class="com.cmms.webapp.action.MachineTypeAction" scope="prototype">
+        <property name="machineTypeDao" ref="machineTypeDao"/>
+    </bean>
 </beans>

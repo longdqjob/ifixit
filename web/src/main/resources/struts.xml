@@ -158,7 +158,19 @@
         <!--company-->
         <action name="company" class="companyAction" method="index">
             <interceptor-ref name="adminCheck"/>
-            <result name="success">/WEB-INF/pages/admin/company/index.jsp</result>
+            <result name="success">/WEB-INF/pages/company/index.jsp</result>
+        </action>
+        
+        <!--supplier-->
+        <action name="supplier" class="supplierAction" method="index">
+            <interceptor-ref name="adminCheck"/>
+            <result name="success">/WEB-INF/pages/supplier/index.jsp</result>
+        </action>
+        
+        <!--machineType-->
+        <action name="machineType" class="machineTypeAction" method="index">
+            <interceptor-ref name="adminCheck"/>
+            <result name="success">/WEB-INF/pages/machineType/index.jsp</result>
         </action>
         
     </package>
@@ -201,6 +213,53 @@
         <action name="deleteCompany" class="companyAction">
             <result type="stream">
                 <param name="inputName">deleteCompany</param>
+            </result>
+        </action>
+    </package>
+    
+    <!--supplierAction-->
+    <package name="supplier" extends="default" namespace="/supplier">
+        <action name="loadData" class="supplierAction">
+            <result type="stream">
+                <param name="inputName">loadData</param>
+            </result>
+        </action>
+        <action name="save" class="supplierAction">
+            <result type="stream">
+                <param name="inputName">save</param>
+            </result>
+        </action>
+        <action name="delete" class="supplierAction">
+            <result type="stream">
+                <param name="inputName">delete</param>
+            </result>
+        </action>
+    </package>
+    
+    <!--machineTypeAction-->
+    <package name="machineType" extends="default" namespace="/machineType">
+        <action name="loadData" class="machineTypeAction">
+            <result type="stream">
+                <param name="inputName">loadData</param>
+            </result>
+        </action>
+        <action name="save" class="machineTypeAction">
+            <result type="stream">
+                <param name="inputName">save</param>
+            </result>
+        </action>
+        <action name="delete" class="machineTypeAction">
+            <result type="stream">
+                <param name="inputName">delete</param>
+            </result>
+        </action>
+    </package>
+    
+    <!--machineAction-->
+    <package name="machine" extends="default" namespace="/machine">
+        <action name="loadData" class="machineAction">
+            <result type="stream">
+                <param name="inputName">loadData</param>
             </result>
         </action>
     </package>

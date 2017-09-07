@@ -1,6 +1,6 @@
 package com.cmms.dao;
 
-import com.cmms.model.Supplier;
+import com.cmms.model.MachineType;
 import java.util.List;
 import java.util.Map;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,7 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author thuyetlv
  */
-public interface SupplierDao extends GenericDao<Supplier, Integer> {
+public interface MachineTypeDao extends GenericDao<MachineType, Integer> {
+
     @Transactional
     Map getList(String code, String name, Integer start, Integer limit);
     

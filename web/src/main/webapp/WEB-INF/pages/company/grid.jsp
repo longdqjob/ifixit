@@ -42,11 +42,11 @@
 //-----------------------------------------Grid---------------------------------------------------------------
     var storeGrid = Ext.create('Ext.data.Store', {
         storeId: 'storeGrid',
-        fields: ['id', 'code', 'name', 'description', 'state', 'parent_id','parent_name'],
+        fields: ['id', 'code', 'name', 'description', 'itemTypeId', 'companyId','companyName'],
         pageSize: 20,
         proxy: {
             type: 'ajax',
-            url: '/company/getListCompany',
+            url: '/machine/loadData',
             reader: {
                 rootProperty: 'list',
                 type: 'json',
@@ -55,8 +55,7 @@
         },
     });
     var mygrid = Ext.create('Ext.grid.Panel', {
-        margin: '0 10 0 10',
-        title: '<fmt:message key="companyList"/>',
+        title: '<fmt:message key="machine.list"/>',
         id: 'gridId',
         store: storeGrid,
         autoWidth: true,
@@ -116,17 +115,16 @@
             },
             ////////////////ITEM   
             {text: 'ID', dataIndex: 'id', flex: 1, hidden: true},
-            {text: '<fmt:message key="companyFullCode"/>', dataIndex: 'code', flex: 1, },
-            {text: '<fmt:message key="companyName"/>', dataIndex: 'name', flex: 1, },
-            {text: '<fmt:message key="companyDescription"/>', dataIndex: 'description', flex: 1, editor: {
+            {text: '<fmt:message key="machine.code"/>', dataIndex: 'code', flex: 1, },
+            {text: '<fmt:message key="machine.name"/>', dataIndex: 'name', flex: 1, },
+            {text: '<fmt:message key="machine.description"/>', dataIndex: 'description', flex: 1, editor: {
                     completeOnEnter: false,
                     field: {
                         xtype: 'textfield',
                         allowBlank: false
                     }
                 }},
-            {text: 'parentId', dataIndex: 'parent_id', flex: 1, },
-            {text: '<fmt:message key="companyParent"/>', dataIndex: 'parent_name', flex: 1, },
+            {text: '<fmt:message key="machine.companyName"/>', dataIndex: 'companyName', flex: 1, },
         ],
         viewConfig: {
             autoFit: true,
@@ -143,7 +141,6 @@
         },
         dockedItems: [{
                 xtype: 'pagingtoolbar',
-                id: 'userpagingid',
                 dock: 'bottom',
                 //store: myStore,
                 displayInfo: true
@@ -199,7 +196,6 @@
     });
 
     var gridPanel = Ext.create('Ext.panel.Panel', {
-        margin: '0 10 0 0',
         autoScroll: true,
         layout: 'fit',
         items: [mygrid]
