@@ -101,19 +101,21 @@ insert  into `item_type`(`id`,`code`,`description`,`name`,`specification`,`paren
 DROP TABLE IF EXISTS `machine`;
 
 CREATE TABLE `machine` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL DEFAULT '0',
   `code` varchar(255) DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `item_type_id` int(11) DEFAULT NULL,
-  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
-  `parent` int(5) DEFAULT NULL,
+  `parent_id` int(5) DEFAULT NULL,
   `company_id` int(5) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=latin1;
+  `machine_type_id` int(5) DEFAULT NULL,
+  `specification` text CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+  `note` varchar(1024) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*Data for the table `machine` */
 
-insert  into `machine`(`id`,`code`,`description`,`item_type_id`,`name`,`parent`,`company_id`) values (1,'11a','a',4,'aa',NULL,NULL),(2,'22b','b',4,'bb',NULL,NULL),(3,'cc','cc',5,'cc',NULL,NULL),(4,'cc','cc',5,'cc',NULL,NULL),(5,'55b','b',4,'bb',NULL,NULL),(6,'66a','a',4,'aa',NULL,NULL),(7,'77a','a',4,'aa',NULL,NULL),(8,'88a','a',4,'aa',NULL,NULL),(9,'99a','a',4,'aa',NULL,NULL),(10,'1010a','a',4,'aa',NULL,NULL),(11,'1111a','a',4,'aa',NULL,NULL),(12,'1212a','a',4,'aa',NULL,NULL),(13,'1313a','a',4,'aa',NULL,NULL),(14,'1414a','a',4,'aa',NULL,NULL),(15,'1515a','a',4,'aa',NULL,NULL),(16,'1616a','a',4,'aa',NULL,NULL),(17,'1717a','a',4,'aa',NULL,NULL),(18,'1818a','a',4,'aa',NULL,NULL),(19,'1919a','a',4,'aa',NULL,NULL),(20,'2020a','a',4,'aa',NULL,NULL),(21,'21a','a',4,'aa',NULL,NULL),(22,'22a','a',4,'aa',NULL,NULL),(23,'23b','b',4,'bb',NULL,NULL),(24,'cc','cc',5,'cc',NULL,NULL),(25,'251a','a',4,'aa',NULL,NULL),(26,'261a','a',4,'aa',NULL,NULL),(27,'271a','a',4,'aa',NULL,NULL),(28,'281a','a',4,'aa',NULL,NULL),(29,'291a','a',4,'aa',NULL,NULL);
+insert  into `machine`(`id`,`code`,`name`,`description`,`item_type_id`,`parent_id`,`company_id`,`machine_type_id`,`specification`,`note`) values (1,'ROOT','ROOT','a',4,NULL,2,NULL,NULL,NULL),(2,'DT','Dien thoai','b',4,1,2,NULL,NULL,NULL),(3,'Box','Box','cc',5,1,2,NULL,NULL,NULL),(4,'DT.NAP','Nap DT','cc',5,2,2,NULL,NULL,NULL),(5,'DT.Pin','Pin','b',4,2,2,NULL,NULL,NULL),(30,'thuyetlvTEst','thuyetlvTEst','',NULL,5,3,2,'{\"01\":{\"label\":\"t\\u00e9t\",\"value\":\"tesst\"},\"02\":{\"label\":\"k\\u00edch th\\u01b0\\u1edbc\",\"value\":\"k\\u00edch th\\u01b0\\u1edbc\"}}','');
 
 /*Table structure for table `machine_type` */
 
