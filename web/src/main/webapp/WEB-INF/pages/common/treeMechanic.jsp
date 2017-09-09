@@ -1,12 +1,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <script>
-    var storeCompany = Ext.create('Ext.data.TreeStore', {
+    var storeMachine = Ext.create('Ext.data.TreeStore', {
         proxy: {
             type: 'ajax',
-            url: '/company/getTreeCompany'
+            url: '/machine/getTree'
         },
         root: {
-            text: '<fmt:message key="company"/>',
+            text: '<fmt:message key="machine"/>',
             id: '0',
             expanded: true
         },
@@ -15,37 +15,11 @@
         autoload: false
     });
 
-//    var storeCompany = Ext.create('Ext.data.TreeStore', {
-//        fields: [
-//            {name: 'id', type: 'int'},
-//            {name: 'parentId', type: 'int'},
-//            {name: 'code', type: 'string'},
-//            {name: 'name', type: 'string'},
-//            {name: 'state', type: 'int'},
-//            {name: 'description', type: 'string'},
-//        ],
-//        proxy: {
-//            type: 'ajax',
-//            url: '/company/getTreeCompany'
-//        },
-//        root: {
-//            text: '<fmt:message key="company"/>',
-//            id: '0',
-//            expanded: true
-//        },
-//        folderSort: true,
-//        sorters: [{
-//                property: 'name',
-//                direction: 'ASC'
-//            }],
-//    });
-
-
-    var companyTreeWindow = Ext.create('Ext.window.Window', {
+    var mechanicTreeWindow = Ext.create('Ext.window.Window', {
         closeAction: 'hide',
         closable: false,
-        title: '<fmt:message key="company"/>',
-        id: 'companyTreeWindow',
+        title: '<fmt:message key="machine"/>',
+        id: 'mechanicTreeWindow',
         autoEl: 'form',
         width: 500,
         constrainHeader: true,
@@ -58,12 +32,12 @@
             {
                 columnWidth: 1,
                 xtype: 'treepanel',
-                itemId: 'treeCompany',
-                id: 'treeCompany',
+                itemId: 'treeMechanic',
+                id: 'treeMechanic',
                 layout: 'fit',
                 height: 300,
-                name: 'treeCompany',
-                store: storeCompany,
+                name: 'treeMechanic',
+                store: storeMachine,
                 rootVisible: false,
                 useArrows: true,
                 columns: [{
@@ -75,8 +49,8 @@
                 ],
                 listeners: {
                     itemdblclick: function (tree, record, index) {
-                        chooseCompany(record);
-                        companyTreeWindow.hide();
+                        chooseMechanic(record);
+                        mechanicTreeWindow.hide();
                     }
                 }
             }
@@ -85,12 +59,12 @@
             show: function (window) {
                 var popUpMask = new Ext.LoadMask({
                     msg: "Please wait...",
-                    target: Ext.getCmp('companyTreeWindow')
+                    target: Ext.getCmp('mechanicTreeWindow')
                 });
                 popUpMask.show();
-                Ext.getCmp('treeCompany').getStore().getRootNode().removeAll();
-                Ext.getCmp('treeCompany').getStore().load();
-                Ext.getCmp('treeCompany').getStore().on('load', function (store, records, options) {
+                Ext.getCmp('treeMechanic').getStore().getRootNode().removeAll();
+                Ext.getCmp('treeMechanic').getStore().load();
+                Ext.getCmp('treeMechanic').getStore().on('load', function (store, records, options) {
                     popUpMask.hide();
                 });
             }
@@ -98,7 +72,7 @@
         buttons: [{
                 text: 'Cancel',
                 handler: function () {
-                    companyTreeWindow.hide();
+                    mechanicTreeWindow.hide();
                 }
             }]
     });

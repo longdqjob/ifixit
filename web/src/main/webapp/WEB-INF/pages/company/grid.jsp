@@ -42,7 +42,7 @@
 //-----------------------------------------Grid---------------------------------------------------------------
     var storeGrid = Ext.create('Ext.data.Store', {
         storeId: 'storeGrid',
-        fields: ['id', 'code', 'name', 'description', 'itemTypeId', 'companyId','companyName'],
+        fields: ['id', 'code', 'name', 'description', 'companyId', 'companyName', 'machineTypeId', 'machineTypeName', 'parentId', 'parentName', 'specification'],
         pageSize: 20,
         proxy: {
             type: 'ajax',
@@ -65,10 +65,6 @@
             selType: 'checkboxmodel',
             showHeaderCheckbox: true
         },
-//        selModel: {
-//            selType: 'rowmodel', // rowmodel is the default selection model
-//            mode: 'MULTI' // Allows selection of multiple rows
-//        },
         columns: [
             Ext.create('Ext.grid.RowNumberer', {
                 text: 'No.',
@@ -108,7 +104,7 @@
                         tooltip: '<fmt:message key="editItem"/>',
                         handler: function (grid, rowIndex, colIndex) {
                             var rec = grid.getStore().getAt(rowIndex);
-                            editCompany(rec);
+                            editMechanic(rec);
                         }
                     },
                 ],
@@ -153,7 +149,7 @@
                         text: '<fmt:message key="add"/>',
                         listeners: {
                             click: function (el) {
-                                addCompany(null);
+                                addMechanic(null);
                             }
                         }//end of listeners
                     }, {
@@ -200,11 +196,4 @@
         layout: 'fit',
         items: [mygrid]
     });
-
-    function loadMachine(id) {
-        mygrid.getStore().getProxy().extraParams = {
-            id: id,
-        };
-        mygrid.getStore().loadPage(1);
-    }
 </script>

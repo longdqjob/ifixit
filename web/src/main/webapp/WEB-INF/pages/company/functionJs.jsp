@@ -1,6 +1,23 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <script>
+    var selectedSystem;
+
+    function updateLayOut() {
+        Ext.getCmp("searchform").updateLayout();
+        Ext.getCmp('gridId').setHeight(Ext.getCmp("viewport").getHeight() - Ext.getCmp("searchform").getHeight() - 110);
+        Ext.getCmp("gridId").updateLayout();
+    }
+
+    function loadMachine() {
+        mygrid.getStore().getProxy().extraParams = {
+            system: selectedSystem,
+            code: searchCode.getValue(),
+            name: searchName.getValue(),
+        };
+        mygrid.getStore().loadPage(1);
+    }
+
     function resetForm(callback) {
         mask();
         Ext.Ajax.request({
@@ -15,11 +32,12 @@
                 }
             },
             failure: function (response, opts) {
-                alertError("System Error!");
+                alertSystemError();
                 unmask();
             },
         });
     }
+
     function addCompany(data) {
 //        resetForm(function () {
 //            companyForm.reset();
@@ -60,7 +78,7 @@
         showMask.show();
         Ext.Ajax.request({
             url: '/company/deleteCompany?' + arrayList,
-            method: "GET",
+            method: "POST",
             timeout: 10000,
             success: function (result, request) {
                 showMask.hide();
@@ -92,14 +110,6 @@
             companyParentName.setActiveError("This field is required!");
             companyTreeWindow.show();
             return false;
-
-//            var recFound = companyParentStore.findExact("id", companyParent.getValue());
-//            if (recFound < 0) {
-//                companyParent.reset();
-//                companyParent.setActiveError("This field is required!");
-//                companyParent.focus();
-//                return false;
-//            }
         }
 
         mask();
@@ -118,10 +128,6 @@
                 var res = JSON.parse(response.responseText);
                 if ("true" == res.success || true === res.success) {
                     companyWindow.hide();
-//                    var scrollPosition = serverGridForm.getEl().down('.x-grid-view').getScroll();
-//                    alertSuccess(res.message);
-//                    searchServer();
-//                    serverGridForm.getView().getEl().scrollTo('Top', scrollPosition.top, true);
                 } else {
                     alertError(res.message);
                 }
@@ -131,5 +137,12 @@
                 unmask();
             },
         });
+    }
+
+    function chooseCompany(record) {
+        Ext.getCmp('companyParentName').setValue(record.get('name'));
+        Ext.getCmp('companyParentId').setValue(record.get('id'));
+        Ext.getCmp('systemName').setValue(record.get('name'));
+        Ext.getCmp('systemId').setValue(record.get('id'));
     }
 </script>

@@ -46,6 +46,7 @@
         <property name="itemTypeDao" ref="itemTypeDao"/>
         <property name="machineDao" ref="machineDao"/>
         <property name="companyDao" ref="companyDao"/>
+        <property name="machineTypeDao" ref="machineTypeDao"/>
     </bean>
     
     <bean id="supplierAction" class="com.cmms.webapp.action.SupplierAction" scope="prototype">

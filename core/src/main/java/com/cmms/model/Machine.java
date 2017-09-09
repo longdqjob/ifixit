@@ -10,8 +10,11 @@ import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
+import org.springframework.transaction.annotation.Transactional;
 
 @Entity
 @Table(name = "machine")
@@ -22,9 +25,12 @@ public class Machine extends BaseObject implements Serializable {
     private String code;
     private String name;
     private String description;
-    private Integer parent;
+    private String specification;
+    private String note;
+    private Machine parent;
     private Integer itemTypeId;
     private Company company;
+    private MachineType machineType;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -63,12 +69,30 @@ public class Machine extends BaseObject implements Serializable {
         this.description = description;
     }
 
-    @Column(name = "parent")
-    public Integer getParent() {
+//    @Transactional
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id", nullable = true)
+    public Machine getParent() {
         return parent;
     }
 
-    public void setParent(Integer parent) {
+    @Transient
+    public Integer getParentId() {
+        if (this.company == null) {
+            return null;
+        }
+        return this.company.getId();
+    }
+
+    @Transient
+    public String getParentName() {
+        if (this.company == null) {
+            return "";
+        }
+        return this.company.getName();
+    }
+
+    public void setParent(Machine parent) {
         this.parent = parent;
     }
 
@@ -81,8 +105,10 @@ public class Machine extends BaseObject implements Serializable {
         this.itemTypeId = itemTypeId;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "company_id", nullable = true)
+    
+//    @Transactional
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
     public Company getCompany() {
         return company;
     }
@@ -90,8 +116,35 @@ public class Machine extends BaseObject implements Serializable {
     public void setCompany(Company company) {
         this.company = company;
     }
-    
-    
+
+    @Column(name = "specification")
+    public String getSpecification() {
+        return specification;
+    }
+
+    public void setSpecification(String specification) {
+        this.specification = specification;
+    }
+
+    @Column(name = "note")
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+//    @Transactional
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "machine_type_id")
+    public MachineType getMachineType() {
+        return machineType;
+    }
+
+    public void setMachineType(MachineType machineType) {
+        this.machineType = machineType;
+    }
 
     @Override
     public String toString() {

@@ -11,7 +11,7 @@
         addForm.reset();
         addWindow.setTitle('<fmt:message key="machineType.add"/>');
         addWindow.show();
-        Ext.getCmp("tabSpecification").setActiveTab(Ext.getCmp("specification1"));        
+        Ext.getCmp("tabSpecification").setActiveTab(Ext.getCmp("specification1"));
         machineTypeCode.focus();
     }
 

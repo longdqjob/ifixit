@@ -108,7 +108,8 @@
                 var menu_grid = new Ext.menu.Menu({items: [{
                             text: '<fmt:message key="loadData"/>',
                             handler: function () {
-                                loadMachine(record.get("id"));
+                                selectedSystem = record.get("id");
+                                loadMachine();
                                 console.log("Load data " + record.get("id") + " - " + record.get("name"));
                             }}, {
                             text: '<fmt:message key="addCompany"/>',
@@ -139,10 +140,5 @@
     });
 
 
-    function loadMachine(id) {
-        mygrid.getStore().getProxy().extraParams = {
-            id: id,
-        };
-        mygrid.getStore().loadPage(1);
-    }
+    
 </script>

@@ -19,8 +19,8 @@ import java.util.Locale;
 public class LocaleFilter extends OncePerRequestFilter {
 
     /**
-     * This method looks for a "locale" request parameter. If it finds one, it sets it as the preferred locale
-     * and also configures it to work with JSTL.
+     * This method looks for a "locale" request parameter. If it finds one, it
+     * sets it as the preferred locale and also configures it to work with JSTL.
      *
      * @param request the current request
      * @param response the current response
@@ -30,7 +30,7 @@ public class LocaleFilter extends OncePerRequestFilter {
      */
     @SuppressWarnings("unchecked")
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                 FilterChain chain)
+            FilterChain chain)
             throws IOException, ServletException {
 
         String locale = request.getParameter("locale");
@@ -63,7 +63,12 @@ public class LocaleFilter extends OncePerRequestFilter {
             }
         }
 
-        chain.doFilter(request, response);
+        try {
+
+            chain.doFilter(request, response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
         // Reset thread-bound LocaleContext.
         LocaleContextHolder.setLocaleContext(null);

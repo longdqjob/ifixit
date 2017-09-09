@@ -1,26 +1,70 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <script>
+    Ext.override(Ext.LoadMask, {
+        onComponentAdded: function (owner) {
+            var me = this;
+            delete me.activeOwner;
+            me.floatParent = owner;
+            if (!owner.floating) {
+                owner = owner.up('[floating]');
+            }
+            if (owner) {
+                me.activeOwner = owner;
+                me.mon(owner, 'move', me.sizeMask, me);
+            } else {
+                me.preventBringToFront = true;
+            }
+            owner = me.floatParent.ownerCt;
+            if (me.rendered && me.isVisible() && owner) {
+                me.floatOwner = owner;
+                me.mon(owner, 'afterlayout', me.sizeMask, me, {single: true});
+            }
+        }
+    });
+
     var maxSpecification = 40;
     Ext.onReady(function () {
-//        myMask = new Ext.LoadMask({
-//            msg: "Please wait...",
-//            target: Ext.getBody()
+        //        myMask = new Ext.LoadMask({
+        //            msg: "Please wait...",
+        //            target: Ext.getBody()
 //        });
 
 //        var myPanel = new Ext.panel.Panel({
-//            renderTo: document.body,
-//            height: 100,
+        //            renderTo: document.body,
+        //            height: 100,
 //            width: 200,
-//            title: 'Foo'
+        //            title: 'Foo'
 //        });
 //
-//        var myMask = new Ext.LoadMask({
-//            msg: 'Please wait...',
-//            target: myPanel
+        //        var myMask = new Ext.LoadMask({
+        //            msg: 'Please wait...',
+        //            target: myPanel
 //        });
-//
-//        myMask.show();
+        // //        myMask.show();
     });
+
+    var showMask;
+    function maskTarget(target, message) {
+        if (message) {
+            howMask = new Ext.LoadMask({
+                msg: message,
+                target: target
+            });
+        } else {
+            showMask = new Ext.LoadMask({
+                msg: '<fmt:message key="loading"/>',
+                target: target
+            });
+        }
+        showMask.show();
+    }
+
+    function unMaskTarget() {
+        if (showMask) {
+            showMask.hide();
+        }
+    }
+
 
     function mask(message) {
         if (message) {
@@ -35,11 +79,9 @@
 
     function trimTextInForm(form) {
         Ext.ComponentQuery.query('[xtype=textfield]', form).forEach(function (entry) {
-            entry.addListener({
-                blur: function () {
+            entry.addListener({blur: function () {
                     this.setValue(this.getValue().trim());
-                }
-            });
+                }});
         });
     }
 
@@ -64,10 +106,8 @@
     function alertInfo(msgr) {
         var messagebox = Ext.MessageBox.show({
             title: 'Information',
-            msg: msgr,
-            buttons: Ext.MessageBox.OK,
-            icon: Ext.Msg.INFO
-        });
+            msg: msgr, buttons: Ext.MessageBox.OK,
+            icon: Ext.Msg.INFO});
 
         Ext.Function.defer(function () {
             messagebox.zIndexManager.bringToFront(messagebox);
@@ -76,8 +116,7 @@
     }
     function alertSuccess(msgr) {
         var messagebox = Ext.MessageBox.show({
-            title: 'Success',
-            msg: msgr,
+            title: 'Success', msg: msgr,
             buttons: Ext.MessageBox.OK,
             icon: 'success-icon',
         });

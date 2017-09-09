@@ -20,6 +20,7 @@
                 <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
                 <!-- Hibernate Search index directory -->
                 <prop key="hibernate.search.default.indexBase">${app.search.index.basedir}</prop>
+                <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
             </props>
             <!-- Turn batching off for better error messages under PostgreSQL -->
             <!-- hibernate.jdbc.batch_size=0 -->

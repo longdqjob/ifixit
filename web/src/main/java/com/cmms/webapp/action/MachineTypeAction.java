@@ -65,7 +65,7 @@ public class MachineTypeAction extends BaseAction implements Preparable {
             return null;
         }
     }
-    
+
     public InputStream getSave() {
         try {
             JSONObject result = new JSONObject();
@@ -141,6 +141,24 @@ public class MachineTypeAction extends BaseAction implements Preparable {
             return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
         } catch (Exception ex) {
             log.error("ERROR getDelete: ", ex);
+            return null;
+        }
+    }
+
+    public InputStream getGetInfo() {
+        try {
+            JSONObject result = new JSONObject();
+            String idReq = getRequest().getParameter("id");
+            MachineType machineType = machineTypeDao.get(Integer.parseInt(idReq));
+            if (machineType != null) {
+                result.put("success", true);
+                result.put("info", WebUtil.toJSONObject(machineType, ""));
+            } else {
+                result.put("success", true);
+            }
+            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+        } catch (Exception ex) {
+            log.error("ERROR getGetInfo: ", ex);
             return null;
         }
     }

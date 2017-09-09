@@ -253,13 +253,33 @@
                 <param name="inputName">delete</param>
             </result>
         </action>
+        <action name="getInfo" class="machineTypeAction">
+            <result type="stream">
+                <param name="inputName">getInfo</param>
+            </result>
+        </action>
     </package>
     
     <!--machineAction-->
     <package name="machine" extends="default" namespace="/machine">
+        <action name="getTree" class="machineAction">
+            <result type="stream">
+                <param name="inputName">tree</param>
+            </result>
+        </action>
         <action name="loadData" class="machineAction">
             <result type="stream">
                 <param name="inputName">loadData</param>
+            </result>
+        </action>
+        <action name="save" class="machineAction">
+            <result type="stream">
+                <param name="inputName">save</param>
+            </result>
+        </action>
+        <action name="delete" class="machineAction">
+            <result type="stream">
+                <param name="inputName">delete</param>
             </result>
         </action>
     </package>
