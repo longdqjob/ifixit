@@ -7,7 +7,7 @@
         ],
         proxy: {
             type: 'ajax',
-            url: '/itemType/getListItem'
+            url: '../itemType/getListItem'
         },
         root: {
             text: '<fmt:message key="itemType"/>',
@@ -141,7 +141,7 @@
         mygrid.getStore().loadPage(1);
         
 //        Ext.Ajax.request({
-//            url: '/itemType/loadData',
+//            url: '../itemType/loadData',
 //            method: "POST",
 //            params: {
 //                id: id,

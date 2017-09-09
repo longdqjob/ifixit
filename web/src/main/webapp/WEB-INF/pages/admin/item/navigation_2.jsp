@@ -6,7 +6,7 @@
         ],
         proxy: {
             type: 'ajax',
-            url: '/admin/getListItem'
+            url: '../admin/getListItem'
         },
         root: {
             text: 'Item Type',

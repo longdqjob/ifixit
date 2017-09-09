@@ -47,7 +47,7 @@
         autoLoad: true,
         proxy: {
             type: 'ajax',
-            url: '/supplier/loadData',
+            url: '../supplier/loadData',
             reader: {
                 rootProperty: 'list',
                 type: 'json',

@@ -13,7 +13,7 @@
         pageSize: 20,
 //        proxy: {
 //            type: 'ajax',
-//            url: '/machine/loadData',
+//            url: '../machine/loadData',
 //            reader: {
 //                rootProperty: 'list',
 //                type: 'json',

@@ -36,7 +36,7 @@
         });
         showMask.show();
         Ext.Ajax.request({
-            url: '/machineType/delete?' + arrayList,
+            url: '../machineType/delete?' + arrayList,
             method: "GET",
             timeout: 10000,
             success: function (result, request) {

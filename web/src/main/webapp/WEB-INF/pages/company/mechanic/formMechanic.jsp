@@ -16,7 +16,7 @@
     var mechanicTypeName = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         grow: true,
-        tabIndex: 1,
+        tabIndex: -1,
         fieldLabel: '<fmt:message key="machine.type"/>',
         name: 'parentName',
         id: "mechanicTypeName",
@@ -26,6 +26,13 @@
         margin: '10 10 10 10',
         width: 250,
         readOnly: true,
+        listeners: {
+            'render': function (cmp) {
+                this.getEl().on('click', function () {
+                    mechanicTypeWindow.show();
+                });
+            }
+        }
     });
 
     var mechanicType = Ext.create('Ext.form.FieldContainer', {
@@ -47,14 +54,14 @@
     var mechanicTypeCode = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         grow: true,
-        tabIndex: 3,
+        tabIndex: -1,
         fieldLabel: '<fmt:message key="machine.machineType.code"/>',
         id: "mechanicTypeCode",
         labelAlign: 'left',
         anchor: '100%',
         allowBlank: false,
         margin: '10 10 10 10',
-        width: 350,
+        width: 250,
         maxLength: 50,
         readOnly: true,
     });
@@ -71,8 +78,24 @@
         anchor: '100%',
         allowBlank: false,
         margin: '10 10 10 10',
-        width: 350,
+        width: 200,
         maxLength: 50,
+        listeners: {
+            'change': function (textfield, newValue, oldValue) {
+                changeCode(oldValue, newValue);
+            }
+        }
+    });
+
+    var mechanicCodeCtn = Ext.create('Ext.form.FieldContainer', {
+        xtype: 'fieldcontainer',
+        columnWidth: 1,
+        layout: 'column',
+        items: [mechanicCode, {
+                xtype: 'label',
+                id: 'mechanicFullCode',
+                margin: '15 10 10 10',
+            }]
     });
 
     var mechanicName = Ext.create('Ext.form.field.Text', {
@@ -82,21 +105,6 @@
         fieldLabel: '<fmt:message key="machine.name"/>',
         name: 'name',
         id: "mechanicName",
-        labelAlign: 'left',
-        anchor: '100%',
-        allowBlank: false,
-        margin: '10 10 10 10',
-        width: 350,
-        maxLength: 50,
-    });
-
-
-    var mechanicFullCode = Ext.create('Ext.form.field.Text', {
-        xtype: 'textfield',
-        grow: true,
-        fieldLabel: '<fmt:message key="companyFullCode"/>',
-        name: 'fullCode',
-        id: "mechanicFullCode",
         labelAlign: 'left',
         anchor: '100%',
         allowBlank: false,
@@ -123,6 +131,13 @@
         margin: '10 10 10 10',
         width: 250,
         readOnly: true,
+        listeners: {
+            'render': function (cmp) {
+                this.getEl().on('click', function () {
+                    mechanicTreeWindow.show();
+                });
+            }
+        }
     });
 
     var father = Ext.create('Ext.form.FieldContainer', {
@@ -159,6 +174,13 @@
         margin: '10 10 10 10',
         width: 250,
         readOnly: true,
+        listeners: {
+            'render': function (cmp) {
+                this.getEl().on('click', function () {
+                    companyTreeWindow.show();
+                });
+            }
+        }
     });
 
     var systemContainer = Ext.create('Ext.form.FieldContainer', {
@@ -438,12 +460,12 @@
                         xtype: 'container',
                         columnWidth: 0.5,
                         layout: 'anchor',
-                        items: [mechanicId, mechanicType, mechanicCode]
+                        items: [mechanicId, mechanicType, mechanicName]
                     }, {
                         xtype: 'container',
                         columnWidth: 0.5,
                         layout: 'anchor',
-                        items: [mechanicTypeCode, mechanicName]
+                        items: [mechanicTypeCode, mechanicCodeCtn]
                     }, {
                         xtype: 'container',
                         columnWidth: 1,
@@ -455,6 +477,8 @@
             }
         ]
     });
+
+
 
 
     var mechanicWindow = Ext.create('Ext.window.Window', {

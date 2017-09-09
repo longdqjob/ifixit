@@ -77,7 +77,7 @@
         });
         showMask.show();
         Ext.Ajax.request({
-            url: '/company/deleteCompany?' + arrayList,
+            url: '../company/deleteCompany?' + arrayList,
             method: "POST",
             timeout: 10000,
             success: function (result, request) {

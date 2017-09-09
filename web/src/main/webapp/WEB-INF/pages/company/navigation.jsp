@@ -11,7 +11,7 @@
         ],
         proxy: {
             type: 'ajax',
-            url: '/company/getTreeCompany'
+            url: '../company/getTreeCompany'
         },
         root: {
             text: '<fmt:message key="company"/>',

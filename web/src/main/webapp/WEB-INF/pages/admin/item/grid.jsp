@@ -45,7 +45,7 @@
         pageSize: 20,
         proxy: {
             type: 'ajax',
-            url: '/itemType/loadData',
+            url: '../itemType/loadData',
             reader: {
                 rootProperty: 'list',
                 type: 'json',

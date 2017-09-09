@@ -143,9 +143,11 @@ public class MachineAction extends BaseAction implements Preparable {
                 if (machineType != null) {
                     tmp.put("machineTypeId", machineType.getId());
                     tmp.put("machineTypeName", machineType.getName());
+                    tmp.put("machineTypeCode", machineType.getCode());
                 } else {
                     tmp.put("machineTypeId", "");
                     tmp.put("machineTypeName", "");
+                    tmp.put("machineTypeCode", "");
                 }
                 parent = machine.getParent();
                 if (parent != null) {
@@ -155,19 +157,11 @@ public class MachineAction extends BaseAction implements Preparable {
                     tmp.put("parentId", "");
                     tmp.put("parentName", "");
                 }
-                log.info("----------companyName: " + tmp.getString("companyName"));
-                log.info("----------machineTypeName: " + tmp.getString("machineTypeName"));
-                log.info("----------parentName: " + tmp.getString("parentName"));
                 jSONArray.put(tmp);
             }
 
-            Machine test = machineDao.get(30L);
-            log.info("----------test getId: " + test.getCompany().getId());
-            log.info("----------test getName: " + test.getCompany().getName());
             result.put("list", jSONArray);
             result.put("totalCount", count);
-
-            log.info("---------------result: " + result.toString());
             return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
         } catch (Exception ex) {
             log.error("ERROR getLoadData: ", ex);

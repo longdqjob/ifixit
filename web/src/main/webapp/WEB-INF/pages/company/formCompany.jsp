@@ -54,7 +54,7 @@
 //        remoteSort: true,
 //        proxy: {
 //            type: 'ajax',
-//            url: '/company/getListCompany',
+//            url: '../company/getListCompany',
 //            reader: {
 //                rootProperty: 'list',
 //                type: 'json',

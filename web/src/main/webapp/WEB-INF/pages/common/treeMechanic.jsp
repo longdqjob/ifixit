@@ -3,7 +3,7 @@
     var storeMachine = Ext.create('Ext.data.TreeStore', {
         proxy: {
             type: 'ajax',
-            url: '/machine/getTree'
+            url: '../machine/getTree'
         },
         root: {
             text: '<fmt:message key="machine"/>',

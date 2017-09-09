@@ -1,6 +1,14 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <script>
+    function changeCode(oldValue, newValue) {
+        if (mechanicTypeCode.getValue() != "") {
+            Ext.getCmp("mechanicFullCode").setText('<fmt:message key="machine.fullCode"/>: ' + mechanicTypeCode.getValue() + "-" + newValue);
+        } else {
+            Ext.getCmp("mechanicFullCode").setText('<fmt:message key="machine.fullCode"/>: ' + newValue);
+        }
+
+    }
     //--------------------------------Mechanic----------------------------------
     function addMechanic(data) {
         resetLabelSpec();
@@ -8,7 +16,7 @@
         mechanicWindow.setTitle('<fmt:message key="machine.add"/>');
         mechanicWindow.show();
         gridHis.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
-        mechanicTypeName.focus();
+        mechanicName.focus();
     }
 
     function editMechanic(data) {
@@ -17,6 +25,7 @@
         mechanicId.setValue(data.get("id"));
         mechanicTypeId.setValue(data.get("machineTypeId"));
         mechanicTypeName.setValue(data.get("machineTypeName"));
+        mechanicTypeCode.setValue(data.get("machineTypeCode"));
         mechanicCode.setValue(data.get("code"));
         mechanicName.setValue(data.get("name"));
         fatherId.setValue(data.get("parentId"));
@@ -27,7 +36,7 @@
         mechanicWindow.setTitle('<fmt:message key="machine.edit"/>');
         mechanicWindow.show();
         gridHis.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
-        mechanicTypeName.focus();
+        mechanicName.focus();
     }
 
     function getMechanicType(id) {
@@ -163,6 +172,7 @@
         Ext.getCmp('mechanicTypeName').setValue(record.get('name'));
         Ext.getCmp('mechanicTypeId').setValue(record.get('id'));
         Ext.getCmp('mechanicTypeCode').setValue(record.get('code'));
+        changeCode("", mechanicCode.getValue());
         fillSpecific(record.get('specification'));
         unMaskTarget();
     }
