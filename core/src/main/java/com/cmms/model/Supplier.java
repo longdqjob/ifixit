@@ -12,7 +12,7 @@ import java.util.Objects;
 import javax.persistence.Column;
 
 @Entity
-@Table(name = "SUPPLIER")
+@Table(name = "supplier")
 public class Supplier extends BaseObject implements Serializable {
 
     private static final long serialVersionUID = -1L;

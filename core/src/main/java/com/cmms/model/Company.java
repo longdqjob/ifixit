@@ -19,7 +19,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 @Entity
-@Table(name = "COMPANY")
+@Table(name = "company")
 public class Company extends BaseObject implements Serializable {
 
     private static final long serialVersionUID = -1L;
@@ -54,7 +54,7 @@ public class Company extends BaseObject implements Serializable {
         this.id = id;
     }
 
-    @Column(name = "CODE")
+    @Column(name = "code")
     public String getCode() {
         return code;
     }
@@ -63,7 +63,7 @@ public class Company extends BaseObject implements Serializable {
         this.code = code;
     }
 
-    @Column(name = "NAME")
+    @Column(name = "name")
     public String getName() {
         return name;
     }
