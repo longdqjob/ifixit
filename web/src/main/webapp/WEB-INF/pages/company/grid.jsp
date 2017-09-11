@@ -86,6 +86,14 @@
                 width: 100,
                 items: [
                     {
+                        icon: '../images/edit.png',
+                        tooltip: '<fmt:message key="editItem"/>',
+                        handler: function (grid, rowIndex, colIndex) {
+                            var rec = grid.getStore().getAt(rowIndex);
+                            editMechanic(rec);
+                        }
+                    },
+                    {
                         icon: '../images/delete.png',
                         tooltip: '<fmt:message key="deleteItem"/>',
                         handler: function (grid, rowIndex, colIndex) {
@@ -97,14 +105,6 @@
                                     deleteCompany(param);
                                 }
                             });
-                        }
-                    },
-                    {
-                        icon: '../images/edit.png',
-                        tooltip: '<fmt:message key="editItem"/>',
-                        handler: function (grid, rowIndex, colIndex) {
-                            var rec = grid.getStore().getAt(rowIndex);
-                            editMechanic(rec);
                         }
                     },
                 ],

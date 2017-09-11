@@ -2,23 +2,10 @@
 
 <head>
     <title><fmt:message key="company.title"/></title>
-    <meta name="menu" content="AdminMenu"/>
+    <meta name="menu" content="SystemMenu"/>
 </head>
 
-<style type="text/css">
-    p {
-        margin:5px;
-    }
-    .settings {
-        background-image:url(../images/folder_wrench.png);
-    }
-    .navpn {
-        background-image:url(../images/folder_go.png);
-    }
-    .info {
-        background-image:url(../images/information.png);
-    }
-</style>
+
 
 <jsp:include page="../common/require.jsp" />
 <jsp:include page="../script.jsp" />
@@ -42,7 +29,6 @@
     <div id="props-panel" class="x-hide-display" style="width:200px;height:200px;overflow:hidden;">
     </div>
     <div id="south" class="x-hide-display">
-        <p>south - generally for informational stuff, also could be for status bar</p>
     </div>
 </body>
 

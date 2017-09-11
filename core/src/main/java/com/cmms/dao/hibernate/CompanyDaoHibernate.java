@@ -67,7 +67,7 @@ public class CompanyDaoHibernate extends GenericDaoHibernate<Company, Integer> i
         obj.put("state", currentGroup.getState());
         obj.put("leaf", false);
         obj.put("expand", true);
-        obj.put("iconCls", "folder");
+        //obj.put("iconCls", "folder");
 //        obj.put("iconCls", "task-folder");
         obj.put("id", currentGroup.getId());
 //        obj.put("children", children);

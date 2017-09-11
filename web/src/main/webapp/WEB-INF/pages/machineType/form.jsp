@@ -195,6 +195,7 @@
 
     var addWindow = Ext.create('Ext.window.Window', {
         closeAction: 'hide',
+        iconCls: 'add-cls',
         id: 'addWindow',
         autoEl: 'form',
         width: '60%',

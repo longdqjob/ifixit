@@ -302,3 +302,35 @@ span.pagelinks {
     background-image: url(/images/delete.png);
     background-repeat: no-repeat;
 }
+.edit-cls {
+    background-image: url(/images/edit.png);
+    background-repeat: no-repeat;
+}
+p {
+    margin:5px;
+}
+.settings {
+    background-image:url(../images/folder_wrench.png);
+}
+.navpn {
+    background-image:url(../images/folder_go.png);
+}
+.info {
+    background-image:url(../images/information.png);
+}
+.refresh {
+    padding-top: 2px;
+    background-image:url(../images/refrehs16.png);
+}
+/*Phan cach Icon giua cac action column*/
+.x-action-col-icon {
+    height: 16px;
+    width: 16px;
+    margin-right: 12px;
+}
+/*.a:hover{
+    text-decoration: none;
+}
+span:hover{
+    text-decoration: none !important;
+}*/

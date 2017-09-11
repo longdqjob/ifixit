@@ -70,8 +70,8 @@
         resizable: false,
         header: false,
         collapsible: true,
-        useArrows: true,
-        rootVisible: false,
+        useArrows: false,
+        rootVisible: true,
         lines: true,
         multiSelect: true,
         border: true,
@@ -108,28 +108,30 @@
             },
             itemcontextmenu: function (tree, record, item, index, e, eOpts) {
                 // Optimize : create menu once
-                var menu_grid = new Ext.menu.Menu({items: [{
+                var menu_grid = new Ext.menu.Menu({
+                    border: true,
+                    items: [{
                             text: '<fmt:message key="loadData"/>',
+                            iconCls: "refresh",
                             handler: function () {
                                 selectedSystem = record.get("id");
                                 loadMachine(selectedSystem);
                                 console.log("Load data " + record.get("id") + " - " + record.get("name"));
                             }}, {
                             text: '<fmt:message key="addCompany"/>',
+                            iconCls: "add-cls",
                             handler: function () {
                                 console.log("addCompany: " + record.get("id") + " - " + record.get("name"));
                                 addCompany(record);
                             }}, {
                             text: '<fmt:message key="editCompany"/>',
+                            iconCls: "edit-cls",
                             handler: function () {
                                 console.log("editCompany: " + record.get("id") + " - " + record.get("name"));
                                 editCompany(record);
                             }}, {
-                            text: '<fmt:message key="moreDetail"/>',
-                            handler: function () {
-                                console.log("Moreils: " + record.get("id") + " - " + record.get("name"));
-                            }}, {
                             text: '<fmt:message key="delete"/>',
+                            iconCls: "delete-cls",
                             handler: function () {
                                 console.log("Delete " + record.get("id") + " - " + record.get("name"));
                             }}]

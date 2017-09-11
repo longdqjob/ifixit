@@ -48,6 +48,7 @@
         id: 'companyTreeWindow',
         autoEl: 'form',
         width: 500,
+        minHeigh:400,
         constrainHeader: true,
         layout: 'anchor',
         modal: true,
@@ -61,14 +62,15 @@
                 itemId: 'treeCompany',
                 id: 'treeCompany',
                 layout: 'fit',
-                height: 300,
+                //height: 300,
                 name: 'treeCompany',
                 store: storeCompany,
-                rootVisible: false,
-                useArrows: true,
+                rootVisible: true,
+                useArrows: false,
+                lines: true,
                 columns: [{
                         xtype: 'treecolumn', //this is so we know which column will show the tree
-                        width: 345,
+                        width: 350,
                         sortable: true,
                         dataIndex: 'name',
                     }

@@ -17,34 +17,38 @@
         var viewport = Ext.create('Ext.Viewport', {
             id: 'viewport',
             layout: 'border',
-            padding: '55 0 50 0',
+            padding: '50 0 0 0',
             items: [{
+                    xtype: 'panel',
                     region: 'west',
                     id: "westSide",
                     stateId: 'navigation-panel',
-                    title: 'West',
+                   // title: 'System',
                     split: true,
-                    width: 200,
-                    minWidth: 175,
-                    maxWidth: 400,
+                    width: 350,
+                    minWidth: 350,
+                    maxWidth: 350,
                     collapsible: true,
                     animCollapse: true,
-                    margins: '0 0 0 5',
+                    margin: '0 0 0 0',
                     layout: 'accordion',
                     items: [{
                             contentEl: 'west',
-                            title: 'Navigation',
+                            title: 'System',
                             html: ' <div id="tree"></div>',
-                            iconCls: 'navpn' // see the HEAD section for style used
-                        }, {
-                            title: 'Settings',
-                            html: '<p>Some settings in here.</p>',
-                            iconCls: 'settings'
-                        }, {
-                            title: 'Information',
-                            html: '<p>Some info in here.</p>',
-                            iconCls: 'info'
-                        }],
+                            iconCls: 'navpn',
+                            margin: '0 0 0 -5',
+                        },
+//                        {
+//                            title: 'Settings',
+//                            html: '<p>Some settings in here.</p>',
+//                            iconCls: 'settings'
+//                        }, {
+//                            title: 'Information',
+//                            html: '<p>Some info in here.</p>',
+//                            iconCls: 'info'
+//                        }
+                    ],
                     listeners: {
                         collapse: function () {
                             console.log("-----collapse:--");

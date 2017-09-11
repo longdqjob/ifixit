@@ -14,6 +14,7 @@
         resetLabelSpec();
         mechanicForm.reset();
         mechanicWindow.setTitle('<fmt:message key="machine.add"/>');
+        mechanicWindow.setIconCls('add-cls');
         mechanicWindow.show();
         gridHis.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
         mechanicName.focus();
@@ -35,6 +36,7 @@
         fillSpecificValue(data.get("specification"));
         machineNote.setValue(data.get("note"));
         mechanicWindow.setTitle('<fmt:message key="machine.edit"/>');
+        mechanicWindow.setIconCls('edit-cls');
         mechanicWindow.show();
         gridHis.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
         mechanicName.focus();

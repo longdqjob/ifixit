@@ -2,7 +2,7 @@
 
 <head>
     <title><fmt:message key="machineType.title"/></title>
-    <meta name="menu" content="AdminMenu"/>
+    <meta name="menu" content="SystemMenu"/>
 </head>
 
 <jsp:include page="../common/require.jsp" />

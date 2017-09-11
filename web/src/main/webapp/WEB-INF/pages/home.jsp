@@ -23,7 +23,6 @@
 
     <script>
         Ext.onReady(function () {
-            alert('hello');
             var store = Ext.create('Ext.data.Store', {
                 fields: ['name', 'email', 'phone'],
                 data: [
