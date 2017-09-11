@@ -1,7 +1,9 @@
 package com.cmms.dao.hibernate;
 
-import com.cmms.dao.ItemTypeDao;
-import com.cmms.model.ItemType;
+import com.cmms.dao.WorkTypeDao;
+import static com.cmms.dao.hibernate.ItemTypeDaoHibernate.TREE_LEVEL;
+import com.cmms.model.Company;
+import com.cmms.model.WorkType;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -10,6 +12,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
@@ -17,22 +20,29 @@ import org.hibernate.criterion.Restrictions;
  *
  * @author thuyetlv
  */
-public class ItemTypeDaoHibernate extends GenericDaoHibernate<ItemType, Integer> implements ItemTypeDao {
+public class WorkTypeDaoHibernate extends GenericDaoHibernate<WorkType, Integer> implements WorkTypeDao {
 
-    public ItemTypeDaoHibernate() {
-        super(ItemType.class);
+    public WorkTypeDaoHibernate() {
+        super(WorkType.class);
     }
 
     @Override
-    public List<ItemType> getListItem(Integer id) {
+    public List<WorkType> getListItem(Integer id) {
         try {
-            List<ItemType> rtn = new LinkedList<>();
-            id = (id == null) ? 0 : id;
-            String hql = "SELECT * FROM item_type WHERE parent_id=:parent_id";
-            rtn = getSession().createSQLQuery(hql)
-                    .addEntity(ItemType.class)
-                    .setParameter("parent_id", id)
-                    .list();
+            List<WorkType> rtn = new LinkedList<>();
+            String hql = "";
+            if (id == null || id == 0) {
+                hql = "SELECT * FROM work_type WHERE parent_id IS NULL";
+                rtn = getSession().createSQLQuery(hql)
+                        .addEntity(Company.class)
+                        .list();
+            } else {
+                hql = "SELECT * FROM work_type WHERE parent_id=:parent_id";
+                rtn = getSession().createSQLQuery(hql)
+                        .addEntity(WorkType.class)
+                        .setParameter("parent_id", id)
+                        .list();
+            }
             return rtn;
         } catch (Exception ex) {
             log.error("ERROR getListItem: ", ex);
@@ -40,72 +50,46 @@ public class ItemTypeDaoHibernate extends GenericDaoHibernate<ItemType, Integer>
         }
     }
 
+    public JSONObject getTree(WorkType root) throws JSONException, SQLException {
+        JSONObject obj = new JSONObject();
+        WorkType currentGroup = root;
+        obj.put("name", currentGroup.getName());
+        obj.put("code", currentGroup.getCode());
+        obj.put("parentId", currentGroup.getParentId());
+        obj.put("leaf", false);
+        obj.put("expand", true);
+        obj.put("iconCls", "folder");
+        obj.put("id", currentGroup.getId());
+        return obj;
+    }
+
     @Override
     public JSONArray getTreeView(Integer id) throws JSONException, SQLException {
-        List<ItemType> roots = getListItem(id);
+        List<WorkType> roots = getListItem(id);
 
         JSONArray treeview = new JSONArray();
-        for (ItemType root : roots) {
+        for (WorkType root : roots) {
             JSONObject tree = getTree(root);
             treeview.put(tree);
         }
         return treeview;
     }
 
-    public JSONObject getTree(ItemType root) throws JSONException, SQLException {
-        JSONObject obj = new JSONObject();
-        JSONArray children = new JSONArray();
-        ItemType currentGroup = root;
-        obj.put("text", currentGroup.getName());
-//        obj.put("description", currentGroup.getDescription());
-        obj.put("leaf", false);
-        obj.put("expand", true);
-        obj.put("iconCls", "folder");
-//        obj.put("iconCls", "task-folder");
-        obj.put("id", currentGroup.getId());
-//        obj.put("children", children);
-        return obj;
-    }
-
-    public static final Integer TREE_LEVEL = 7;
-
-    @Override
-    public String getStringChildren(Integer id) {
-        try {
-            StringBuffer rtn = null;
-            id = (id == null) ? 0 : id;
-            String hql = "SELECT id,GetFamilyTree(id,:level) FamilyTree FROM item_type WHERE id=:parent_id";
-            List<Object[]> areaList = getSession().createSQLQuery(hql)
-                    .setParameter("level", TREE_LEVEL)
-                    .setParameter("parent_id", id)
-                    .list();
-            rtn = new StringBuffer();
-            rtn.append(id);
-            if (areaList != null && !areaList.isEmpty()) {
-                for (Object[] obj : areaList) {
-                    rtn.append(",").append(String.valueOf(obj[0]));
-                }
-            }
-
-            return rtn.toString();
-        } catch (Exception ex) {
-            log.error("ERROR getStringChildren: ", ex);
-            return null;
-        }
-    }
-    
     @Override
     public List<Integer> getListChildren(Integer id) {
         try {
             List<Integer> rtn = null;
-            id = (id == null) ? 0 : id;
-            String hql = "SELECT id,GetFamilyTree(id,:level) FamilyTree FROM item_type WHERE id=:parent_id";
-
-            List<Object[]> areaList = getSession()
+            Query query;
+            if (id == null || id <= 0) {
+                return new ArrayList<Integer>(0);
+            }
+            String hql = "SELECT id,GetWorkTypeTree(id,:level) FamilyTree FROM work_type WHERE id=:parent_id";
+            query = getSession()
                     .createSQLQuery(hql)
                     .setParameter("level", TREE_LEVEL)
-                    .setParameter("parent_id", id)
-                    .list();
+                    .setParameter("parent_id", id);
+
+            List<Object[]> areaList = query.list();
             rtn = new LinkedList<>();
             rtn.add(id);
             if (areaList != null && !areaList.isEmpty()) {
@@ -127,13 +111,29 @@ public class ItemTypeDaoHibernate extends GenericDaoHibernate<ItemType, Integer>
             return null;
         }
     }
-    
+
+    @Override
+    public Integer delete(List<Integer> list) {
+        try {
+            if (list == null || list.isEmpty()) {
+                return 0;
+            }
+            Query q = getSession().createSQLQuery("DELETE FROM work_type WHERE id in (:lstId)")
+                    .addEntity(WorkType.class)
+                    .setParameterList("lstId", list);
+            return q.executeUpdate();
+        } catch (Exception ex) {
+            log.error("ERROR delete: ", ex);
+            return null;
+        }
+    }
+
     @Override
     public Boolean checkUnique(Integer id, String code) {
         Boolean rtn = null;
         Session session = null;
         try {
-            List<ItemType> list = new ArrayList<ItemType>();
+            List<Company> list = new ArrayList<Company>();
 
             session = this.getSessionFactory().openSession();
             session = getSession();
@@ -142,7 +142,7 @@ public class ItemTypeDaoHibernate extends GenericDaoHibernate<ItemType, Integer>
                 session = this.getSessionFactory().openSession();
             }
 
-            Criteria criteria = session.createCriteria(ItemType.class);
+            Criteria criteria = session.createCriteria(WorkType.class);
 
             //Id
             if (id != null && id > 0) {
@@ -164,4 +164,5 @@ public class ItemTypeDaoHibernate extends GenericDaoHibernate<ItemType, Integer>
         }
         return rtn;
     }
+
 }

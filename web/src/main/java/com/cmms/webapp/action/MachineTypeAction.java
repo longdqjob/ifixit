@@ -78,11 +78,35 @@ public class MachineTypeAction extends BaseAction implements Preparable {
             String specification = getRequest().getParameter("specification");
             String note = getRequest().getParameter("note");
 
+            if (StringUtils.isBlank(code)) {
+                result.put("success", false);
+                result.put("message", ResourceBundleUtils.getName("message.codeRequired"));
+                return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+            }
+
+            Boolean checkUnique = true;
             MachineType machineType = new MachineType();
             if (!StringUtils.isBlank(idReq)) {
                 id = Integer.parseInt(idReq);
-                machineType.setId(id);
+                machineType = machineTypeDao.get(id);
+                if (code.equals(machineType.getCode())) {
+                    checkUnique = false;
+                }
             }
+            //Check unique
+            if (checkUnique) {
+                checkUnique = machineTypeDao.checkUnique(id, code);
+                if (checkUnique == null) {
+                    result.put("success", false);
+                    result.put("message", ResourceBundleUtils.getName("systemError"));
+                    return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                } else if (checkUnique) {
+                    result.put("success", "codeExisted");
+                    result.put("message", ResourceBundleUtils.getName("message.codeExisted"));
+                    return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                }
+            }
+
             machineType.setCode(code);
             machineType.setName(name);
             machineType.setDescription(description);

@@ -1,12 +1,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <script>
-    var storeMachine = Ext.create('Ext.data.TreeStore', {
+    var storeTreeWorkType = Ext.create('Ext.data.TreeStore', {
         proxy: {
             type: 'ajax',
-            url: '../machine/getTree'
+            url: '../workType/getTree'
         },
         root: {
-            text: '<fmt:message key="machine"/>',
+            text: '<fmt:message key="workType"/>',
             id: '-10',
             expanded: true
         },
@@ -15,11 +15,11 @@
         autoload: false
     });
 
-    var mechanicTreeWindow = Ext.create('Ext.window.Window', {
+    var workTypeTreeWindow = Ext.create('Ext.window.Window', {
         closeAction: 'hide',
         closable: false,
-        title: '<fmt:message key="machine"/>',
-        id: 'mechanicTreeWindow',
+        title: '<fmt:message key="workType"/>',
+        id: 'workTypeTreeWindow',
         autoEl: 'form',
         width: 500,
         constrainHeader: true,
@@ -32,12 +32,11 @@
             {
                 columnWidth: 1,
                 xtype: 'treepanel',
-                itemId: 'treeMechanic',
-                id: 'treeMechanic',
                 layout: 'fit',
                 height: 300,
-                name: 'treeMechanic',
-                store: storeMachine,
+                name: 'treeWorkType',
+                id: 'treeWorkType',
+                store: storeTreeWorkType,
                 rootVisible: false,
                 useArrows: true,
                 columns: [{
@@ -49,19 +48,18 @@
                 ],
                 listeners: {
                     itemdblclick: function (tree, record, index) {
-                        chooseMechanic(record);
-                        mechanicTreeWindow.hide();
+                        chooseWorkType(record);
+                        workTypeTreeWindow.hide();
                     }
                 }
             }
         ],
         listeners: {
             show: function (window) {
-                console.log("---show mechanicTreeWindow -----");
-                maskTarget(Ext.getCmp('mechanicTreeWindow'));
-                Ext.getCmp('treeMechanic').getStore().getRootNode().removeAll();
-                Ext.getCmp('treeMechanic').getStore().load();
-                Ext.getCmp('treeMechanic').getStore().on('load', function (store, records, options) {
+                maskTarget(Ext.getCmp('workTypeTreeWindow'));
+                Ext.getCmp('treeWorkType').getStore().getRootNode().removeAll();
+                Ext.getCmp('treeWorkType').getStore().load();
+                Ext.getCmp('treeWorkType').getStore().on('load', function (store, records, options) {
                     unMaskTarget();
                 });
             }
@@ -69,7 +67,7 @@
         buttons: [{
                 text: '<fmt:message key="button.cancel"/>',
                 handler: function () {
-                    mechanicTreeWindow.hide();
+                    workTypeTreeWindow.hide();
                 }
             }]
     });

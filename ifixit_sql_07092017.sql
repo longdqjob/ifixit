@@ -52,16 +52,18 @@ DROP TABLE IF EXISTS `company`;
 CREATE TABLE `company` (
   `id` int(5) NOT NULL AUTO_INCREMENT,
   `code` varchar(20) DEFAULT NULL,
+  `full_code` varchar(20) DEFAULT NULL,
   `description` varchar(512) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `name` varchar(128) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `state` int(1) DEFAULT NULL,
   `parent_id` int(5) DEFAULT '0',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `parent_id` (`parent_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
 
 /*Data for the table `company` */
 
-insert  into `company`(`id`,`code`,`description`,`name`,`state`,`parent_id`) values (1,'LAMSON','Lamson comany des','Lamson company',NULL,NULL),(2,'LAMSON01','Trung tam 01','Trung tam 01',NULL,1),(3,'LAMSON02','Trung tam 02','Trung tam 02',NULL,1),(4,'TESST','TESST desc','test',NULL,1),(6,'sldfjk','slkj','sdfkjl',NULL,2),(7,'sfn','fgn','sadf',NULL,1),(8,'ng','fgn','een',NULL,7);
+insert  into `company`(`id`,`code`,`full_code`,`description`,`name`,`state`,`parent_id`) values (1,'',NULL,'ROOT','ROOT',NULL,NULL),(2,'LAMSON01',NULL,'Trung tam 01','Trung tam 01',NULL,1),(3,'LAMSON02',NULL,'Trung tam 02','Trung tam 02',NULL,1),(4,'TESST',NULL,'TESST desc','test',NULL,1),(6,'SLDFJK',NULL,'slkj','sdfkjl',NULL,2),(7,'SFN',NULL,'fgn','sadf',NULL,1),(8,'NG',NULL,'fgn','een',NULL,7);
 
 /*Table structure for table `group_engineer` */
 
@@ -73,10 +75,13 @@ CREATE TABLE `group_engineer` (
   `cost` float DEFAULT NULL,
   `description` varchar(512) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `name` varchar(128) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `parent_id` int(5) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
 /*Data for the table `group_engineer` */
+
+insert  into `group_engineer`(`id`,`code`,`cost`,`description`,`name`,`parent_id`) values (1,'',NULL,'ROOT','ROOT',NULL);
 
 /*Table structure for table `item_type` */
 
@@ -101,8 +106,8 @@ insert  into `item_type`(`id`,`code`,`description`,`name`,`specification`,`paren
 DROP TABLE IF EXISTS `machine`;
 
 CREATE TABLE `machine` (
-  `id` bigint(20) NOT NULL DEFAULT '0',
-  `code` varchar(255) DEFAULT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `code` varchar(20) DEFAULT NULL,
   `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `item_type_id` int(11) DEFAULT NULL,
@@ -110,12 +115,16 @@ CREATE TABLE `machine` (
   `company_id` int(5) DEFAULT NULL,
   `machine_type_id` int(5) DEFAULT NULL,
   `specification` text CHARACTER SET utf8 COLLATE utf8_unicode_ci,
-  `note` varchar(1024) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `note` varchar(1024) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `parent_id` (`parent_id`),
+  KEY `company_id` (`company_id`),
+  KEY `code` (`code`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
 
 /*Data for the table `machine` */
 
-insert  into `machine`(`id`,`code`,`name`,`description`,`item_type_id`,`parent_id`,`company_id`,`machine_type_id`,`specification`,`note`) values (1,'ROOT','ROOT','a',4,NULL,2,NULL,NULL,NULL),(2,'DT','Dien thoai','b',4,1,2,NULL,NULL,NULL),(3,'Box','Box','cc',5,1,2,NULL,NULL,NULL),(4,'DT.NAP','Nap DT','cc',5,2,2,NULL,NULL,NULL),(5,'DT.Pin','Pin','b',4,2,2,NULL,NULL,NULL),(30,'thuyetlvTEst','thuyetlvTEst','',NULL,5,3,2,'{\"01\":{\"label\":\"t\\u00e9t\",\"value\":\"tesst\"},\"02\":{\"label\":\"k\\u00edch th\\u01b0\\u1edbc\",\"value\":\"k\\u00edch th\\u01b0\\u1edbc\"}}','');
+insert  into `machine`(`id`,`code`,`name`,`description`,`item_type_id`,`parent_id`,`company_id`,`machine_type_id`,`specification`,`note`) values (1,'ROOT','ROOT','a',4,NULL,2,NULL,NULL,NULL),(2,'DT','Dien thoai','b',4,1,2,NULL,NULL,NULL),(3,'BOX','Box','cc',5,1,2,NULL,NULL,NULL),(4,'DT.NAP','Nap DT','cc',5,2,2,NULL,NULL,NULL),(5,'DT.PIN','Pin','b',4,2,2,NULL,NULL,NULL),(6,'THUYETLVTEST','thuyetlvTEst','',NULL,5,3,2,'{\"01\":{\"label\":\"t\\u00e9t\",\"value\":\"tesst\"},\"02\":{\"label\":\"k\\u00edch th\\u01b0\\u1edbc\",\"value\":\"k\\u00edch th\\u01b0\\u1edbc\"}}',''),(7,'cdsaf','test','',NULL,NULL,1,2,'{\"01\":{\"label\":\"\",\"value\":\"32rs\"},\"02\":{\"label\":\"\",\"value\":\"dfdfsh\"}}','');
 
 /*Table structure for table `machine_type` */
 
@@ -131,11 +140,11 @@ CREATE TABLE `machine_type` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`),
   FULLTEXT KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 
 /*Data for the table `machine_type` */
 
-insert  into `machine_type`(`id`,`code`,`name`,`description`,`specification`,`note`) values (2,'fbnad','ndan','dn','{\"01\":\"t\\u00e9t\",\"02\":\"k\\u00edch th\\u01b0\\u1edbc\"}','fgn'),(3,'test','test','','{\"10\":\"docao\",\"13\":\"donang\",\"40\":\"IpAddress\",\"01\":\"SERIAL NO\",\"02\":\"trong luong\",\"03\":\"aa\",\"04\":\"haha\"}','stsvfsadg');
+insert  into `machine_type`(`id`,`code`,`name`,`description`,`specification`,`note`) values (2,'FBNAD','ndan','dn','{\"01\":\"t\\u00e9t\",\"02\":\"k\\u00edch th\\u01b0\\u1edbc\"}','fgn'),(3,'TEST','test name','','{\"10\":\"docao\",\"13\":\"donang\",\"40\":\"IpAddress\",\"01\":\"SERIAL NO\",\"02\":\"trong luong\",\"03\":\"aa\",\"04\":\"haha\"}','stsvfsadg'),(4,'ASDFSAF','sfssgsag','','{\"01\":\"sdfsf\"}','sdgsdgsdg'),(5,'TEST1','sf','','{\"01\":\"sdgsdg\"}','sfsg');
 
 /*Table structure for table `role` */
 
@@ -171,7 +180,7 @@ CREATE TABLE `supplier` (
 
 /*Data for the table `supplier` */
 
-insert  into `supplier`(`id`,`code`,`name`,`contact`,`phone`,`email`,`address`,`city`,`country`) values (1,'a','â',NULL,NULL,NULL,NULL,NULL,NULL),(2,'bb','bbb','bbb','bbb',NULL,NULL,NULL,NULL),(6,'a','â',NULL,NULL,NULL,NULL,NULL,NULL),(7,'bb','bbb','bbb','bbb',NULL,NULL,NULL,NULL),(9,'a','â',NULL,NULL,NULL,NULL,NULL,NULL),(10,'a','â',NULL,NULL,NULL,NULL,NULL,NULL),(12,'a','â',NULL,NULL,NULL,NULL,NULL,NULL),(13,'a','â',NULL,NULL,NULL,NULL,NULL,NULL),(14,'a','â',NULL,NULL,NULL,NULL,NULL,NULL),(15,'a','â',NULL,NULL,NULL,NULL,NULL,NULL),(16,'a','â',NULL,NULL,NULL,NULL,NULL,NULL),(17,'a','â',NULL,NULL,NULL,NULL,NULL,NULL),(18,'a','â',NULL,NULL,NULL,NULL,NULL,NULL),(19,'a','â',NULL,NULL,NULL,NULL,NULL,NULL),(20,'a','â',NULL,NULL,NULL,NULL,NULL,NULL),(21,'a','â',NULL,NULL,NULL,NULL,NULL,NULL),(22,'a','â',NULL,NULL,NULL,NULL,NULL,NULL),(23,'a','â',NULL,NULL,NULL,NULL,NULL,NULL),(29,'abc','abc','abc','abc',NULL,NULL,NULL,NULL),(33,'bb','bb','bb','bb',NULL,NULL,NULL,NULL),(34,'cc','cc','cc','cc',NULL,NULL,NULL,NULL);
+insert  into `supplier`(`id`,`code`,`name`,`contact`,`phone`,`email`,`address`,`city`,`country`) values (1,'A','â',NULL,NULL,NULL,NULL,NULL,NULL),(2,'BB','bbb','bbb','bbb',NULL,NULL,NULL,NULL),(6,'A','â',NULL,NULL,NULL,NULL,NULL,NULL),(7,'BB','bbb','bbb','bbb',NULL,NULL,NULL,NULL),(9,'A','â',NULL,NULL,NULL,NULL,NULL,NULL),(10,'A','â',NULL,NULL,NULL,NULL,NULL,NULL),(12,'A','â',NULL,NULL,NULL,NULL,NULL,NULL),(13,'A','â',NULL,NULL,NULL,NULL,NULL,NULL),(14,'A','â',NULL,NULL,NULL,NULL,NULL,NULL),(15,'A','â',NULL,NULL,NULL,NULL,NULL,NULL),(16,'A','â',NULL,NULL,NULL,NULL,NULL,NULL),(17,'A','â',NULL,NULL,NULL,NULL,NULL,NULL),(18,'A','â',NULL,NULL,NULL,NULL,NULL,NULL),(19,'A','â',NULL,NULL,NULL,NULL,NULL,NULL),(20,'A','â',NULL,NULL,NULL,NULL,NULL,NULL),(21,'A','â',NULL,NULL,NULL,NULL,NULL,NULL),(22,'A','â',NULL,NULL,NULL,NULL,NULL,NULL),(23,'A','â',NULL,NULL,NULL,NULL,NULL,NULL),(29,'ABC','abc','abc','abc',NULL,NULL,NULL,NULL),(33,'BB','bb','bb','bb',NULL,NULL,NULL,NULL),(34,'CC','cc','cc','cc',NULL,NULL,NULL,NULL);
 
 /*Table structure for table `user_role` */
 
@@ -189,6 +198,41 @@ CREATE TABLE `user_role` (
 /*Data for the table `user_role` */
 
 insert  into `user_role`(`user_id`,`role_id`) values (-3,-2),(-1,-2),(-3,-1),(-2,-1);
+
+/*Table structure for table `work_order` */
+
+DROP TABLE IF EXISTS `work_order`;
+
+CREATE TABLE `work_order` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `code` varchar(20) DEFAULT NULL,
+  `name` varchar(512) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `start_time` datetime DEFAULT NULL,
+  `end_time` datetime DEFAULT NULL,
+  `status` int(1) DEFAULT '0' COMMENT '1: Open, 2: Approval, 3: In process,4: Pedding, 0: Complete',
+  `work_type_id` int(5) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `work_type_id` (`work_type_id`),
+  KEY `status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Data for the table `work_order` */
+
+/*Table structure for table `work_type` */
+
+DROP TABLE IF EXISTS `work_type`;
+
+CREATE TABLE `work_type` (
+  `id` int(5) NOT NULL AUTO_INCREMENT,
+  `code` varchar(20) DEFAULT NULL,
+  `name` varchar(512) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `parent_id` int(5) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `code` (`code`),
+  KEY `parent_id` (`parent_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Data for the table `work_type` */
 
 /* Function  structure for function  `GetAncestry` */
 
@@ -317,6 +361,75 @@ BEGIN
         SELECT IFNULL(qc,'') INTO queue_children
         FROM (SELECT GROUP_CONCAT(CONCAT(id,':',front_ht+1)) qc
         FROM item_type WHERE parent_id = front_id) A;
+        IF LENGTH(queue_children) = 0 THEN
+            IF LENGTH(queue) = 0 THEN
+                SET queue_length = 0;
+            END IF;
+        ELSE
+            IF LENGTH(rv) = 0 THEN
+                IF front_ht < LevelLimit THEN
+                    SET rv = queue_children;
+                END IF;
+            ELSE
+                IF front_ht < LevelLimit THEN
+                    SET rv = CONCAT(rv,',',queue_children);
+                END IF;
+            END IF;
+            IF LENGTH(queue) = 0 THEN
+                SET queue = queue_children;
+            ELSE
+                SET queue = CONCAT(queue,',',queue_children);
+            END IF;
+            SET queue_length = LENGTH(queue) - LENGTH(REPLACE(queue,',','')) + 1;
+        END IF;
+    END WHILE;
+    #
+    # Strip away level parts of the output
+    #
+    IF LENGTH(rv) > 0 THEN
+        SET curr_level = 1;
+        WHILE curr_level <= LevelLimit DO
+            SET level_part = CONCAT(':',curr_level);
+            SET rv = REPLACE(rv,level_part,'');
+            SET curr_level = curr_level + 1;
+        END WHILE;
+    END IF;
+    RETURN rv;
+END */$$
+DELIMITER ;
+
+/* Function  structure for function  `GetWorkTypeTree` */
+
+/*!50003 DROP FUNCTION IF EXISTS `GetWorkTypeTree` */;
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` FUNCTION `GetWorkTypeTree`(GivenID INT,LevelLimit INT) RETURNS varchar(1024) CHARSET latin1
+    DETERMINISTIC
+BEGIN
+    DECLARE rv,q,queue,queue_children,front_rc,level_part VARCHAR(1024);
+    DECLARE queue_length,front_id,front_ht,pos,curr_level INT;
+    SET rv = '';
+    SET queue = CONCAT(GivenID,':0');
+    SET queue_length = 1;
+    WHILE queue_length > 0 DO
+        SET front_id = FORMAT(queue,0);
+        IF queue_length = 1 THEN
+            SET front_rc = queue;
+            SET queue = '';
+            SET pos = LOCATE(':',front_rc);
+        ELSE
+            SET pos = LOCATE(',',queue);
+            SET front_rc = LEFT(queue,pos - 1);
+            SET q = SUBSTR(queue,pos + 1);
+            SET queue = q;
+            SET pos = LOCATE(':',front_rc);
+        END IF;
+        SET front_id = LEFT(front_rc,pos - 1);
+        SET front_ht = SUBSTR(front_rc,pos + 1);
+        SET queue_length = queue_length - 1;
+        SELECT IFNULL(qc,'') INTO queue_children
+        FROM (SELECT GROUP_CONCAT(CONCAT(id,':',front_ht+1)) qc
+        FROM work_type WHERE parent_id = front_id) A;
         IF LENGTH(queue_children) = 0 THEN
             IF LENGTH(queue) = 0 THEN
                 SET queue_length = 0;

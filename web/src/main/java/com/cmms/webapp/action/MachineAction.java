@@ -7,6 +7,7 @@ import com.cmms.dao.MachineTypeDao;
 import com.cmms.model.Company;
 import com.cmms.model.Machine;
 import com.cmms.model.MachineType;
+import com.cmms.webapp.security.LoginSuccessHandler;
 import com.cmms.webapp.util.ResourceBundleUtils;
 import com.cmms.webapp.util.WebUtil;
 import com.opensymphony.xwork2.Preparable;
@@ -82,7 +83,24 @@ public class MachineAction extends BaseAction implements Preparable {
             if (!StringUtils.isBlank(idReq)) {
                 id = Integer.parseInt(idReq);
             }
-            return new ByteArrayInputStream(machineDao.getTreeView(id).toString().getBytes("UTF8"));
+
+            String scompany = getRequest().getParameter("system");
+            Integer companyId = null;
+            if (!StringUtils.isBlank(scompany)) {
+                companyId = Integer.parseInt(scompany);
+            }
+            List<Integer> listCompany;
+            if (companyId == null || companyId < -1) {
+                companyId = null;
+                if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID) != null) {
+                    companyId = (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID);
+                }
+                listCompany = getListSytem();
+            } else {
+                listCompany = companyDao.getListChildren(companyId);
+            }
+
+            return new ByteArrayInputStream(machineDao.getTreeView(listCompany, id).toString().getBytes("UTF8"));
         } catch (Exception e) {
             log.error("ERROR getTree: ", e);
             return null;
@@ -106,7 +124,16 @@ public class MachineAction extends BaseAction implements Preparable {
             if (!StringUtils.isBlank(scompany)) {
                 companyId = Integer.parseInt(scompany);
             }
-            List<Integer> listCompany = companyDao.getListChildren(companyId);
+            List<Integer> listCompany;
+            if (companyId == null || companyId < -1) {
+                companyId = null;
+                if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID) != null) {
+                    companyId = (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID);
+                }
+                listCompany = getListSytem();
+            } else {
+                listCompany = companyDao.getListChildren(companyId);
+            }
 
             String code = getRequest().getParameter("code");
             String name = getRequest().getParameter("name");
@@ -184,11 +211,39 @@ public class MachineAction extends BaseAction implements Preparable {
             String machineTypeId = getRequest().getParameter("machineTypeId");
             String note = getRequest().getParameter("note");
 
-            Machine mechanic = new Machine();
+            if (StringUtils.isBlank(code)) {
+                result.put("success", false);
+                result.put("message", ResourceBundleUtils.getName("message.codeRequired"));
+                return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+            }
+
+            Boolean checkUnique = true;
+
+            Machine mechanic;
             if (!StringUtils.isBlank(idReq)) {
                 id = Long.parseLong(idReq);
-                mechanic.setId(id);
+                mechanic = machineDao.get(id);
+                if (code.equals(mechanic.getCode())) {
+                    checkUnique = false;
+                }
+            } else {
+                mechanic = new Machine();
             }
+
+            //Check unique
+            if (checkUnique) {
+                checkUnique = machineDao.checkUnique(id, code);
+                if (checkUnique == null) {
+                    result.put("success", false);
+                    result.put("message", ResourceBundleUtils.getName("systemError"));
+                    return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                } else if (checkUnique) {
+                    result.put("success", "codeExisted");
+                    result.put("message", ResourceBundleUtils.getName("message.codeExisted"));
+                    return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                }
+            }
+
             if (!StringUtils.isBlank(parentId)) {
                 Machine mParent = machineDao.get(Long.parseLong(parentId));
                 mechanic.setParent(mParent);

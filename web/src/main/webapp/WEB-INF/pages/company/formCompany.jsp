@@ -211,13 +211,13 @@
         },
         items: [companyForm],
         buttons: [{
-                text: 'Save',
+                text: '<fmt:message key="button.save"/>',
                 type: 'submit',
                 handler: function () {
                     saveForm();
                 }
             }, {
-                text: 'Cancel',
+                text: '<fmt:message key="button.cancel"/>',
                 handler: function () {
                     companyWindow.hide();
                 }

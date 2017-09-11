@@ -62,7 +62,7 @@
         if (!valid || valid.length > 0) {
             return false;
         }
-        
+
         mask();
         Ext.Ajax.request({
             url: "/supplier/save",
@@ -77,14 +77,21 @@
             success: function (response) {
                 unmask();
                 var res = JSON.parse(response.responseText);
-                if ("true" == res.success || true === res.success) {
+                if ("codeExisted" == res.success) {
+                    alertError(res.message);
+                    supplierCode.setActiveError(res.message);
+                } else if ("true" == res.success || true === res.success) {
                     supplierWindow.hide();
                     var scrollPosition = mygrid.getEl().down('.x-grid-view').getScroll();
                     alertSuccess(res.message);
                     searchGrid();
                     mygrid.getView().getEl().scrollTo('Top', scrollPosition.top, true);
                 } else {
-                    alertError(res.message);
+                    if (res.message) {
+                        alertError(res.message);
+                    } else {
+                        alertSystemError();
+                    }
                 }
             },
             failure: function (response, opts) {
@@ -93,7 +100,7 @@
             },
         });
     }
-    
+
     function searchGrid() {
         mygrid.getStore().getProxy().extraParams = {
             code: searchCode.getValue(),

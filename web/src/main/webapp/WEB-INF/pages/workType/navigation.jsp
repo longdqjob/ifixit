@@ -1,20 +1,18 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <script>
-    var store = Ext.create('Ext.data.TreeStore', {
+    var storeWorkType = Ext.create('Ext.data.TreeStore', {
         fields: [
             {name: 'id', type: 'int'},
             {name: 'parentId', type: 'int'},
             {name: 'code', type: 'string'},
             {name: 'name', type: 'string'},
-            {name: 'state', type: 'int'},
-            {name: 'description', type: 'string'},
         ],
         proxy: {
             type: 'ajax',
-            url: '../company/getTreeCompany'
+            url: '../workType/getTree'
         },
         root: {
-            text: '<fmt:message key="company"/>',
+            text: '<fmt:message key="workType"/>',
             id: '-11',
             expanded: true
         },
@@ -23,35 +21,6 @@
                 property: 'name',
                 direction: 'ASC'
             }],
-//        listeners: {
-//            // Each demo.UserModel instance will be automatically   
-//            // decorated with methods/properties of Ext.data.NodeInterface   
-//            // (i.e., a "node"). Whenever a UserModel node is appended  
-//            // to the tree, this TreeStore will fire an "append" event.  
-//            append: function (thisNode, newChildNode, index, eOpts) {
-//
-//                // If the node that's being appended isn't a root node, then we can   
-//                // assume it's one of our UserModel instances that's been "dressed   
-//                // up" as a node  
-//                if (!newChildNode.isRoot()) {
-//
-//                    // The node is a UserModel instance with NodeInterface  
-//                    // properties and methods added. We want to customize those   
-//                    // node properties  to control how it appears in the TreePanel.  
-//
-//                    // A user "item" shouldn't be expandable in the tree  
-//                    newChildNode.set('leaf', true);
-//
-//                    // Use the model's "name" value as the text for each tree item  
-//                    newChildNode.set('text', newChildNode.get('text'));
-//
-////                    // Use the model's profile url as the icon for each tree item  
-////                    newChildNode.set('icon', newChildNode.get('iconCls'));
-////                    newChildNode.set('cls', 'iconCls');
-////                    newChildNode.set('iconCls', 'iconCls');
-//                }
-//            }
-//        }
     });
 
     function resetHeight(cmp) {
@@ -66,7 +35,6 @@
 
     //Ext.ux.tree.TreeGrid is no longer a Ux. You can simply use a tree.TreePanel
     var tree = Ext.create('Ext.tree.Panel', {
-        id: 'sidelefttree',
         resizable: false,
         header: false,
         collapsible: true,
@@ -75,7 +43,7 @@
         lines: true,
         multiSelect: true,
         border: true,
-        store: store,
+        store: storeWorkType,
         minHeight: 500,
         columns: [{
                 xtype: 'treecolumn', //this is so we know which column will show the tree
@@ -93,7 +61,7 @@
                 this.body.setStyle('height', 'auto');
                 this.getView().getEl().setStyle('height', 'auto');
                 console.log("---afterrender:---");
-                loadMachine("-10");
+//                loadWorkOrder("-10");
             },
             itemclick: function (view, node) {
                 console.log(node);
@@ -112,18 +80,15 @@
                             text: '<fmt:message key="loadData"/>',
                             handler: function () {
                                 selectedSystem = record.get("id");
-                                loadMachine(selectedSystem);
-                                console.log("Load data " + record.get("id") + " - " + record.get("name"));
+                                loadWorkOrder(selectedSystem);
                             }}, {
-                            text: '<fmt:message key="addCompany"/>',
+                            text: '<fmt:message key="workType.add"/>',
                             handler: function () {
-                                console.log("addCompany: " + record.get("id") + " - " + record.get("name"));
-                                addCompany(record);
+                                addWorkType(record);
                             }}, {
-                            text: '<fmt:message key="editCompany"/>',
+                            text: '<fmt:message key="workType.edit"/>',
                             handler: function () {
-                                console.log("editCompany: " + record.get("id") + " - " + record.get("name"));
-                                editCompany(record);
+                                editWorkType(record);
                             }}, {
                             text: '<fmt:message key="moreDetail"/>',
                             handler: function () {

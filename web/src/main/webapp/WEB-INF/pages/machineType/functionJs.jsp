@@ -20,7 +20,6 @@
         machineTypeId.setValue(data.get("id"));
         machineTypeCode.setValue(data.get("code"));
         machineTypeName.setValue(data.get("name"));
-        machineTypeDescription.setValue(data.get("description"));
         machineTypeNote.setValue(data.get("note"));
         fillSpecific(data.get("specification"));
         addWindow.setTitle('<fmt:message key="machineType.edit"/>');
@@ -74,21 +73,27 @@
                 id: machineTypeId.getValue(),
                 code: machineTypeCode.getValue(),
                 name: machineTypeName.getValue(),
-                description: machineTypeDescription.getValue(),
                 note: machineTypeNote.getValue(),
                 specification: Ext.encode(createSpecific()),
             },
             success: function (response) {
                 unmask();
                 var res = JSON.parse(response.responseText);
-                if ("true" == res.success || true === res.success) {
+                if ("codeExisted" == res.success) {
+                    alertError(res.message);
+                    machineTypeCode.setActiveError(res.message);
+                } else if ("true" == res.success || true === res.success) {
                     addWindow.hide();
                     var scrollPosition = mygrid.getEl().down('.x-grid-view').getScroll();
                     alertSuccess(res.message);
                     searchGrid();
                     mygrid.getView().getEl().scrollTo('Top', scrollPosition.top, true);
                 } else {
-                    alertError(res.message);
+                    if (res.message) {
+                        alertError(res.message);
+                    } else {
+                        alertSystemError();
+                    }
                 }
             },
             failure: function (response, opts) {

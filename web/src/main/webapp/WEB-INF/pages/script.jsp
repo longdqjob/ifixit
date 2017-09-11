@@ -46,7 +46,7 @@
     var showMask;
     function maskTarget(target, message) {
         if (message) {
-            howMask = new Ext.LoadMask({
+            showMask = new Ext.LoadMask({
                 msg: message,
                 target: target
             });

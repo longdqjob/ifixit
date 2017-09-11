@@ -127,7 +127,7 @@
         id: "fatherName",
         labelAlign: 'left',
         anchor: '100%',
-        allowBlank: false,
+        allowBlank: true,
         margin: '10 10 10 10',
         width: 250,
         readOnly: true,
@@ -199,9 +199,8 @@
             }]
     });
 
-    var sinceField = Ext.create('Ext.form.field.Text', {
-        xtype: 'textfield',
-        grow: true,
+    var sinceField = {
+        xtype: 'datefield',
         tabIndex: 11,
         fieldLabel: '<fmt:message key="machine.since"/>',
         id: "sinceField",
@@ -210,8 +209,22 @@
         allowBlank: false,
         margin: '10 10 10 10',
         width: 250,
-        readOnly: true,
-        value: new Date()
+        format: 'd/m/Y',
+//        altFormats: 'm,d,Y|m.d.Y',
+    };
+
+    var machineNote = Ext.create('Ext.form.field.TextArea', {
+        xtype: 'textfield',
+        grow: true,
+        fieldLabel: '<fmt:message key="machine.note"/>',
+        id: "machineNote",
+        labelAlign: 'left',
+        anchor: '100%',
+        allowBlank: true,
+        margin: '20 10 10 10',
+        width: "98%",
+        maxLength: 512,
+        tabIndex: 57,
     });
 
     //--------------------------------------------------------------------------
@@ -440,7 +453,7 @@
                 title: '<fmt:message key="machine.note"/>',
                 tabIndex: 56,
                 id: "machineNotes",
-                items: []
+                items: [machineNote]
             }]
     });
 
@@ -478,9 +491,6 @@
         ]
     });
 
-
-
-
     var mechanicWindow = Ext.create('Ext.window.Window', {
         closeAction: 'hide',
         id: 'mechanicWindow',
@@ -494,13 +504,13 @@
         },
         items: [mechanicForm],
         buttons: [{
-                text: 'Save',
+                text: '<fmt:message key="button.save"/>',
                 type: 'submit',
                 handler: function () {
                     saveMechanic();
                 }
             }, {
-                text: 'Cancel',
+                text: '<fmt:message key="button.cancel"/>',
                 handler: function () {
                     mechanicWindow.hide();
                 }

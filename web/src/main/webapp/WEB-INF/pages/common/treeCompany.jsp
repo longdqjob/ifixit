@@ -7,7 +7,7 @@
         },
         root: {
             text: '<fmt:message key="company"/>',
-            id: '0',
+            id: '-10',
             expanded: true
         },
         folderSort: true,
@@ -83,20 +83,16 @@
         ],
         listeners: {
             show: function (window) {
-                var popUpMask = new Ext.LoadMask({
-                    msg: "Please wait...",
-                    target: Ext.getCmp('companyTreeWindow')
-                });
-                popUpMask.show();
+                maskTarget(Ext.getCmp('companyTreeWindow'));
                 Ext.getCmp('treeCompany').getStore().getRootNode().removeAll();
                 Ext.getCmp('treeCompany').getStore().load();
                 Ext.getCmp('treeCompany').getStore().on('load', function (store, records, options) {
-                    popUpMask.hide();
+                    unMaskTarget();
                 });
             }
         },
         buttons: [{
-                text: 'Cancel',
+                text: '<fmt:message key="button.cancel"/>',
                 handler: function () {
                     companyTreeWindow.hide();
                 }

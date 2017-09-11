@@ -41,7 +41,7 @@
     //-----------------------------------------Grid---------------------------------------------------------------
     var storeGrid = Ext.create('Ext.data.Store', {
         storeId: 'storeGrid',
-        fields: ['id', 'code', 'name', 'description', 'specification', 'note'],
+        fields: ['id', 'code', 'name', 'specification', 'note'],
         pageSize: 20,
         autoLoad: true,
         proxy: {
@@ -113,7 +113,6 @@
             {text: 'ID', dataIndex: 'id', flex: 1, hidden: true},
             {text: '<fmt:message key="machineType.code"/>', dataIndex: 'code', flex: 0.5, },
             {text: '<fmt:message key="machineType.name"/>', dataIndex: 'name', flex: 1.5, },
-            {text: '<fmt:message key="machineType.description"/>', dataIndex: 'description', flex: 1},
             {text: '<fmt:message key="machineType.note"/>', dataIndex: 'note', flex: 1},
         ],
         viewConfig: {

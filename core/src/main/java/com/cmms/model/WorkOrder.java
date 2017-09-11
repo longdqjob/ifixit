@@ -8,6 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.FetchType;
@@ -15,16 +16,17 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-@Table(name = "group_engineer")
-public class GroupEngineer extends BaseObject implements Serializable {
+@Table(name = "work_order")
+public class WorkOrder extends BaseObject implements Serializable {
 
     private static final long serialVersionUID = -1L;
     private Long id;
     private String code;
     private String name;
-    private String description;
-    private Float cost;
-    private GroupEngineer parent;
+    private Date startTime;
+    private Date endTime;
+    private Integer status;
+    private WorkType workType;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -54,32 +56,41 @@ public class GroupEngineer extends BaseObject implements Serializable {
         this.name = name;
     }
 
-    @Column(name = "description")
-    public String getDescription() {
-        return description;
+    @Column(name = "start_time")
+    public Date getStartTime() {
+        return startTime;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
-    @Column(name = "cost")
-    public Float getCost() {
-        return cost;
+    @Column(name = "end_time")
+    public Date getEndTime() {
+        return endTime;
     }
 
-    public void setCost(Float cost) {
-        this.cost = cost;
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    @Column(name = "status")
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id", nullable = true)
-    public GroupEngineer getParent() {
-        return parent;
+    @JoinColumn(name = "work_type_id")
+    public WorkType getWorkType() {
+        return workType;
     }
 
-    public void setParent(GroupEngineer parent) {
-        this.parent = parent;
+    public void setWorkType(WorkType workType) {
+        this.workType = workType;
     }
 
     @Override
@@ -97,5 +108,4 @@ public class GroupEngineer extends BaseObject implements Serializable {
     public int hashCode() {
         return 0;
     }
-
 }

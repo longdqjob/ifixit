@@ -15,4 +15,7 @@ public interface SupplierDao extends GenericDao<Supplier, Integer> {
     
     @Transactional
     Integer delete(List<Integer> list);
+    
+    @Transactional
+    Boolean checkUnique(Integer id,String code);
 }

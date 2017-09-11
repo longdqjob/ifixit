@@ -16,7 +16,10 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 
 /**
@@ -87,14 +90,17 @@ public class CompanyDaoHibernate extends GenericDaoHibernate<Company, Integer> i
     public List<Integer> getListChildren(Integer id) {
         try {
             List<Integer> rtn = null;
-            id = (id == null) ? 0 : id;
+            Query query;
+            if (id == null || id <= 0) {
+                return new ArrayList<Integer>(0);
+            }
             String hql = "SELECT id,GetCompanyTree(id,:level) FamilyTree FROM company WHERE id=:parent_id";
-
-            List<Object[]> areaList = getSession()
+            query = getSession()
                     .createSQLQuery(hql)
                     .setParameter("level", TREE_LEVEL)
-                    .setParameter("parent_id", id)
-                    .list();
+                    .setParameter("parent_id", id);
+
+            List<Object[]> areaList = query.list();
             rtn = new LinkedList<>();
             rtn.add(id);
             if (areaList != null && !areaList.isEmpty()) {
@@ -216,6 +222,43 @@ public class CompanyDaoHibernate extends GenericDaoHibernate<Company, Integer> i
             log.error("ERROR deleteCompany: ", ex);
             return null;
         }
+    }
+
+    @Override
+    public Boolean checkUnique(Integer id, String code) {
+        Boolean rtn = null;
+        Session session = null;
+        try {
+            List<Company> list = new ArrayList<Company>();
+
+            session = this.getSessionFactory().openSession();
+            session = getSession();
+            if (!session.isOpen() || !session.isConnected()) {
+                log.debug("Session is close...." + session.isOpen() + " --- " + session.isConnected());
+                session = this.getSessionFactory().openSession();
+            }
+
+            Criteria criteria = session.createCriteria(Company.class);
+
+            //Id
+            if (id != null && id > 0) {
+                criteria.add(Restrictions.ne("id", id));
+            }
+
+            //Code
+            if (code != null && code.trim().length() > 0) {
+                criteria.add(Restrictions.eq("code", code));
+            }
+
+            list = criteria.list();
+
+            rtn = (list != null && list.size() > 0);
+
+        } catch (Exception ex) {
+            log.error("ERROR checkUnique: " + code, ex);
+            return null;
+        }
+        return rtn;
     }
 
 }

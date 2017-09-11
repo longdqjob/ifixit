@@ -18,5 +18,7 @@
     <bean id="machineDao" class="com.cmms.dao.hibernate.MachineDaoHibernate"></bean>
     <bean id="machineTypeDao" class="com.cmms.dao.hibernate.MachineTypeDaoHibernate"></bean>
     <bean id="supplierDao" class="com.cmms.dao.hibernate.SupplierDaoHibernate"></bean>
+    <bean id="workOrderDao" class="com.cmms.dao.hibernate.WorkOrderDaoHibernate"></bean>
+    <bean id="workTypeDao" class="com.cmms.dao.hibernate.WorkTypeDaoHibernate"></bean>
     <!-- Add new Managers here -->
 </beans>

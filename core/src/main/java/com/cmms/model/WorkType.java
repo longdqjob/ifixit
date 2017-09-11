@@ -13,26 +13,26 @@ import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 @Entity
-@Table(name = "group_engineer")
-public class GroupEngineer extends BaseObject implements Serializable {
+@Table(name = "work_type")
+public class WorkType extends BaseObject implements Serializable {
 
     private static final long serialVersionUID = -1L;
-    private Long id;
+    private Integer id;
     private String code;
     private String name;
-    private String description;
-    private Float cost;
-    private GroupEngineer parent;
+
+    private WorkType parent;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -54,31 +54,21 @@ public class GroupEngineer extends BaseObject implements Serializable {
         this.name = name;
     }
 
-    @Column(name = "description")
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    @Column(name = "cost")
-    public Float getCost() {
-        return cost;
-    }
-
-    public void setCost(Float cost) {
-        this.cost = cost;
-    }
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id", nullable = true)
-    public GroupEngineer getParent() {
+    @JoinColumn(name = "parent_id")
+    public WorkType getParent() {
         return parent;
     }
+    @Transient
+    public Integer getParentId() {
+        if (this.parent == null) {
+            return null;
+        }
+        return this.parent.getId();
+    }
 
-    public void setParent(GroupEngineer parent) {
+
+    public void setParent(WorkType parent) {
         this.parent = parent;
     }
 
@@ -97,5 +87,4 @@ public class GroupEngineer extends BaseObject implements Serializable {
     public int hashCode() {
         return 0;
     }
-
 }

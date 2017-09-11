@@ -1,17 +1,21 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <script>
-    var selectedSystem;
+    var selectedSystem = -10;
 
     function updateLayOut() {
         Ext.getCmp("searchform").updateLayout();
+        Ext.getCmp('gridId').setWidth(Ext.getCmp("searchform").getWidth());
         Ext.getCmp('gridId').setHeight(Ext.getCmp("viewport").getHeight() - Ext.getCmp("searchform").getHeight() - 110);
         Ext.getCmp("gridId").updateLayout();
     }
 
-    function loadMachine() {
+    function loadMachine(system) {
+        if(!system){
+            system = selectedSystem;
+        }
         mygrid.getStore().getProxy().extraParams = {
-            system: selectedSystem,
+            system: system,
             code: searchCode.getValue(),
             name: searchName.getValue(),
         };
@@ -126,10 +130,17 @@
             success: function (response) {
                 unmask();
                 var res = JSON.parse(response.responseText);
-                if ("true" == res.success || true === res.success) {
+                if ("codeExisted" == res.success) {
+                    alertError(res.message);
+                    companyCode.setActiveError(res.message);
+                } else if ("true" == res.success || true === res.success) {
                     companyWindow.hide();
                 } else {
-                    alertError(res.message);
+                    if (res.message) {
+                        alertError(res.message);
+                    } else {
+                        alertSystemError();
+                    }
                 }
             },
             failure: function (response, opts) {

@@ -9,6 +9,7 @@ import com.cmms.model.User;
 import com.cmms.service.MailEngine;
 import com.cmms.service.RoleManager;
 import com.cmms.service.UserManager;
+import com.cmms.webapp.security.LoginSuccessHandler;
 import org.springframework.mail.SimpleMailMessage;
 
 import javax.servlet.http.HttpServletRequest;
@@ -241,6 +242,14 @@ public class BaseAction extends ActionSupport {
 
     public void setLimit(int limit) {
         this.limit = limit;
+    }
+
+    //Lay danh sach system thuoc user
+    public List<Integer> getListSytem() {
+        if (getSession().getServletContext().getAttribute(LoginSuccessHandler.SESSION_LIST_SYSTEM_ID) != null) {
+            return (List<Integer>) getSession().getServletContext().getAttribute(LoginSuccessHandler.SESSION_LIST_SYSTEM_ID);
+        }
+        return new ArrayList<Integer>(0);
     }
 
 }

@@ -3,7 +3,7 @@
 <script>
     function changeCode(oldValue, newValue) {
         if (mechanicTypeCode.getValue() != "") {
-            Ext.getCmp("mechanicFullCode").setText('<fmt:message key="machine.fullCode"/>: ' + mechanicTypeCode.getValue() + "-" + newValue);
+            Ext.getCmp("mechanicFullCode").setText('<fmt:message key="machine.fullCode"/>: ' + mechanicTypeCode.getValue() + "." + newValue);
         } else {
             Ext.getCmp("mechanicFullCode").setText('<fmt:message key="machine.fullCode"/>: ' + newValue);
         }
@@ -26,13 +26,14 @@
         mechanicTypeId.setValue(data.get("machineTypeId"));
         mechanicTypeName.setValue(data.get("machineTypeName"));
         mechanicTypeCode.setValue(data.get("machineTypeCode"));
-        mechanicCode.setValue(data.get("code"));
+        mechanicCode.setValue(data.get("code").replace(data.get("machineTypeCode") + ".", ""));
         mechanicName.setValue(data.get("name"));
         fatherId.setValue(data.get("parentId"));
         fatherName.setValue(data.get("parentName"));
         systemId.setValue(data.get("companyId"));
         systemName.setValue(data.get("companyName"));
         fillSpecificValue(data.get("specification"));
+        machineNote.setValue(data.get("note"));
         mechanicWindow.setTitle('<fmt:message key="machine.edit"/>');
         mechanicWindow.show();
         gridHis.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
@@ -193,19 +194,36 @@
     function saveMechanic() {
         var valid = mechanicForm.query("field{isValid()==false}");
         if (!valid || valid.length > 0) {
+            if (mechanicTypeId.getValue() == null || mechanicTypeId.getValue() === "") {
+                mechanicTypeName.reset();
+                mechanicTypeName.setActiveError('<fmt:message key="message.required"/>');
+                return false;
+            }
+
+            if (systemId.getValue() == null || systemId.getValue() === "") {
+                Ext.getCmp("tabMechanic").setActiveTab(Ext.getCmp("indentify"));
+                systemName.reset();
+                systemName.setActiveError('<fmt:message key="message.required"/>');
+                return false;
+            }
+
+            if (!machineNote.isValid()) {
+                Ext.getCmp("tabMechanic").setActiveTab(Ext.getCmp("machineNotes"));
+            }
             return false;
         }
 
         if (mechanicTypeId.getValue() == null || mechanicTypeId.getValue() === "") {
             mechanicTypeName.reset();
-            mechanicTypeName.setActiveError("This field is required!");
+            mechanicTypeName.setActiveError('<fmt:message key="message.required"/>');
             mechanicTypeWindow.show();
             return false;
         }
 
         if (systemId.getValue() == null || systemId.getValue() === "") {
+            Ext.getCmp("tabMechanic").setActiveTab(Ext.getCmp("indentify"));
             systemName.reset();
-            systemName.setActiveError("This field is required!");
+            systemName.setActiveError('<fmt:message key="message.required"/>');
             companyTreeWindow.show();
             return false;
         }
@@ -228,14 +246,21 @@
             success: function (response) {
                 unMaskTarget();
                 var res = JSON.parse(response.responseText);
-                if ("true" == res.success || true === res.success) {
+                if ("codeExisted" == res.success) {
+                    alertError(res.message);
+                    mechanicCode.setActiveError(res.message);
+                } else if ("true" == res.success || true === res.success) {
                     mechanicWindow.hide();
                     var scrollPosition = mygrid.getEl().down('.x-grid-view').getScroll();
                     alertSuccess(res.message);
                     loadMachine();
                     mygrid.getView().getEl().scrollTo('Top', scrollPosition.top, true);
                 } else {
-                    alertError(res.message);
+                    if (res.message) {
+                        alertError(res.message);
+                    } else {
+                        alertSystemError();
+                    }
                 }
             },
             failure: function (response, opts) {

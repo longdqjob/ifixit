@@ -18,11 +18,14 @@ public interface MachineDao extends GenericDao<Machine, Long> {
     Map getList(List<Integer> listItemType, List<Integer> listCompany, String code, String name, Integer start, Integer limit);
 
     @Transactional
-    List<Machine> getListItem(Integer id);
+    List<Machine> getListItem(List<Integer> lstSystem, Integer id);
 
     @Transactional
-    JSONArray getTreeView(Integer id) throws JSONException, SQLException;
+    JSONArray getTreeView(List<Integer> lstSystem, Integer id) throws JSONException, SQLException;
 
     @Transactional
     Integer delete(List<Long> list);
+
+    @Transactional
+    Boolean checkUnique(Long id, String code);
 }

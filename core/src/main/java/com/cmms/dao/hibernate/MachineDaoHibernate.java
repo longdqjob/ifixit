@@ -2,11 +2,9 @@ package com.cmms.dao.hibernate;
 
 import com.cmms.dao.MachineDao;
 import com.cmms.model.Machine;
-import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +14,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -120,20 +119,25 @@ public class MachineDaoHibernate extends GenericDaoHibernate<Machine, Long> impl
     }
 
     @Override
-    public List<Machine> getListItem(Integer id) {
+    public List<Machine> getListItem(List<Integer> lstSystem, Integer id) {
         try {
+            if (lstSystem == null || lstSystem.isEmpty()) {
+                return new ArrayList<>(0);
+            }
             List<Machine> rtn = new LinkedList<>();
             String hql = "";
             if (id == null || id == 0) {
-                hql = "SELECT * FROM machine WHERE parent_id IS NULL";
+                hql = "SELECT * FROM machine WHERE parent_id IS NULL AND company_id IN (:lstSystem)";
                 rtn = getSession().createSQLQuery(hql)
                         .addEntity(Machine.class)
+                        .setParameterList("lstSystem", lstSystem)
                         .list();
             } else {
-                hql = "SELECT * FROM machine WHERE parent_id=:parent_id";
+                hql = "SELECT * FROM machine WHERE parent_id=:parent_id AND company_id IN (:lstSystem)";
                 rtn = getSession().createSQLQuery(hql)
                         .addEntity(Machine.class)
                         .setParameter("parent_id", id)
+                        .setParameterList("lstSystem", lstSystem)
                         .list();
             }
             return rtn;
@@ -144,8 +148,8 @@ public class MachineDaoHibernate extends GenericDaoHibernate<Machine, Long> impl
     }
 
     @Override
-    public JSONArray getTreeView(Integer id) throws JSONException, SQLException {
-        List<Machine> roots = getListItem(id);
+    public JSONArray getTreeView(List<Integer> lstSystem, Integer id) throws JSONException, SQLException {
+        List<Machine> roots = getListItem(lstSystem, id);
 
         JSONArray treeview = new JSONArray();
         for (Machine root : roots) {
@@ -169,5 +173,42 @@ public class MachineDaoHibernate extends GenericDaoHibernate<Machine, Long> impl
             log.error("ERROR delete: ", ex);
             return null;
         }
+    }
+
+    @Override
+    public Boolean checkUnique(Long id, String code) {
+        Boolean rtn = null;
+        Session session = null;
+        try {
+            List<Machine> list = new ArrayList<Machine>();
+
+            session = this.getSessionFactory().openSession();
+            session = getSession();
+            if (!session.isOpen() || !session.isConnected()) {
+                log.debug("Session is close...." + session.isOpen() + " --- " + session.isConnected());
+                session = this.getSessionFactory().openSession();
+            }
+
+            Criteria criteria = session.createCriteria(Machine.class);
+
+            //Id
+            if (id != null && id > 0) {
+                criteria.add(Restrictions.ne("id", id));
+            }
+
+            //Code
+            if (code != null && code.trim().length() > 0) {
+                criteria.add(Restrictions.eq("code", code));
+            }
+
+            list = criteria.list();
+
+            rtn = (list != null && list.size() > 0);
+
+        } catch (Exception ex) {
+            log.error("ERROR checkUnique: " + code, ex);
+            return null;
+        }
+        return rtn;
     }
 }

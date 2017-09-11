@@ -77,7 +77,7 @@
         storeId: 'storeGrid',
         fields: ['id', 'code', 'name', 'description', 'specification', 'note'],
         pageSize: 20,
-        autoLoad: true,
+        autoLoad: false,
         proxy: {
             type: 'ajax',
             url: '../machineType/loadData',
@@ -147,7 +147,7 @@
         width: 1000,
         height: 600,
         constrainHeader: true,
-        title: 'Choose Device(s)',
+        title: '<fmt:message key="machineType"/>',
         modal: true,
         defaults: {
             anchor: '100%'
@@ -167,16 +167,17 @@
             },
         ],
         listeners: {
+            show: function (window) {
+                fnSearchMechanicType();
+            },
             resize: function (width, height, oldWidth, oldHeight, eOpts) {
                 setTimeout(function () {
                     gridMechanicType.setHeight(mechanicTypeWindow.getHeight() - searchMechanicType.getHeight() - 78);
                 }, 1);
             },
         },
-        buttons: [
-            {
-                text: 'Cancel',
-                id: 'cancelEditDeviceId',
+        buttons: [{
+                text: '<fmt:message key="button.cancel"/>',
                 handler: function () {
                     mechanicTypeWindow.hide();
                 }

@@ -1,7 +1,11 @@
 package com.cmms.webapp.action;
 
-import com.cmms.dao.CompanyDao;
-import com.cmms.model.Company;
+import com.cmms.dao.GroupEngineerDao;
+import com.cmms.dao.MachineDao;
+import com.cmms.dao.WorkOrderDao;
+import com.cmms.dao.WorkTypeDao;
+import com.cmms.model.WorkOrder;
+import com.cmms.model.WorkType;
 import com.cmms.webapp.security.LoginSuccessHandler;
 import com.cmms.webapp.util.ResourceBundleUtils;
 import com.cmms.webapp.util.WebUtil;
@@ -16,19 +20,46 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 /**
- * Action for CompanyAction
+ * Action for MachineAction
  */
-public class CompanyAction extends BaseAction implements Preparable {
+public class WorkOrderAction extends BaseAction implements Preparable {
 
     private static final long serialVersionUID = -1L;
-    private CompanyDao companyDao;
+    private GroupEngineerDao groupEngineerDao;
+    private MachineDao machineDao;
+    private WorkTypeDao workTypeDao;
+    private WorkOrderDao workOrderDao;
 
-    public CompanyDao getCompanyDao() {
-        return companyDao;
+    public GroupEngineerDao getGroupEngineerDao() {
+        return groupEngineerDao;
     }
 
-    public void setCompanyDao(CompanyDao companyDao) {
-        this.companyDao = companyDao;
+    public void setGroupEngineerDao(GroupEngineerDao groupEngineerDao) {
+        this.groupEngineerDao = groupEngineerDao;
+    }
+
+    public WorkTypeDao getWorkTypeDao() {
+        return workTypeDao;
+    }
+
+    public void setWorkTypeDao(WorkTypeDao workTypeDao) {
+        this.workTypeDao = workTypeDao;
+    }
+
+    public WorkOrderDao getWorkOrderDao() {
+        return workOrderDao;
+    }
+
+    public void setWorkOrderDao(WorkOrderDao workOrderDao) {
+        this.workOrderDao = workOrderDao;
+    }
+
+    public MachineDao getMachineDao() {
+        return machineDao;
+    }
+
+    public void setMachineDao(MachineDao machineDao) {
+        this.machineDao = machineDao;
     }
 
     @Override
@@ -39,92 +70,75 @@ public class CompanyAction extends BaseAction implements Preparable {
         return SUCCESS;
     }
 
-    public InputStream getTreeCompany() {
+    public InputStream getLoadData() {
         try {
-            String idReq = getRequest().getParameter("id");
-            Integer id = null;
-            if (!StringUtils.isBlank(idReq)) {
-                id = Integer.parseInt(idReq);
-            } else {
-                idReq = getRequest().getParameter("node");
+            JSONObject result = new JSONObject();
+            //companyDao
+            String sWorkType = getRequest().getParameter("workType");
+            Integer companyId = null;
+            if (!StringUtils.isBlank(sWorkType)) {
+                companyId = Integer.parseInt(sWorkType);
             }
-            if (!StringUtils.isBlank(idReq)) {
-                id = Integer.parseInt(idReq);
-            }
-            if (id == null || id < -1) {
-                id = null;
+            List<Integer> listWorkType;
+            if (companyId == null || companyId < -1) {
+                companyId = null;
                 if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID) != null) {
-                    id = (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID);
+                    companyId = (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID);
                 }
+                listWorkType = getListSytem();
+            } else {
+                listWorkType = workTypeDao.getListChildren(companyId);
             }
-
-//            String result = "";
-//            JSONObject treeview = new JSONObject();
-//            treeview.put("list", itemTypeDao.getTreeView(id));
-//            result = treeview.toString();
-            return new ByteArrayInputStream(companyDao.getTreeView(id).toString().getBytes("UTF8"));
-        } catch (Exception e) {
-            log.error("ERROR getTreeCompany: ", e);
-            return null;
-        }
-    }
-
-    public InputStream getListCompany() {
-        try {
-            JSONObject result = new JSONObject();
-            String idReq = getRequest().getParameter("id");
-            Integer id = null;
-            if (!StringUtils.isBlank(idReq)) {
-                id = Integer.parseInt(idReq);
-            }
-            List<Integer> listChildrent = companyDao.getListChildren(id);
-            Map pagingMap = companyDao.getListCompany(listChildrent, null, null, start, limit);
-
-            ArrayList<Company> list = new ArrayList<Company>();
-            if (pagingMap.get("list") != null) {
-                list = (ArrayList<Company>) pagingMap.get("list");
-            }
-
-            Long count = 0L;
-            if (pagingMap.get("count") != null) {
-                count = (Long) pagingMap.get("count");
-            }
-
-            JSONArray jSONArray = WebUtil.toJSONArray(list);
-
-            result.put("list", jSONArray);
-            result.put("totalCount", count);
-
-            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
-        } catch (Exception ex) {
-            log.error("ERROR getListCompany: ", ex);
-            return null;
-        }
-    }
-
-    public InputStream getAllCompany() {
-        try {
-            JSONObject result = new JSONObject();
-            List<Company> list = companyDao.getAll();
-            JSONArray jSONArray = WebUtil.toJSONArray(list);
-            result.put("list", jSONArray);
-            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
-        } catch (Exception ex) {
-            log.error("ERROR getAllCompany: ", ex);
-            return null;
-        }
-    }
-
-    public InputStream getSaveCompany() {
-        try {
-            JSONObject result = new JSONObject();
-            String idReq = getRequest().getParameter("id");
-            Integer id = null;
 
             String code = getRequest().getParameter("code");
             String name = getRequest().getParameter("name");
-            String parent = getRequest().getParameter("parent");
-            String description = getRequest().getParameter("description");
+            Map pagingMap = workOrderDao.getList(listWorkType, code, name, start, limit);
+
+            ArrayList<WorkOrder> list = new ArrayList<WorkOrder>();
+            if (pagingMap.get("list") != null) {
+                list = (ArrayList<WorkOrder>) pagingMap.get("list");
+            }
+
+            Integer count = 0;
+            if (pagingMap.get("count") != null) {
+                count = (Integer) pagingMap.get("count");
+            }
+
+            JSONArray jSONArray = new JSONArray();
+            JSONObject tmp;
+            WorkType workType;
+            for (WorkOrder workOrder : list) {
+                tmp = new JSONObject();
+                tmp = WebUtil.toJSONObject(workOrder, "workType");
+                workType = workOrder.getWorkType();
+                if (workOrder != null) {
+                    tmp.put("workTypeId", workType.getId());
+                    tmp.put("workTypeName", workType.getName());
+                } else {
+                    tmp.put("workTypeId", "");
+                    tmp.put("workTypeName", "");
+                }
+                jSONArray.put(tmp);
+            }
+
+            result.put("list", jSONArray);
+            result.put("totalCount", count);
+            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+        } catch (Exception ex) {
+            log.error("ERROR getLoadData: ", ex);
+            return null;
+        }
+    }
+
+    public InputStream getSave() {
+        try {
+            JSONObject result = new JSONObject();
+            String idReq = getRequest().getParameter("id");
+            Long id = null;
+
+            String code = getRequest().getParameter("code");
+            String name = getRequest().getParameter("name");
+            String workTypeId = getRequest().getParameter("workTypeId");
 
             if (StringUtils.isBlank(code)) {
                 result.put("success", false);
@@ -133,20 +147,21 @@ public class CompanyAction extends BaseAction implements Preparable {
             }
 
             Boolean checkUnique = true;
-            Company company;
+
+            WorkOrder workOrder;
             if (!StringUtils.isBlank(idReq)) {
-                id = Integer.parseInt(idReq);
-                company = companyDao.get(id);
-                if (code.equals(company.getCode())) {
+                id = Long.parseLong(idReq);
+                workOrder = workOrderDao.get(id);
+                if (code.equals(workOrder.getCode())) {
                     checkUnique = false;
                 }
             } else {
-                company = new Company();
+                workOrder = new WorkOrder();
             }
 
             //Check unique
             if (checkUnique) {
-                checkUnique = companyDao.checkUnique(id, code);
+                checkUnique = workOrderDao.checkUnique(id, code);
                 if (checkUnique == null) {
                     result.put("success", false);
                     result.put("message", ResourceBundleUtils.getName("systemError"));
@@ -158,14 +173,14 @@ public class CompanyAction extends BaseAction implements Preparable {
                 }
             }
 
-            Company parentObj = companyDao.get(Integer.parseInt(parent));
-            company.setCompany(parentObj);
-//            company.setParentId(Integer.parseInt(parent));
-            company.setCode(code);
-            company.setName(name);
-            company.setDescription(description);
-            company = companyDao.save(company);
-            if (company != null) {
+            if (!StringUtils.isBlank(workTypeId)) {
+                WorkType workType = workTypeDao.get(Integer.parseInt(workTypeId));
+                workOrder.setWorkType(workType);
+            }
+            workOrder.setCode(code);
+            workOrder.setName(name);
+            workOrder = workOrderDao.save(workOrder);
+            if (workOrder != null) {
                 result.put("success", true);
                 result.put("message", ResourceBundleUtils.getName("saveSuccess"));
             } else {
@@ -174,7 +189,7 @@ public class CompanyAction extends BaseAction implements Preparable {
             }
             return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
         } catch (Exception ex) {
-            log.error("ERROR getSaveCompany: ", ex);
+            log.error("ERROR getSave: ", ex);
             return null;
         }
     }
@@ -189,18 +204,18 @@ public class CompanyAction extends BaseAction implements Preparable {
         this.ids = ids;
     }
 
-    public InputStream getDeleteCompany() {
+    public InputStream getDelete() {
         try {
             JSONObject result = new JSONObject();
             if (ids != null && ids.length > 0) {
                 if (ids.length == 1) {
-                    companyDao.remove(Integer.parseInt(ids[0]));
+                    workOrderDao.remove(Long.parseLong(ids[0]));
                 } else {
-                    List<Integer> list = new ArrayList<>(ids.length);
+                    List<Long> list = new ArrayList<>(ids.length);
                     for (String idTmp : ids) {
-                        list.add(Integer.parseInt(idTmp));
+                        list.add(Long.parseLong(idTmp));
                     }
-                    int delete = companyDao.deleteCompany(list);
+                    int delete = workOrderDao.delete(list);
                     if (delete != ids.length) {
                         log.warn("deleteCompany rtn: " + delete + " list: " + ids.length);
                         result.put("success", false);
@@ -216,9 +231,8 @@ public class CompanyAction extends BaseAction implements Preparable {
             }
             return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
         } catch (Exception ex) {
-            log.error("ERROR getDeleteCompany: ", ex);
+            log.error("ERROR getDelete: ", ex);
             return null;
         }
     }
-
 }

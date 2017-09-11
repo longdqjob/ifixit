@@ -9,6 +9,8 @@
         'Ext.grid.*',
         'Ext.tree.*',
         'Ext.tip.*',
+        'Ext.picker.Date',
+        'Ext.form.field.Date',
         'Ext.ux.CheckColumn'
     ]);
 </script>

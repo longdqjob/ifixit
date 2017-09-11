@@ -36,22 +36,7 @@
         tabIndex: 2,
     });
 
-    var machineTypeDescription = Ext.create('Ext.form.field.Text', {
-        xtype: 'textfield',
-        grow: true,
-        fieldLabel: '<fmt:message key="machineType.description"/>',
-        name: 'description',
-        id: "machineTypeDescription",
-        labelAlign: 'left',
-        anchor: '100%',
-        allowBlank: false,
-        margin: '10 10 10 10',
-        width: 350,
-        maxLength: 50,
-        tabIndex: 3,
-    });
-
-    var machineTypeNote = Ext.create('Ext.form.field.Text', {
+    var machineTypeNote = Ext.create('Ext.form.field.TextArea', {
         xtype: 'textfield',
         grow: true,
         fieldLabel: '<fmt:message key="machineType.note"/>',

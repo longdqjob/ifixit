@@ -31,6 +31,11 @@
         <property name="mailMessage" ref="mailMessage"/>
     </bean>
     
+    <bean id="loginSuccessHandler" class="com.cmms.webapp.security.LoginSuccessHandler">
+        <property name="companyDao" ref="companyDao"/>
+        <property name="userManager" ref="userManager" />
+    </bean>
+    
     
     <!--Item-->
     <bean id="itemAction" class="com.cmms.webapp.action.ItemAction" scope="prototype">
@@ -55,5 +60,15 @@
     
     <bean id="machineTypeAction" class="com.cmms.webapp.action.MachineTypeAction" scope="prototype">
         <property name="machineTypeDao" ref="machineTypeDao"/>
+    </bean>
+    
+    <bean id="workTypeAction" class="com.cmms.webapp.action.WorkTypeAction" scope="prototype">
+        <property name="workTypeDao" ref="workTypeDao"/>
+    </bean>
+    <bean id="workOrderAction" class="com.cmms.webapp.action.WorkOrderAction" scope="prototype">
+        <property name="groupEngineerDao" ref="groupEngineerDao"/>
+        <property name="machineDao" ref="machineDao"/>
+        <property name="workTypeDao" ref="workTypeDao"/>
+        <property name="workOrderDao" ref="workOrderDao"/>
     </bean>
 </beans>

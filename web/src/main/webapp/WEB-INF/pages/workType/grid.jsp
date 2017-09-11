@@ -1,8 +1,3 @@
-<%-- 
-    Document   : layout
-    Created on : Aug 26, 2017, 5:57:28 PM
-    Author     : thuyetlv
---%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <script>
@@ -42,11 +37,11 @@
 //-----------------------------------------Grid---------------------------------------------------------------
     var storeGrid = Ext.create('Ext.data.Store', {
         storeId: 'storeGrid',
-        fields: ['id', 'code', 'name', 'description', 'note', 'companyId', 'companyName', 'machineTypeId', 'machineTypeCode', 'machineTypeName', 'parentId', 'parentName', 'specification'],
+        fields: ['id', 'code', 'name', 'startTime', 'endTime', 'status', 'workTypeId', 'workTypeName'],
         pageSize: 20,
         proxy: {
             type: 'ajax',
-            url: '../machine/loadData',
+            url: '../workOrder/loadData',
             reader: {
                 rootProperty: 'list',
                 type: 'json',
@@ -55,7 +50,7 @@
         },
     });
     var mygrid = Ext.create('Ext.grid.Panel', {
-        title: '<fmt:message key="machine.list"/>',
+        title: '<fmt:message key="work.list"/>',
         id: 'gridId',
         store: storeGrid,
         autoWidth: true,
@@ -94,7 +89,7 @@
                                 if (btn == 'yes') {
                                     var rec = grid.getStore().getAt(rowIndex);
                                     var param = '&ids=' + rec.get('id');
-                                    deleteCompany(param);
+                                    deleteWorkOrder(param);
                                 }
                             });
                         }
@@ -104,23 +99,34 @@
                         tooltip: '<fmt:message key="editItem"/>',
                         handler: function (grid, rowIndex, colIndex) {
                             var rec = grid.getStore().getAt(rowIndex);
-                            editMechanic(rec);
+                            editWorkOrder(rec);
                         }
                     },
                 ],
             },
             ////////////////ITEM   
             {text: 'ID', dataIndex: 'id', flex: 1, hidden: true},
-            {text: '<fmt:message key="machine.code"/>', dataIndex: 'code', flex: 1, },
-            {text: '<fmt:message key="machine.name"/>', dataIndex: 'name', flex: 1, },
-            {text: '<fmt:message key="machine.description"/>', dataIndex: 'description', flex: 1, editor: {
-                    completeOnEnter: false,
-                    field: {
-                        xtype: 'textfield',
-                        allowBlank: false
+            {text: '<fmt:message key="work.code"/>', dataIndex: 'code', flex: 1, },
+            {text: '<fmt:message key="work.name"/>', dataIndex: 'name', flex: 1, },
+            {text: '<fmt:message key="work.status"/>', dataIndex: 'status', flex: 1,
+                renderer: function (value) {
+                    switch (value) {
+                        case 0 :
+                            return '<fmt:message key="work.status.complete"/>';
+                        case 1 :
+                            return '<fmt:message key="work.status.open"/>';
+                        case 2 :
+                            return '<fmt:message key="work.status.approval"/>';
+                        case 3 :
+                            return '<fmt:message key="work.status.inProgress"/>';
+                        case 3 :
+                            return '<fmt:message key="work.status.pendding"/>';
                     }
-                }},
-            {text: '<fmt:message key="machine.companyName"/>', dataIndex: 'companyName', flex: 1, },
+                }
+            },
+            {text: '<fmt:message key="work.start"/>', dataIndex: 'startTime', flex: 1, },
+            {text: '<fmt:message key="work.end"/>', dataIndex: 'endTime', flex: 1, },
+            {text: '<fmt:message key="work.workType"/>', dataIndex: 'workTypeName', flex: 1, },
         ],
         viewConfig: {
             autoFit: true,
@@ -149,7 +155,7 @@
                         text: '<fmt:message key="add"/>',
                         listeners: {
                             click: function (el) {
-                                addMechanic(null);
+                                addWorkOrder(null);
                             }
                         }//end of listeners
                     }, {
@@ -170,10 +176,9 @@
                                 } else {
                                     var message = '<fmt:message key="msgDelete.confirm.list"/>';
                                     message = message.replace("{0}", count);
-                                    console.log(message);
                                     alertConfirm(message, function (e) {
                                         if (e == 'yes') {
-                                            deleteCompany(arrayList);
+                                            deleteWorkOrder(arrayList);
                                         }
                                     });
                                 }

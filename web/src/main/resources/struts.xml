@@ -173,6 +173,11 @@
             <result name="success">/WEB-INF/pages/machineType/index.jsp</result>
         </action>
         
+        <!-- workType -->
+        <action name="workType" class="workTypeAction" method="index">
+            <interceptor-ref name="adminCheck"/>
+            <result name="success">/WEB-INF/pages/workType/index.jsp</result>
+        </action>
     </package>
     
     <package name="itemType" extends="default" namespace="/itemType">
@@ -278,6 +283,44 @@
             </result>
         </action>
         <action name="delete" class="machineAction">
+            <result type="stream">
+                <param name="inputName">delete</param>
+            </result>
+        </action>
+    </package>
+    
+    <!-- workTypeAction -->
+    <package name="workType" extends="default" namespace="/workType">
+        <action name="getTree" class="workTypeAction">
+            <result type="stream">
+                <param name="inputName">tree</param>
+            </result>
+        </action>
+        <action name="save" class="workTypeAction">
+            <result type="stream">
+                <param name="inputName">save</param>
+            </result>
+        </action>
+        <action name="delete" class="workTypeAction">
+            <result type="stream">
+                <param name="inputName">delete</param>
+            </result>
+        </action>
+    </package>
+    
+    <!-- workOrderAction -->
+    <package name="workOrder" extends="default" namespace="/workOrder">
+        <action name="loadData" class="workOrderAction">
+            <result type="stream">
+                <param name="inputName">loadData</param>
+            </result>
+        </action>
+        <action name="save" class="workOrderAction">
+            <result type="stream">
+                <param name="inputName">save</param>
+            </result>
+        </action>
+        <action name="delete" class="workOrderAction">
             <result type="stream">
                 <param name="inputName">delete</param>
             </result>

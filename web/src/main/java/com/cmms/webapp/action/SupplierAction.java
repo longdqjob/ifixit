@@ -67,7 +67,7 @@ public class SupplierAction extends BaseAction implements Preparable {
             return null;
         }
     }
-    
+
     public InputStream getSave() {
         try {
             JSONObject result = new JSONObject();
@@ -79,10 +79,35 @@ public class SupplierAction extends BaseAction implements Preparable {
             String contact = getRequest().getParameter("contact");
             String phone = getRequest().getParameter("phone");
 
-            Supplier supplier = new Supplier();
+            if (StringUtils.isBlank(code)) {
+                result.put("success", false);
+                result.put("message", ResourceBundleUtils.getName("message.codeRequired"));
+                return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+            }
+            Boolean checkUnique = true;
+
+            Supplier supplier;
             if (!StringUtils.isBlank(idReq)) {
                 id = Integer.parseInt(idReq);
-                supplier.setId(id);
+                supplier = supplierDao.get(id);
+                if (code.equals(supplier.getCode())) {
+                    checkUnique = false;
+                }
+            } else {
+                supplier = new Supplier();
+            }
+            //Check unique
+            if (checkUnique) {
+                checkUnique = supplierDao.checkUnique(id, code);
+                if (checkUnique == null) {
+                    result.put("success", false);
+                    result.put("message", ResourceBundleUtils.getName("systemError"));
+                    return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                } else if (checkUnique) {
+                    result.put("success", "codeExisted");
+                    result.put("message", ResourceBundleUtils.getName("message.codeExisted"));
+                    return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                }
             }
 //            company.setParentId(Integer.parseInt(parent));
             supplier.setCode(code);
