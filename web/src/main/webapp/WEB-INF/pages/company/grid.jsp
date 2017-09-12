@@ -102,7 +102,7 @@
                                 if (btn == 'yes') {
                                     var rec = grid.getStore().getAt(rowIndex);
                                     var param = '&ids=' + rec.get('id');
-                                    deleteCompany(param);
+                                    deleteMachine(param);
                                 }
                             });
                         }
@@ -173,7 +173,7 @@
                                     console.log(message);
                                     alertConfirm(message, function (e) {
                                         if (e == 'yes') {
-                                            deleteCompany(arrayList);
+                                            deleteMachine(arrayList);
                                         }
                                     });
                                 }

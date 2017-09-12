@@ -99,7 +99,7 @@ public class MachineAction extends BaseAction implements Preparable {
                 if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID) != null) {
                     companyId = (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID);
                 }
-                listCompany = getListSytem();
+                listCompany = getListSytem2();
             } else {
                 listCompany = companyDao.getListChildren(companyId);
             }
@@ -109,6 +109,17 @@ public class MachineAction extends BaseAction implements Preparable {
             log.error("ERROR getTree: ", e);
             return null;
         }
+    }
+
+    private List<Integer> getListSytem2() {
+        List<Integer> listCompany = getListSytem();
+        if (listCompany == null) {
+            if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID) != null) {
+                listCompany = companyDao.getListChildren((Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID));
+                getRequest().getSession().setAttribute(LoginSuccessHandler.SESSION_LIST_SYSTEM_ID, listCompany);
+            }
+        }
+        return listCompany;
     }
 
     public InputStream getLoadData() {
@@ -134,7 +145,7 @@ public class MachineAction extends BaseAction implements Preparable {
                 if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID) != null) {
                     companyId = (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID);
                 }
-                listCompany = getListSytem();
+                listCompany = getListSytem2();
             } else {
                 listCompany = companyDao.getListChildren(companyId);
             }
@@ -300,12 +311,23 @@ public class MachineAction extends BaseAction implements Preparable {
         try {
             JSONObject result = new JSONObject();
             if (ids != null && ids.length > 0) {
+                List<Long> list = new ArrayList<>(ids.length);
                 if (ids.length == 1) {
+                    list.add(Long.parseLong(ids[0]));
+                    if (machineDao.checkUseParent(list)) {
+                        result.put("success", false);
+                        result.put("message", ResourceBundleUtils.getName("deleteUsing"));
+                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                    }
                     machineDao.remove(Long.parseLong(ids[0]));
                 } else {
-                    List<Long> list = new ArrayList<>(ids.length);
                     for (String idTmp : ids) {
                         list.add(Long.parseLong(idTmp));
+                    }
+                    if (machineDao.checkUseParent(list)) {
+                        result.put("success", false);
+                        result.put("message", ResourceBundleUtils.getName("deleteUsing"));
+                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
                     }
                     int delete = machineDao.delete(list);
                     if (delete != ids.length) {

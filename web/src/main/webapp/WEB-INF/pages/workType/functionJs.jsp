@@ -121,5 +121,7 @@
     function chooseWorkType(record) {
         workTypeParentName.setValue(record.get('name'));
         workTypeParentId.setValue(record.get('id'));
+        wWorkTypeName.setValue(record.get('name'));
+        wWorkTypeId.setValue(record.get('id'));
     }
 </script>

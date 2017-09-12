@@ -28,4 +28,7 @@ public interface MachineDao extends GenericDao<Machine, Long> {
 
     @Transactional
     Boolean checkUnique(Long id, String code);
+    
+    @Transactional
+    Boolean checkUseParent(List<Long> lstId);
 }

@@ -18,26 +18,27 @@
     }
 
     function editWorkOrder(data) {
-        resetLabelSpec();
         workOrderForm.reset();
         workOrderWindow.setTitle('<fmt:message key="work.edit"/>');
+        
+        mechanicName.setValue(data.get('machineName'));
+        mechanicId.setValue(data.get('machineId'));
+        wWorkTypeName.setValue(data.get('workTypeName'));
+        wWorkTypeId.setValue(data.get('workTypeId'));
+        
+        workOrderCode.setValue(data.get('code'));
+        workOrderName.setValue(data.get('name'));
+        
+        Ext.getCmp("startTime").setValue(new Date(data.get('startTime')));
+        Ext.getCmp("endTime").setValue(new Date(data.get('endTime')));
+        
         workOrderWindow.show();
         gridManHrs.setHeight(workOrderForm.getHeight() - mechanic.getHeight() - workType.getHeight() - 50);
     }
 
-    function chooseMechanicType(record) {
-        maskTarget(mechanicWindow);
-        Ext.getCmp('mechanicTypeName').setValue(record.get('name'));
-        Ext.getCmp('mechanicTypeId').setValue(record.get('id'));
-        Ext.getCmp('mechanicTypeCode').setValue(record.get('code'));
-        changeCode("", mechanicCode.getValue());
-        fillSpecific(record.get('specification'));
-        unMaskTarget();
-    }
-
     function chooseMechanic(record) {
-        Ext.getCmp('fatherName').setValue(record.get('name'));
-        Ext.getCmp('fatherId').setValue(record.get('id'));
+        mechanicName.setValue(record.get('name'));
+        mechanicId.setValue(record.get('id'));
     }
 
     function loadHistory(id) {
@@ -49,55 +50,32 @@
 
 
     function saveWorkOrder() {
-        var valid = mechanicForm.query("field{isValid()==false}");
+        var valid = workOrderForm.query("field{isValid()==false}");
         if (!valid || valid.length > 0) {
-            if (mechanicTypeId.getValue() == null || mechanicTypeId.getValue() === "") {
-                mechanicTypeName.reset();
-                mechanicTypeName.setActiveError('<fmt:message key="message.required"/>');
-                return false;
-            }
+//            if (mechanicTypeId.getValue() == null || mechanicTypeId.getValue() === "") {
+//                mechanicTypeName.reset();
+//                mechanicTypeName.setActiveError('<fmt:message key="message.required"/>');
+//                return false;
+//            }
 
-            if (systemId.getValue() == null || systemId.getValue() === "") {
-                Ext.getCmp("tabMechanic").setActiveTab(Ext.getCmp("indentify"));
-                systemName.reset();
-                systemName.setActiveError('<fmt:message key="message.required"/>');
-                return false;
-            }
-
-            if (!machineNote.isValid()) {
-                Ext.getCmp("tabMechanic").setActiveTab(Ext.getCmp("machineNotes"));
-            }
+//            if (!machineNote.isValid()) {
+//                Ext.getCmp("tabMechanic").setActiveTab(Ext.getCmp("machineNotes"));
+//            }
             return false;
         }
 
-        if (mechanicTypeId.getValue() == null || mechanicTypeId.getValue() === "") {
-            mechanicTypeName.reset();
-            mechanicTypeName.setActiveError('<fmt:message key="message.required"/>');
-            mechanicTypeWindow.show();
-            return false;
-        }
-
-        if (systemId.getValue() == null || systemId.getValue() === "") {
-            Ext.getCmp("tabMechanic").setActiveTab(Ext.getCmp("indentify"));
-            systemName.reset();
-            systemName.setActiveError('<fmt:message key="message.required"/>');
-            companyTreeWindow.show();
-            return false;
-        }
-
-        maskTarget(mechanicWindow);
+        maskTarget(workOrderWindow);
         Ext.Ajax.request({
-            url: "/machine/save",
+            url: "/workOrder/save",
             method: "POST",
             params: {
-                id: mechanicId.getValue(),
-                code: mechanicCode.getValue(),
-                name: mechanicName.getValue(),
-                description: "",
-                specification: Ext.encode(createSpecific()),
-                parentId: fatherId.getValue(),
-                companyId: systemId.getValue(),
-                machineTypeId: mechanicTypeId.getValue(),
+                id: workOrderId.getValue(),
+                mechanicId: mechanicId.getValue(),
+                workTypeId: wWorkTypeId.getValue(),
+                code: workOrderCode.getValue(),
+                name: workOrderName.getValue(),
+                startTime: Ext.getCmp("startTime").getRawValue(),
+                endTime: Ext.getCmp("endTime").getRawValue(),
                 note: "",
             },
             success: function (response) {
@@ -105,9 +83,9 @@
                 var res = JSON.parse(response.responseText);
                 if ("codeExisted" == res.success) {
                     alertError(res.message);
-                    mechanicCode.setActiveError(res.message);
+                    workOrderCode.setActiveError(res.message);
                 } else if ("true" == res.success || true === res.success) {
-                    mechanicWindow.hide();
+                    workOrderWindow.hide();
                     var scrollPosition = mygrid.getEl().down('.x-grid-view').getScroll();
                     alertSuccess(res.message);
                     loadWorkOrder();

@@ -31,4 +31,10 @@ public interface CompanyDao extends GenericDao<Company, Integer> {
     
     @Transactional
     Boolean checkUnique(Integer id,String code);
+    
+    @Transactional
+    Boolean checkUseParent(List<Integer> lstId);
+    
+    @Transactional
+    Boolean checkUseByMachenic(List<Integer> lstId);
 }

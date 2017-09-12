@@ -47,7 +47,7 @@
         minHeight: 500,
         columns: [{
                 xtype: 'treecolumn', //this is so we know which column will show the tree
-                width: 345,
+                width: 500,
                 sortable: true,
                 dataIndex: 'name',
             }

@@ -73,6 +73,7 @@ public class MachineDaoHibernate extends GenericDaoHibernate<Machine, Long> impl
                 sbCount.append("AND item_type_id IN (:item_type_id) ");
                 param.put("item_type_id", listItemType);
             }
+            log.info("-------------listCompany: " + StringUtils.join(listCompany, ","));
             if (listCompany != null && !listCompany.isEmpty()) {
                 sb.append(" AND company_id IN (:company_id) ");
                 sbCount.append("AND company_id IN (:company_id) ");
@@ -126,7 +127,7 @@ public class MachineDaoHibernate extends GenericDaoHibernate<Machine, Long> impl
             }
             List<Machine> rtn = new LinkedList<>();
             String hql = "";
-            if (id == null || id == 0) {
+            if (id == null || id <= 0) {
                 hql = "SELECT * FROM machine WHERE parent_id IS NULL AND company_id IN (:lstSystem)";
                 rtn = getSession().createSQLQuery(hql)
                         .addEntity(Machine.class)
@@ -210,5 +211,26 @@ public class MachineDaoHibernate extends GenericDaoHibernate<Machine, Long> impl
             return null;
         }
         return rtn;
+    }
+
+    /**
+     * 
+     * @param lstId
+     * @return true neu duoc su dung
+     */
+    @Override
+    public Boolean checkUseParent(List<Long> lstId) {
+        try {
+            if (lstId == null || lstId.isEmpty()) {
+                return false;
+            }
+            Query query = getSession().createSQLQuery("SELECT * FROM machine WHERE parent_id in (:lstId)")
+                    .addEntity(Machine.class)
+                    .setParameterList("lstId", lstId);
+            return (query.list().size() > 0);
+        } catch (Exception ex) {
+            log.error("ERROR checkUseParent: " + StringUtils.join(lstId, ","), ex);
+            return null;
+        }
     }
 }

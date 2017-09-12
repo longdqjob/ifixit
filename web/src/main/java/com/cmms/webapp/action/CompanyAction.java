@@ -193,12 +193,33 @@ public class CompanyAction extends BaseAction implements Preparable {
         try {
             JSONObject result = new JSONObject();
             if (ids != null && ids.length > 0) {
+                List<Integer> list = new ArrayList<>(ids.length);
                 if (ids.length == 1) {
+                    list.add(Integer.parseInt(ids[0]));
+                    if (companyDao.checkUseParent(list)) {
+                        result.put("success", false);
+                        result.put("message", ResourceBundleUtils.getName("deleteUsing"));
+                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                    }
+                    if (companyDao.checkUseByMachenic(list)) {
+                        result.put("success", false);
+                        result.put("message", ResourceBundleUtils.getName("deleteUsing"));
+                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                    }
                     companyDao.remove(Integer.parseInt(ids[0]));
                 } else {
-                    List<Integer> list = new ArrayList<>(ids.length);
                     for (String idTmp : ids) {
                         list.add(Integer.parseInt(idTmp));
+                    }
+                    if (companyDao.checkUseParent(list)) {
+                        result.put("success", false);
+                        result.put("message", ResourceBundleUtils.getName("deleteUsing"));
+                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                    }
+                    if (companyDao.checkUseByMachenic(list)) {
+                        result.put("success", false);
+                        result.put("message", ResourceBundleUtils.getName("deleteUsing"));
+                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
                     }
                     int delete = companyDao.deleteCompany(list);
                     if (delete != ids.length) {
