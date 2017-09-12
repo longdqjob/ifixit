@@ -8,6 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.FetchType;
@@ -30,6 +31,7 @@ public class Machine extends BaseObject implements Serializable {
     private Integer itemTypeId;
     private Company company;
     private MachineType machineType;
+    private Timestamp since;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -75,6 +77,15 @@ public class Machine extends BaseObject implements Serializable {
         return parent;
     }
 
+    @Column(name = "since")
+    public Timestamp getSince() {
+        return since;
+    }
+
+    public void setSince(Timestamp since) {
+        this.since = since;
+    }
+
     @Transient
     public Integer getParentId() {
         if (this.company == null) {
@@ -104,7 +115,6 @@ public class Machine extends BaseObject implements Serializable {
         this.itemTypeId = itemTypeId;
     }
 
-    
 //    @Transactional
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")

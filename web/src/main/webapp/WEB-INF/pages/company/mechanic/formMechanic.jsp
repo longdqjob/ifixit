@@ -66,6 +66,7 @@
         readOnly: true,
     });
 
+  
 
     var mechanicCode = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
@@ -77,8 +78,8 @@
         labelAlign: 'left',
         anchor: '100%',
         allowBlank: false,
-        margin: '10 10 10 10',
-        width: 200,
+        margin: '20 10 10 10',
+        width: 250,
         maxLength: 50,
         listeners: {
             'change': function (textfield, newValue, oldValue) {
@@ -86,17 +87,34 @@
             }
         }
     });
+    var mechanicCompleteCode = Ext.create('Ext.form.field.Text', {
+        xtype: 'textfield',
+        grow: true,
+        tabIndex: -1,
+        fieldLabel: '<fmt:message key="machine.fullCode"/>',
+        id: "mechanicCompleteCode",
+        labelAlign: 'left',
+        anchor: '100%',
+        allowBlank: false,
+        margin: '10 10 10 10',
+        width: 250,
+        maxLength: 50,
+        readOnly: true,
+    });
 
     var mechanicCodeCtn = Ext.create('Ext.form.FieldContainer', {
         xtype: 'fieldcontainer',
-        columnWidth: 1,
+        //columnWidth: 1,
         layout: 'column',
-        items: [mechanicCode, {
-                xtype: 'label',
-                id: 'mechanicFullCode',
-                margin: '15 10 10 10',
-            }]
+        items: [mechanicCode,
+//            {
+//                xtype: 'label',
+//                id: 'mechanicFullCode',
+//                margin: '15 10 10 10',
+//            }
+        ]
     });
+
 
     var mechanicName = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
@@ -478,8 +496,14 @@
                         xtype: 'container',
                         columnWidth: 0.5,
                         layout: 'anchor',
-                        items: [mechanicTypeCode, mechanicCodeCtn]
+                        items: [mechanicTypeCode, mechanicCode]
                     }, {
+                        xtype: 'container',
+                        columnWidth: 1,
+                        layout: 'anchor',
+                        items: [mechanicCompleteCode]
+                    },
+                    {
                         xtype: 'container',
                         columnWidth: 1,
                         id: "containerTab",

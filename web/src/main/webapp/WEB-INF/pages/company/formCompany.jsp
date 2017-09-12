@@ -190,8 +190,8 @@
                         columnWidth: 1,
                         height: '100%',
                         items: [
-                            companyId, companyParent,
-                            companyName, companyCode, companyFullCode, companyDescription]
+                            companyId, companyParent,companyCode,
+                            companyName,companyFullCode, companyDescription]
                     }]
             },
         ]

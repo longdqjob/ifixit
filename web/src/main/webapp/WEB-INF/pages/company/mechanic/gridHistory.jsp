@@ -9,7 +9,7 @@
 //-----------------------------------------Grid---------------------------------------------------------------
     var storeHis = Ext.create('Ext.data.Store', {
         storeId: 'storeHis',
-        fields: ['id', 'status', 'wo', 'code', 'description', 'start', 'end', 'cost', 'note'],
+        fields: ['id', 'status', 'wo', 'code', 'description', 'start', 'end', 'cost', 'note','since'],
         pageSize: 20,
 //        proxy: {
 //            type: 'ajax',

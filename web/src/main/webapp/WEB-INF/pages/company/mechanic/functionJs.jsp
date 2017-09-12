@@ -3,9 +3,11 @@
 <script>
     function changeCode(oldValue, newValue) {
         if (mechanicTypeCode.getValue() != "") {
-            Ext.getCmp("mechanicFullCode").setText('<fmt:message key="machine.fullCode"/>: ' + mechanicTypeCode.getValue() + "." + newValue);
+            //  Ext.getCmp("mechanicFullCode").setText('<fmt:message key="machine.fullCode"/>: ' + mechanicTypeCode.getValue() + "." + newValue);
+            mechanicCompleteCode.setValue(mechanicTypeCode.getValue() + "." + newValue);
         } else {
-            Ext.getCmp("mechanicFullCode").setText('<fmt:message key="machine.fullCode"/>: ' + newValue);
+            // Ext.getCmp("mechanicFullCode").setText('<fmt:message key="machine.fullCode"/>: ' + newValue);
+            mechanicCompleteCode.setValue(newValue);
         }
 
     }
@@ -35,6 +37,9 @@
         systemName.setValue(data.get("companyName"));
         fillSpecificValue(data.get("specification"));
         machineNote.setValue(data.get("note"));
+        
+        Ext.getCmp("sinceField").setValue(Ext.Date.parse(data.get("since").split(".")[0],'Y-d-m H:i:s'));
+
         mechanicWindow.setTitle('<fmt:message key="machine.edit"/>');
         mechanicWindow.setIconCls('edit-cls');
         mechanicWindow.show();
@@ -243,7 +248,8 @@
                 parentId: fatherId.getValue(),
                 companyId: systemId.getValue(),
                 machineTypeId: mechanicTypeId.getValue(),
-                note: "",
+                note: machineNote.getValue(),
+                since: Ext.getCmp("sinceField").getRawValue()
             },
             success: function (response) {
                 unMaskTarget();

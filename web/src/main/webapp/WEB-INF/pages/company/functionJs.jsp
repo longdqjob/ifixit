@@ -11,7 +11,7 @@
     }
 
     function loadMachine(system) {
-        if(!system){
+        if (!system) {
             system = selectedSystem;
         }
         mygrid.getStore().getProxy().extraParams = {
@@ -55,6 +55,8 @@
             companyParentName.setValue(data.get("name"));
         }
         companyWindow.setTitle('<fmt:message key="addCompany"/>');
+        companyWindow.setIconCls("add-cls");
+        enableCode();
         companyWindow.show();
         companyParent.focus();
     }
@@ -68,10 +70,21 @@
         companyCode.setValue(data.get("code"));
         companyFullCode.setValue(data.get("code"));
         companyDescription.setValue(data.get("description"));
+        
+        disableCode();
 
         companyWindow.setTitle('<fmt:message key="editCompany"/>');
+        companyWindow.setIconCls("edit-cls");
         companyWindow.show();
         companyParent.focus();
+    }
+    function enableCode() {
+        companyCode.setReadOnly(false);
+        companyFullCode.setReadOnly(false);
+    }
+    function disableCode() {
+        companyCode.setReadOnly(true);
+        companyFullCode.setReadOnly(true);
     }
 
     function deleteCompany(arrayList) {

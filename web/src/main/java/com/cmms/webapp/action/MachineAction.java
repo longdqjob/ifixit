@@ -7,13 +7,17 @@ import com.cmms.dao.MachineTypeDao;
 import com.cmms.model.Company;
 import com.cmms.model.Machine;
 import com.cmms.model.MachineType;
+import com.cmms.util.DateUtil;
 import com.cmms.webapp.security.LoginSuccessHandler;
 import com.cmms.webapp.util.ResourceBundleUtils;
 import com.cmms.webapp.util.WebUtil;
 import com.opensymphony.xwork2.Preparable;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang.StringUtils;
@@ -210,6 +214,7 @@ public class MachineAction extends BaseAction implements Preparable {
             String companyId = getRequest().getParameter("companyId");
             String machineTypeId = getRequest().getParameter("machineTypeId");
             String note = getRequest().getParameter("note");
+            String since = getRequest().getParameter("since");
 
             if (StringUtils.isBlank(code)) {
                 result.put("success", false);
@@ -255,6 +260,10 @@ public class MachineAction extends BaseAction implements Preparable {
             if (!StringUtils.isBlank(machineTypeId)) {
                 MachineType machineType = machineTypeDao.get(Integer.parseInt(machineTypeId));
                 mechanic.setMachineType(machineType);
+            }
+            if (!StringUtils.isBlank(since)) {
+                Date d = DateUtil.convertStringToDate(since);
+                mechanic.setSince(new Timestamp(d.getTime()));
             }
 
             mechanic.setCode(code);

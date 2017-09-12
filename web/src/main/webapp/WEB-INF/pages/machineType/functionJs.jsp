@@ -6,11 +6,20 @@
         Ext.getCmp('gridId').setHeight(Ext.getCmp("viewport").getHeight() - Ext.getCmp("searchform").getHeight() - 120);
         Ext.getCmp("gridId").updateLayout();
     }
+    function enableCode() {
+        machineTypeCode.setReadOnly(false);
+       // companyFullCode.setReadOnly(false);
+    }
+    function disableCode() {
+        machineTypeCode.setReadOnly(true);
+        //companyFullCode.setReadOnly(true);
+    }
 
     function add() {
         addForm.reset();
         addWindow.setTitle('<fmt:message key="machineType.add"/>');
         addWindow.setIconCls('add-cls');
+        enableCode();
         addWindow.show();
         Ext.getCmp("tabSpecification").setActiveTab(Ext.getCmp("specification1"));
         machineTypeCode.focus();
@@ -24,6 +33,7 @@
         machineTypeNote.setValue(data.get("note"));
         fillSpecific(data.get("specification"));
         addWindow.setTitle('<fmt:message key="machineType.edit"/>');
+        disableCode();
         addWindow.setIconCls('edit-cls');
         addWindow.show();
         Ext.getCmp("tabSpecification").setActiveTab(Ext.getCmp("specification1"));

@@ -106,6 +106,9 @@
                     node.expand();
                 }
             },
+            itemdblclick : function( tree, record, item, index, e, eOpts ) {
+                console.log(record);
+            },
             itemcontextmenu: function (tree, record, item, index, e, eOpts) {
                 // Optimize : create menu once
                 var menu_grid = new Ext.menu.Menu({
