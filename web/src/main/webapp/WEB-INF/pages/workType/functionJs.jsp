@@ -11,7 +11,7 @@
     }
 
     function loadWorkOrder(system) {
-        if(!system){
+        if (!system) {
             system = selectedSystem;
         }
         mygrid.getStore().getProxy().extraParams = {
@@ -20,6 +20,22 @@
             name: searchName.getValue(),
         };
         mygrid.getStore().loadPage(1);
+    }
+
+    function testAjax() {
+        Ext.Ajax.request({
+            url: '../workOrder/loadData?id=1',
+            method: "POST",
+            timeout: 10000,
+            success: function (result, request) {
+                console.log("-----------success");
+            },
+            failure: function (response, opts) {
+                console.log("-----------failure");
+                console.log(response);
+                alertSystemError();
+            }
+        });
     }
 
     function addWorkType(data) {

@@ -26,8 +26,14 @@ public class WorkOrder extends BaseObject implements Serializable {
     private Date startTime;
     private Date endTime;
     private Integer status;
+    private Integer interval;
+    private Integer isRepeat;
+    private String task;
+    private String reason;
+    private String note;
     private WorkType workType;
     private Machine machine;
+    private GroupEngineer groupEngineer;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -84,6 +90,51 @@ public class WorkOrder extends BaseObject implements Serializable {
         this.status = status;
     }
 
+    @Column(name = "interval")
+    public Integer getInterval() {
+        return interval;
+    }
+
+    public void setInterval(Integer interval) {
+        this.interval = interval;
+    }
+
+    @Column(name = "is_repeat")
+    public Integer getIsRepeat() {
+        return isRepeat;
+    }
+
+    public void setIsRepeat(Integer isRepeat) {
+        this.isRepeat = isRepeat;
+    }
+
+    @Column(name = "task")
+    public String getTask() {
+        return task;
+    }
+
+    public void setTask(String task) {
+        this.task = task;
+    }
+
+    @Column(name = "reason")
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    @Column(name = "note")
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "work_type_id")
     public WorkType getWorkType() {
@@ -102,6 +153,16 @@ public class WorkOrder extends BaseObject implements Serializable {
 
     public void setMachine(Machine machine) {
         this.machine = machine;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_engineer_id")
+    public GroupEngineer getGroupEngineer() {
+        return groupEngineer;
+    }
+
+    public void setGroupEngineer(GroupEngineer groupEngineer) {
+        this.groupEngineer = groupEngineer;
     }
 
     @Override

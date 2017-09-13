@@ -103,7 +103,8 @@
             <![CDATA[jdbc:mysql://localhost/${db.name}?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf-8&amp;autoReconnect=true]]>
         </jdbc.url>
         <jdbc.username>root</jdbc.username>
-        <jdbc.password>nms@123</jdbc.password>
+        <jdbc.password>Longdq@2902</jdbc.password>
+        <!--<jdbc.password>admin@123</jdbc.password>-->
         <jdbc.validationQuery><![CDATA[SELECT 1 + 1]]></jdbc.validationQuery>
 
     </properties>

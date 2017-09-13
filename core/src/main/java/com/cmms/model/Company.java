@@ -112,6 +112,14 @@ public class Company extends BaseObject implements Serializable {
     public Company getCompany() {
         return company;
     }
+    
+    @Transient
+    public String getParentCode() {
+        if (this.company == null) {
+            return "";
+        }
+        return this.company.getCompleteCode();
+    }
 
     @Column(name = "completeCode")
     public String getCompleteCode() {

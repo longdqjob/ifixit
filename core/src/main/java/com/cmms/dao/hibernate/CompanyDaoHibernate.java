@@ -67,8 +67,8 @@ public class CompanyDaoHibernate extends GenericDaoHibernate<Company, Integer> i
         obj.put("completeCode", currentGroup.getCompleteCode());
         
         
-        obj.put("completeParentCode", currentGroup.getCompany().getCompleteCode());
-        obj.put("parentName", currentGroup.getCompany().getName());
+        obj.put("completeParentCode", currentGroup.getParentCode());
+        obj.put("parentName", currentGroup.getParentName());
         obj.put("parentId", currentGroup.getParentId());
         obj.put("state", currentGroup.getState());
         obj.put("leaf", false);

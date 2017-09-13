@@ -27,7 +27,7 @@
 
     var search = new Ext.create('Ext.form.Panel', {
         xtype: 'form-hboxlayout',
-        title: '<fmt:message key="button.search"/>' + " " + '<fmt:message key="workType"/>',
+        title: '<fmt:message key="button.search"/>' + " " + '<fmt:message key="work"/>',
         collapsible: true,
         collapsed: true,
         id: 'searchform',

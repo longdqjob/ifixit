@@ -74,7 +74,7 @@
         header: false,
         collapsible: true,
         useArrows: false,
-        rootVisible: false,
+       rootVisible: false,
         lines: true,
         multiSelect: true,
         border: true,
@@ -95,11 +95,10 @@
                 this.getEl().setStyle('height', 'auto');
                 this.body.setStyle('height', 'auto');
                 this.getView().getEl().setStyle('height', 'auto');
-                console.log("---afterrender:---");
                 loadMachine("-10");
             },
             itemclick: function (view, node) {
-                //console.log(node);
+                              //console.log(node);
 //                if (node.isLeaf()) {
 //                    // some functionality to open the leaf(document) in a tabpanel
 //                    alert(node.get("text"));
@@ -127,20 +126,16 @@
                                 selectedSystem = record;
                                 loadMachine(selectedSystem.get("id"));
                                 console.log("Load data " + record.get("id") + " - " + record.get("name"));
-
                             }}, {
                             text: '<fmt:message key="addCompany"/>',
                             iconCls: "add-cls",
                             handler: function () {
-                               // console.log("addCompany: " + record.get("id") + " - " + record.get("name"));
                                 addCompany(record);
                                 console.log(record);
                             }}, {
                             text: '<fmt:message key="editCompany"/>',
                             iconCls: "edit-cls",
                             handler: function () {
-                                //console.log("editCompany: " + record.get("id") + " - " + record.get("name"));
-                                //console.log(record);
                                 editCompany(record);
                             }}, {
                             text: '<fmt:message key="delete"/>',

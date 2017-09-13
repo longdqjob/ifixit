@@ -1,8 +1,8 @@
 package com.cmms.webapp.action;
 
-import com.cmms.dao.CompanyDao;
-import com.cmms.dao.WorkTypeDao;
-import com.cmms.model.WorkType;
+import com.cmms.dao.GroupEngineerDao;
+import com.cmms.model.GroupEngineer;
+import com.cmms.webapp.security.LoginSuccessHandler;
 import com.cmms.webapp.util.ResourceBundleUtils;
 import com.opensymphony.xwork2.Preparable;
 import java.io.ByteArrayInputStream;
@@ -13,28 +13,19 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONObject;
 
 /**
- * Action for CompanyAction
+ * Action for GrpEngineerAction
  */
-public class WorkTypeAction extends BaseAction implements Preparable {
+public class GrpEngineerAction extends BaseAction implements Preparable {
 
     private static final long serialVersionUID = -1L;
-    private WorkTypeDao workTypeDao;
-    private CompanyDao companyDao;
+    private GroupEngineerDao groupEngineerDao;
 
-    public CompanyDao getCompanyDao() {
-        return companyDao;
+    public GroupEngineerDao getGroupEngineerDao() {
+        return groupEngineerDao;
     }
 
-    public void setCompanyDao(CompanyDao companyDao) {
-        this.companyDao = companyDao;
-    }
-
-    public WorkTypeDao getWorkTypeDao() {
-        return workTypeDao;
-    }
-
-    public void setWorkTypeDao(WorkTypeDao workTypeDao) {
-        this.workTypeDao = workTypeDao;
+    public void setGroupEngineerDao(GroupEngineerDao groupEngineerDao) {
+        this.groupEngineerDao = groupEngineerDao;
     }
 
     @Override
@@ -57,9 +48,12 @@ public class WorkTypeAction extends BaseAction implements Preparable {
             if (!StringUtils.isBlank(idReq)) {
                 id = Integer.parseInt(idReq);
             }
-            return new ByteArrayInputStream(workTypeDao.getTreeView(id).toString().getBytes("UTF8"));
+            if (id == null || id < -1) {
+                id = getGrpEngineerId();
+            }
+            return new ByteArrayInputStream(groupEngineerDao.getTreeView(id).toString().getBytes("UTF8"));
         } catch (Exception e) {
-            log.error("ERROR getTreeCompany: ", e);
+            log.error("ERROR getTree: ", e);
             return null;
         }
     }
@@ -73,6 +67,7 @@ public class WorkTypeAction extends BaseAction implements Preparable {
             String code = getRequest().getParameter("code");
             String name = getRequest().getParameter("name");
             String parent = getRequest().getParameter("parent");
+            String description = getRequest().getParameter("description");
 
             if (StringUtils.isBlank(code)) {
                 result.put("success", false);
@@ -81,20 +76,20 @@ public class WorkTypeAction extends BaseAction implements Preparable {
             }
 
             Boolean checkUnique = true;
-            WorkType workType;
+            GroupEngineer cGroupEngineer;
             if (!StringUtils.isBlank(idReq)) {
                 id = Integer.parseInt(idReq);
-                workType = workTypeDao.get(id);
-                if (code.equals(workType.getCode())) {
+                cGroupEngineer = groupEngineerDao.get(id);
+                if (code.equals(cGroupEngineer.getCode())) {
                     checkUnique = false;
                 }
             } else {
-                workType = new WorkType();
+                cGroupEngineer = new GroupEngineer();
             }
 
             //Check unique
             if (checkUnique) {
-                checkUnique = workTypeDao.checkUnique(id, code);
+                checkUnique = groupEngineerDao.checkUnique(id, code);
                 if (checkUnique == null) {
                     result.put("success", false);
                     result.put("message", ResourceBundleUtils.getName("systemError"));
@@ -106,13 +101,13 @@ public class WorkTypeAction extends BaseAction implements Preparable {
                 }
             }
 
-            WorkType parentObj = workTypeDao.get(Integer.parseInt(parent));
-            workType.setParent(parentObj);
-//            company.setParentId(Integer.parseInt(parent));
-            workType.setCode(code);
-            workType.setName(name);
-            workType = workTypeDao.save(workType);
-            if (workType != null) {
+            GroupEngineer parentObj = groupEngineerDao.get(Integer.parseInt(parent));
+            cGroupEngineer.setParent(parentObj);
+            cGroupEngineer.setCode(code);
+            cGroupEngineer.setName(name);
+            cGroupEngineer.setDescription(description);
+            cGroupEngineer = groupEngineerDao.save(cGroupEngineer);
+            if (cGroupEngineer != null) {
                 result.put("success", true);
                 result.put("message", ResourceBundleUtils.getName("saveSuccess"));
             } else {
@@ -121,7 +116,7 @@ public class WorkTypeAction extends BaseAction implements Preparable {
             }
             return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
         } catch (Exception ex) {
-            log.error("ERROR getSaveCompany: ", ex);
+            log.error("ERROR getSave: ", ex);
             return null;
         }
     }
@@ -140,16 +135,36 @@ public class WorkTypeAction extends BaseAction implements Preparable {
         try {
             JSONObject result = new JSONObject();
             if (ids != null && ids.length > 0) {
+                List<Integer> list = new ArrayList<>(ids.length);
                 if (ids.length == 1) {
-                    workTypeDao.remove(Integer.parseInt(ids[0]));
+                    list.add(Integer.parseInt(ids[0]));
+                    if (groupEngineerDao.checkUseParent(list)) {
+                        result.put("success", false);
+                        result.put("message", ResourceBundleUtils.getName("deleteUsing"));
+                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                    }
+                    if (groupEngineerDao.checkUseByManHrs(list)) {
+                        result.put("success", false);
+                        result.put("message", ResourceBundleUtils.getName("deleteUsing"));
+                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                    }
+                    groupEngineerDao.remove(Integer.parseInt(ids[0]));
                 } else {
-                    List<Integer> list = new ArrayList<>(ids.length);
                     for (String idTmp : ids) {
                         list.add(Integer.parseInt(idTmp));
                     }
-                    int delete = workTypeDao.delete(list);
+                    if (groupEngineerDao.checkUseParent(list)) {
+                        result.put("success", false);
+                        result.put("message", ResourceBundleUtils.getName("deleteUsing"));
+                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                    }
+                    if (groupEngineerDao.checkUseByManHrs(list)) {
+                        result.put("success", false);
+                        result.put("message", ResourceBundleUtils.getName("deleteUsing"));
+                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                    }
+                    int delete = groupEngineerDao.delete(list);
                     if (delete != ids.length) {
-                        log.warn("deleteCompany rtn: " + delete + " list: " + ids.length);
                         result.put("success", false);
                         result.put("message", ResourceBundleUtils.getName("deleteFail"));
                         return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
@@ -163,7 +178,7 @@ public class WorkTypeAction extends BaseAction implements Preparable {
             }
             return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
         } catch (Exception ex) {
-            log.error("ERROR getDeleteCompany: ", ex);
+            log.error("ERROR getDelete: ", ex);
             return null;
         }
     }

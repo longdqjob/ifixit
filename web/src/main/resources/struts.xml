@@ -222,6 +222,25 @@
         </action>
     </package>
     
+    <!--grpEngineer-->
+    <package name="grpEngineer" extends="default" namespace="/grpEngineer">
+        <action name="getTree" class="grpEngineerAction">
+            <result type="stream">
+                <param name="inputName">tree</param>
+            </result>
+        </action>
+        <action name="save" class="grpEngineerAction">
+            <result type="stream">
+                <param name="inputName">save</param>
+            </result>
+        </action>
+        <action name="delete" class="grpEngineerAction">
+            <result type="stream">
+                <param name="inputName">delete</param>
+            </result>
+        </action>
+    </package>
+    
     <!--supplierAction-->
     <package name="supplier" extends="default" namespace="/supplier">
         <action name="loadData" class="supplierAction">
@@ -308,11 +327,37 @@
         </action>
     </package>
     
+    <!-- materialAction -->
+    <package name="material" extends="default" namespace="/material">
+        <action name="loadData" class="materialAction">
+            <result type="stream">
+                <param name="inputName">loadData</param>
+            </result>
+        </action>
+        <action name="save" class="materialAction">
+            <result type="stream">
+                <param name="inputName">save</param>
+            </result>
+        </action>
+        <action name="delete" class="materialAction">
+            <result type="stream">
+                <param name="inputName">delete</param>
+            </result>
+        </action>
+    </package>
+    
     <!-- workOrderAction -->
     <package name="workOrder" extends="default" namespace="/workOrder">
         <action name="loadData" class="workOrderAction">
+            <interceptor-ref name="adminOnly"/>
             <result type="stream">
                 <param name="inputName">loadData</param>
+            </result>
+        </action>
+        <action name="loadInfo" class="workOrderAction">
+            <interceptor-ref name="adminOnly"/>
+            <result type="stream">
+                <param name="inputName">loadInfo</param>
             </result>
         </action>
         <action name="save" class="workOrderAction">

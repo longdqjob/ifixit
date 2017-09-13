@@ -20,5 +20,8 @@
     <bean id="supplierDao" class="com.cmms.dao.hibernate.SupplierDaoHibernate"></bean>
     <bean id="workOrderDao" class="com.cmms.dao.hibernate.WorkOrderDaoHibernate"></bean>
     <bean id="workTypeDao" class="com.cmms.dao.hibernate.WorkTypeDaoHibernate"></bean>
+    <bean id="materialDao" class="com.cmms.dao.hibernate.MaterialDaoHibernate"></bean>
+    <bean id="manHoursDao" class="com.cmms.dao.hibernate.ManHoursDaoHibernate"></bean>
+    <bean id="stockItemDao" class="com.cmms.dao.hibernate.StockItemDaoHibernate"></bean>
     <!-- Add new Managers here -->
 </beans>

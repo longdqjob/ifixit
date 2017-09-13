@@ -6,6 +6,7 @@
 package com.cmms.webapp.security;
 
 import com.cmms.dao.CompanyDao;
+import com.cmms.dao.GroupEngineerDao;
 import com.cmms.service.UserManager;
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -27,6 +28,15 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     protected UserManager userManager;
     protected CompanyDao companyDao;
+    protected GroupEngineerDao groupEngineerDao;
+
+    public GroupEngineerDao getGroupEngineerDao() {
+        return groupEngineerDao;
+    }
+
+    public void setGroupEngineerDao(GroupEngineerDao groupEngineerDao) {
+        this.groupEngineerDao = groupEngineerDao;
+    }
 
     public CompanyDao getCompanyDao() {
         return companyDao;
@@ -44,9 +54,12 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         this.userManager = userManager;
     }
 
+    public static final String SESSION_USER_NAME = "USERNAME_HANDLE";
+    public static final String SESSION_USER_ID = "USER_HANDLE";
     public static final String SESSION_LIST_SYSTEM_ID = "lstSystemId";
     public static final String SESSION_SYSTEM_ID = "systemId";
-    public static final String SESSION_ENGINNER_GRP = "EngineerGrp";
+    public static final String SESSION_ENGINNER_GRP = "grpEngineerId";
+    public static final String SESSION_LIST_GRP_ENGINNER = "lstEngineerGrp";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -55,17 +68,23 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         String userName = authUser.getUsername();
         Long userId = authUser.getId();
 
-        session.setAttribute("userName", userName);
-        session.setAttribute("userId", userId);
+        session.setAttribute(SESSION_USER_NAME, userName);
+        session.setAttribute(SESSION_USER_ID, userId);
 
         Integer systemId = 1;
         Integer engineerGrpID = 1;
 
+        //System
         session.setAttribute(SESSION_SYSTEM_ID, systemId);
         List<Integer> lstChild = companyDao.getListChildren(systemId);
-        System.out.println("lstChild: " + StringUtils.join(lstChild, " , ") );
+        System.out.println("lstChild: " + StringUtils.join(lstChild, " , "));
         session.setAttribute(SESSION_LIST_SYSTEM_ID, lstChild);
+
+        //ENGINNER_GRP
         session.setAttribute(SESSION_ENGINNER_GRP, engineerGrpID);
+        List<Integer> lstGrpEng = groupEngineerDao.getListChildren(engineerGrpID);
+        System.out.println("lstGrpEng: " + StringUtils.join(lstGrpEng, " , "));
+        session.setAttribute(SESSION_LIST_GRP_ENGINNER, lstGrpEng);
         System.out.println("SESSION_SYSTEM_ID: " + session.getAttribute(SESSION_SYSTEM_ID));
 
         //set our response to OK status
@@ -73,6 +92,5 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         //since we have created our custom success handler, its up to us to where
         //we will redirect the user after successfully login
         response.sendRedirect("home");
-
     }
 }

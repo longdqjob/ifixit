@@ -22,6 +22,10 @@
         <mapping class="com.cmms.model.MachineType"/>
         <mapping class="com.cmms.model.WorkType"/>
         <mapping class="com.cmms.model.WorkOrder"/>
+        <mapping class="com.cmms.model.Material"/>
+        <mapping class="com.cmms.model.ManHours"/>
+        <mapping class="com.cmms.model.StockItem"/>
+        
         <mapping class="com.cmms.model.Role"/>
         <mapping class="com.cmms.model.Supplier"/>
         <mapping class="com.cmms.model.User"/>

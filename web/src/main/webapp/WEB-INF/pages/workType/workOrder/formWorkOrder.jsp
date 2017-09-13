@@ -92,6 +92,75 @@
     });
 
 
+    //--------------------------------------------------------------------------
+    var grpEngineerId = Ext.create('Ext.form.field.Text', {
+        xtype: 'textfield',
+        hidden: true,
+    });
+
+    var grpEngineerName = Ext.create('Ext.form.field.Text', {
+        xtype: 'textfield',
+        grow: true,
+        tabIndex: -1,
+        fieldLabel: '<fmt:message key="work.enginnerGrp"/>',
+        labelAlign: 'left',
+        anchor: '100%',
+        allowBlank: false,
+        margin: '10 10 10 10',
+        width: 250,
+        readOnly: true,
+        labelWidth: 100,
+        listeners: {
+            'render': function (cmp) {
+                this.getEl().on('click', function () {
+                    grpEngineerTreeWindow.show();
+                });
+            }
+        }
+    });
+
+    var grpEngineer = Ext.create('Ext.form.FieldContainer', {
+        xtype: 'fieldcontainer',
+        columnWidth: 1,
+        layout: 'column',
+        items: [grpEngineerId, grpEngineerName, {
+                xtype: 'button',
+                text: '<fmt:message key="choose"/>',
+                tabIndex: 2,
+                margin: '10 0 6 10',
+                width: 80,
+                handler: function () {
+                    grpEngineerTreeWindow.show();
+                }
+            }]
+    });
+    var statusStore = Ext.create('Ext.data.Store', {
+        fields: ['abbr', 'name'],
+        data: [
+            {"abbr": 1, "name": "<fmt:message key="work.status.open"/>"},
+            {"abbr": 2, "name": "<fmt:message key="work.status.approval"/>"},
+            {"abbr": 3, "name": "<fmt:message key="work.status.inProgress"/>"},
+            {"abbr": 4, "name": "<fmt:message key="work.status.pendding"/>"},
+            {"abbr": 0, "name": "<fmt:message key="work.status.complete"/>"},
+        ]
+    });
+
+
+    var workOrderStatus = Ext.create('Ext.form.ComboBox', {
+        fieldLabel: '<fmt:message key="work.status"/>',
+        labelWidth: 100,
+        store: statusStore,
+        queryMode: 'local',
+        displayField: 'name',
+        valueField: 'abbr',
+        margin: '20 10 10 10',
+        anchor: '100%',
+        allowBlank: false,
+        editable: false,
+        value: 1,
+    });
+
+    //--------------------------------------------------------------------------
     var workOrderCode = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         grow: true,
@@ -105,7 +174,7 @@
         margin: '10 10 10 10',
         width: 200,
         maxLength: 20,
-        labelWidth: 80,
+        labelWidth: 100,
     });
 
     var workOrderName = Ext.create('Ext.form.field.Text', {
@@ -121,7 +190,7 @@
         margin: '10 10 10 10',
         width: 350,
         maxLength: 50,
-        labelWidth: 80,
+        labelWidth: 100,
     });
 
     var workOrderInfo = Ext.create('Ext.form.FieldContainer', {
@@ -150,6 +219,73 @@
         ]
     });
 
+    var workOrderInterval = Ext.create('Ext.form.field.Text', {
+        xtype: 'textfield',
+        grow: true,
+        tabIndex: 5,
+        fieldLabel: '<fmt:message key="work.interval"/>',
+        name: 'interval',
+        id: "workOrderInteval",
+        labelAlign: 'right',
+        anchor: '100%',
+        allowBlank: false,
+        margin: '10 10 10 10',
+        width: 350,
+        maxLength: 50,
+        labelWidth: 100,
+    });
+    var workOrderRepeat = Ext.create('Ext.form.field.Checkbox', {
+        xtype: 'checkboxfield',
+        grow: true,
+        tabIndex: 5,
+        boxLabel: '<fmt:message key="work.repeat"/>',
+        name: 'repeat',
+        inputValue: '1',
+        id: "workOrderRepeat",
+        labelAlign: 'right',
+        anchor: '100%',
+        allowBlank: false,
+        margin: '10 10 10 10',
+    });
+
+    var workOrderIntervalCtn = Ext.create('Ext.form.FieldContainer', {
+        xtype: 'fieldcontainer',
+        columnWidth: 1,
+        layout: 'column',
+        items: [{
+                xtype: 'container',
+                anchor: '100%',
+                columnWidth: 1,
+                layout: 'column',
+                height: '100%',
+                items: [{
+                        xtype: 'container',
+                        columnWidth: 0.1,
+                        layout: 'anchor',
+                        items: [workOrderRepeat]
+                    }, {
+                        xtype: 'container',
+                        columnWidth: 0.8,
+                        layout: 'anchor',
+                        items: [workOrderInterval]
+                    }, {
+                        xtype: 'container',
+                        columnWidth: 0.1,
+                        layout: 'anchor',
+                        items: [{
+                                xtype: 'label',
+                                labelAlign: 'left',
+                                text: '<fmt:message key="work.unit"/>',
+                                style: 'font-weight:inherit;',
+                                margin: '15 0 0 0'
+                            }]
+                    }
+                ]
+            }
+        ]
+    });
+    //--------------------------------------------------------------------------
+
 
     var startTime = {
         xtype: 'datefield',
@@ -159,10 +295,10 @@
         labelAlign: 'left',
         anchor: '100%',
         allowBlank: false,
-        margin: '10 10 10 10',
+        margin: '20 10 10 10',
         width: 250,
         format: 'd/m/Y',
-        labelWidth: 80,
+        labelWidth: 100,
 //        altFormats: 'm,d,Y|m.d.Y',
     };
     var endTime = {
@@ -176,9 +312,35 @@
         margin: '20 10 10 10',
         width: 250,
         format: 'd/m/Y',
-        labelWidth: 80,
+        labelWidth: 100,
 //        altFormats: 'm,d,Y|m.d.Y',
     };
+
+    var workTypeTask = Ext.create('Ext.form.field.TextArea', {
+        xtype: 'textfield',
+        grow: true,
+        fieldLabel: '<fmt:message key="work.task"/>',
+        labelAlign: 'left',
+        anchor: '100%',
+        allowBlank: true,
+        margin: '20 10 10 10',
+        width: "98%",
+        maxLength: 512,
+        tabIndex: 7,
+    });
+
+    var workTypeReason = Ext.create('Ext.form.field.TextArea', {
+        xtype: 'textfield',
+        grow: true,
+        fieldLabel: '<fmt:message key="work.reason"/>',
+        labelAlign: 'left',
+        anchor: '100%',
+        allowBlank: true,
+        margin: '20 10 10 10',
+        width: "98%",
+        maxLength: 512,
+        tabIndex: 15,
+    });
 
     var workTypeNote = Ext.create('Ext.form.field.TextArea', {
         xtype: 'textfield',
@@ -203,22 +365,22 @@
                 title: '<fmt:message key="work.task"/>',
                 id: "tabTask",
                 tabIndex: 6,
-                items: []
+                items: [workTypeTask]
             }, {
                 title: '<fmt:message key="work.manHour"/>',
                 id: "manHour",
                 tabIndex: 12,
-                items: []
+                items: [gridManHrsPanel]
             }, {
                 title: '<fmt:message key="work.material"/>',
                 id: "material",
                 tabIndex: 55,
-                items: [gridManHrsPanel]
+                items: [gridStockPanel]
             }, {
                 title: '<fmt:message key="work.reason"/>',
                 tabIndex: 56,
                 id: "reason",
-                items: []
+                items: [workTypeReason]
             }, {
                 title: '<fmt:message key="work.note"/>',
                 tabIndex: 56,
@@ -243,12 +405,12 @@
                         xtype: 'container',
                         columnWidth: 0.5,
                         layout: 'anchor',
-                        items: [workOrderId, mechanic, workType, workOrderInfo]
+                        items: [workOrderId, mechanic, workType, grpEngineer, workOrderInfo]
                     }, {
                         xtype: 'container',
                         columnWidth: 0.5,
                         layout: 'anchor',
-                        items: [startTime, endTime]
+                        items: [startTime, endTime, workOrderStatus, workOrderIntervalCtn]
                     }, {
                         xtype: 'container',
                         columnWidth: 1,
@@ -286,6 +448,11 @@
                 }
             }],
         listeners: {
+            show: function (window) {
+                Ext.getCmp("tabWorkOrder").setActiveTab(Ext.getCmp("tabTask"));
+                gridManHrs.setHeight(workOrderForm.getHeight() - 220);
+                gridStock.setHeight(workOrderForm.getHeight() - 220);
+            },
             afterRender: function (thisForm, options) {
                 this.keyNav = Ext.create('Ext.util.KeyNav', this.el, {
                     enter: function () {

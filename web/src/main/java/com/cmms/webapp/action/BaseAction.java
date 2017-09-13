@@ -246,11 +246,39 @@ public class BaseAction extends ActionSupport {
         this.limit = limit;
     }
 
+    public Integer getSytemId() {
+        if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID) != null) {
+            return (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID);
+        } else {
+            Integer rtn = 1;
+            getRequest().getSession().setAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID, rtn);
+            return rtn;
+        }
+    }
+
+    public Integer getGrpEngineerId() {
+        if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP) != null) {
+            return (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP);
+        } else {
+            Integer rtn = 1;
+            getRequest().getSession().setAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP, rtn);
+            return rtn;
+        }
+    }
+
     //Lay danh sach system thuoc user
     public List<Integer> getListSytem() {
         log.info("-------------SESSION_LIST_SYSTEM_ID: " + getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_LIST_SYSTEM_ID));
         if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_LIST_SYSTEM_ID) != null) {
             return (List<Integer>) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_LIST_SYSTEM_ID);
+        }
+        return null;
+    }
+
+    //Lay danh sach group_engineer thuoc user
+    public List<Integer> getListGrpEngineer() {
+        if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_LIST_GRP_ENGINNER) != null) {
+            return (List<Integer>) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_LIST_GRP_ENGINNER);
         }
         return null;
     }

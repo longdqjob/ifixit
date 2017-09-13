@@ -1,22 +1,33 @@
 package com.cmms.webapp.action;
 
+import com.cmms.dao.CompanyDao;
 import com.cmms.dao.GroupEngineerDao;
 import com.cmms.dao.MachineDao;
+import com.cmms.dao.ManHoursDao;
+import com.cmms.dao.MaterialDao;
+import com.cmms.dao.StockItemDao;
 import com.cmms.dao.WorkOrderDao;
 import com.cmms.dao.WorkTypeDao;
+import com.cmms.model.GroupEngineer;
 import com.cmms.model.Machine;
+import com.cmms.model.ManHours;
+import com.cmms.model.ManHoursObj;
+import com.cmms.model.Material;
+import com.cmms.model.StockItem;
 import com.cmms.model.WorkOrder;
 import com.cmms.model.WorkType;
 import com.cmms.webapp.security.LoginSuccessHandler;
 import com.cmms.webapp.util.ResourceBundleUtils;
 import com.cmms.webapp.util.WebUtil;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.opensymphony.xwork2.Preparable;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
@@ -27,10 +38,47 @@ import org.codehaus.jettison.json.JSONObject;
 public class WorkOrderAction extends BaseAction implements Preparable {
 
     private static final long serialVersionUID = -1L;
+    //<editor-fold defaultstate="collapsed" desc="getAndSet">
     private GroupEngineerDao groupEngineerDao;
     private MachineDao machineDao;
     private WorkTypeDao workTypeDao;
     private WorkOrderDao workOrderDao;
+    private CompanyDao companyDao;
+    private MaterialDao materialDao;
+    private ManHoursDao manHoursDao;
+    private StockItemDao stockItemDao;
+
+    public MaterialDao getMaterialDao() {
+        return materialDao;
+    }
+
+    public void setMaterialDao(MaterialDao materialDao) {
+        this.materialDao = materialDao;
+    }
+
+    public ManHoursDao getManHoursDao() {
+        return manHoursDao;
+    }
+
+    public void setManHoursDao(ManHoursDao manHoursDao) {
+        this.manHoursDao = manHoursDao;
+    }
+
+    public StockItemDao getStockItemDao() {
+        return stockItemDao;
+    }
+
+    public void setStockItemDao(StockItemDao stockItemDao) {
+        this.stockItemDao = stockItemDao;
+    }
+
+    public CompanyDao getCompanyDao() {
+        return companyDao;
+    }
+
+    public void setCompanyDao(CompanyDao companyDao) {
+        this.companyDao = companyDao;
+    }
 
     public GroupEngineerDao getGroupEngineerDao() {
         return groupEngineerDao;
@@ -66,7 +114,7 @@ public class WorkOrderAction extends BaseAction implements Preparable {
 
     @Override
     public void prepare() throws Exception {
-    }
+    }//</editor-fold>
 
     public String index() {
         return SUCCESS;
@@ -110,9 +158,10 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             JSONObject tmp;
             WorkType workType;
             Machine machine;
+            GroupEngineer groupEngineer;
             for (WorkOrder workOrder : list) {
                 tmp = new JSONObject();
-                tmp = WebUtil.toJSONObject(workOrder, "workType,machine");
+                tmp = WebUtil.toJSONObject(workOrder, "workType,machine,groupEngineer");
                 workType = workOrder.getWorkType();
                 if (workOrder != null) {
                     tmp.put("workTypeId", workType.getId());
@@ -129,6 +178,14 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                     tmp.put("machineId", "");
                     tmp.put("machineName", "");
                 }
+                groupEngineer = workOrder.getGroupEngineer();
+                if (groupEngineer != null) {
+                    tmp.put("grpEngineerId", groupEngineer.getId());
+                    tmp.put("grpEngineerName", groupEngineer.getName());
+                } else {
+                    tmp.put("grpEngineerId", "");
+                    tmp.put("grpEngineerName", "");
+                }
                 jSONArray.put(tmp);
             }
 
@@ -137,6 +194,88 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
         } catch (Exception ex) {
             log.error("ERROR getLoadData: ", ex);
+            return null;
+        }
+    }
+
+    public InputStream getLoadInfo() {
+        try {
+            JSONObject result = new JSONObject();
+            Long workOrderId = Long.parseLong(getRequest().getParameter("id"));
+            //manHoursDao
+            Map mapManHours = manHoursDao.getList(workOrderId, start, limit);
+            ArrayList<ManHours> listManHrs = new ArrayList<ManHours>();
+            if (mapManHours.get("list") != null) {
+                listManHrs = (ArrayList<ManHours>) mapManHours.get("list");
+            }
+
+            Integer countManHrs = 0;
+            if (mapManHours.get("count") != null) {
+                countManHrs = (Integer) mapManHours.get("count");
+            }
+
+            JSONArray jsArrayManHrs = new JSONArray();
+            JSONObject tmp;
+            GroupEngineer engineer;
+            for (ManHours manHours : listManHrs) {
+                tmp = new JSONObject();
+                tmp = WebUtil.toJSONObject(manHours, "workOrder,groupEngineer");
+                engineer = manHours.getGroupEngineer();
+                if (engineer != null) {
+                    tmp.put("engineerId", engineer.getId());
+                    tmp.put("engineerGrp", engineer.getName());
+                    tmp.put("engineerCost", engineer.getCost());
+                } else {
+                    tmp.put("engineerId", "");
+                    tmp.put("engineerGrp", "");
+                    tmp.put("engineerCost", "");
+                }
+                tmp.put("workOrderId", workOrderId);
+                jsArrayManHrs.put(tmp);
+            }
+            result.put("listManHrs", jsArrayManHrs);
+            result.put("totalCountManHrs", countManHrs);
+
+            //stockItemDao
+            Map mapStock = stockItemDao.getList(workOrderId, start, limit);
+            ArrayList<StockItem> listStock = new ArrayList<StockItem>();
+            if (mapStock.get("list") != null) {
+                listStock = (ArrayList<StockItem>) mapStock.get("list");
+            }
+
+            Integer countStock = 0;
+            if (mapStock.get("count") != null) {
+                countStock = (Integer) mapStock.get("count");
+            }
+
+            JSONArray jsArrayStock = new JSONArray();
+            Material material;
+            for (StockItem item : listStock) {
+                tmp = new JSONObject();
+                tmp = WebUtil.toJSONObject(item, "workOrder,material");
+                material = item.getMaterial();
+                if (material != null) {
+                    tmp.put("materialId", material.getId());
+                    tmp.put("materialCode", material.getCode());
+                    tmp.put("materialName", material.getName());
+                    tmp.put("materialDesc", material.getDescription());
+                    tmp.put("materialUnit", material.getUnit());
+                } else {
+                    tmp.put("materialId", "");
+                    tmp.put("materialCode", "");
+                    tmp.put("materialName", "");
+                    tmp.put("materialDesc", "");
+                    tmp.put("materialUnit", "");
+                }
+                tmp.put("workOrderId", workOrderId);
+                jsArrayStock.put(tmp);
+            }
+            result.put("listStock", jsArrayStock);
+            result.put("totalCountStock", countStock);
+            //Return
+            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+        } catch (Exception ex) {
+            log.error("ERROR getLoadInfo: ", ex);
             return null;
         }
     }
@@ -151,8 +290,22 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             String name = getRequest().getParameter("name");
             String workTypeId = getRequest().getParameter("workTypeId");
             String mechanicId = getRequest().getParameter("mechanicId");
+            String grpEngineerId = getRequest().getParameter("grpEngineerId");
+            String status = getRequest().getParameter("status");
+            String interval = getRequest().getParameter("interval");
+            String repeat = getRequest().getParameter("repeat");
             String startTime = getRequest().getParameter("startTime");
             String endTime = getRequest().getParameter("endTime");
+            String task = getRequest().getParameter("task");
+            String manHrs = getRequest().getParameter("manHrs");
+            List<ManHoursObj> listManHours = null;
+            Gson gson = new Gson();
+            if (!StringUtils.isBlank(manHrs)) {
+                listManHours = gson.fromJson(manHrs, new TypeToken<List<ManHoursObj>>() {
+                }.getType());
+            }
+
+            log.info("--------listManHours: " + listManHours.size());
 
             if (StringUtils.isBlank(code)) {
                 result.put("success", false);
@@ -195,12 +348,43 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                 Machine machine = machineDao.get(Long.parseLong(mechanicId));
                 workOrder.setMachine(machine);
             }
+            if (!StringUtils.isBlank(grpEngineerId)) {
+                GroupEngineer groupEngineer = groupEngineerDao.get(Integer.parseInt(workTypeId));
+                workOrder.setGroupEngineer(groupEngineer);
+            }
             workOrder.setCode(code);
             workOrder.setName(name);
             workOrder.setStartTime(sdf.parse(startTime));
             workOrder.setEndTime(sdf.parse(endTime));
+            workOrder.setStatus(Integer.parseInt(status));
+            workOrder.setInterval(Integer.parseInt(interval));
+            workOrder.setIsRepeat(Integer.parseInt(repeat));
+            workOrder.setTask(task);
             workOrder = workOrderDao.save(workOrder);
             if (workOrder != null) {
+                if (listManHours != null && !listManHours.isEmpty()) {
+                    ManHours manHours;
+                    GroupEngineer groupEngineer;
+                    Integer tmpEngineerId = -1;
+                    for (ManHoursObj manHoursObj : listManHours) {
+                        if (manHoursObj.getId() <= 0) {
+                            //Add
+                            manHours = new ManHours();
+                            manHours.setWorkOrder(workOrder);
+                            tmpEngineerId = -100;
+                        } else {
+                            //Edit
+                            manHours = manHoursDao.get(manHoursObj.getId());
+                            tmpEngineerId = manHours.getGroupEngineerId();
+                        }
+                        if (!Objects.equals(tmpEngineerId, manHoursObj.getGroupEngineerId())) {
+                            groupEngineer = groupEngineerDao.get(manHoursObj.getGroupEngineerId());
+                            manHours.setGroupEngineer(groupEngineer);
+                        }
+                        manHours.setMh(manHoursObj.getMh());
+                        manHoursDao.save(manHours);
+                    }
+                }
                 result.put("success", true);
                 result.put("message", ResourceBundleUtils.getName("saveSuccess"));
             } else {

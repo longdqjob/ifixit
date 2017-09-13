@@ -38,7 +38,7 @@
         resizable: false,
         header: false,
         collapsible: true,
-        useArrows: true,
+        useArrows: false,
         rootVisible: false,
         lines: true,
         multiSelect: true,
@@ -47,7 +47,7 @@
         minHeight: 500,
         columns: [{
                 xtype: 'treecolumn', //this is so we know which column will show the tree
-                width: 500,
+                width: 345,
                 sortable: true,
                 dataIndex: 'name',
             }
@@ -60,19 +60,27 @@
                 this.getEl().setStyle('height', 'auto');
                 this.body.setStyle('height', 'auto');
                 this.getView().getEl().setStyle('height', 'auto');
-                console.log("---afterrender:---");
-//                loadWorkOrder("-10");
+                if (storeWorkType.data.length == 1) {
+                    loadWorkOrder(storeWorkType.data.items[0].data.id);
+                }
             },
             itemclick: function (view, node) {
-                console.log(node);
-                if (node.isLeaf()) {
-                    // some functionality to open the leaf(document) in a tabpanel
-                    alert(node.get("text"));
-                } else if (node.isExpanded()) {
-                    node.collapse();
-                } else {
-                    node.expand();
-                }
+//                console.log(node);
+//                if (node.isLeaf()) {
+//                    // some functionality to open the leaf(document) in a tabpanel
+//                    alert(node.get("text"));
+//                } else if (node.isExpanded()) {
+//                    node.collapse();
+//                } else {
+//                    node.expand();
+//                }
+            },
+            itemdblclick: function (tree, record, item, index, e, eOpts) {
+                //console.log(record);
+                //console.log(record.get("id"));
+                selectedSystem = record;
+                loadWorkOrder(selectedSystem);
+                console.log("dbClick Load data " + record.get("id") + " - " + record.get("name"));
             },
             itemcontextmenu: function (tree, record, item, index, e, eOpts) {
                 // Optimize : create menu once

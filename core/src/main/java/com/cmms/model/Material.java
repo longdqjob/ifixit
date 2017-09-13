@@ -10,23 +10,18 @@ import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Transient;
 
 @Entity
-@Table(name = "group_engineer")
-public class GroupEngineer extends BaseObject implements Serializable {
+@Table(name = "material")
+public class Material extends BaseObject implements Serializable {
 
     private static final long serialVersionUID = -1L;
     private Integer id;
     private String code;
-    private String completeCode;
     private String name;
     private String description;
+    private String unit;
     private Float cost;
-    private GroupEngineer parent;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -47,15 +42,6 @@ public class GroupEngineer extends BaseObject implements Serializable {
         this.code = code;
     }
 
-    @Column(name = "complete_code")
-    public String getCompleteCode() {
-        return completeCode;
-    }
-
-    public void setCompleteCode(String completeCode) {
-        this.completeCode = completeCode;
-    }
-
     @Column(name = "name")
     public String getName() {
         return name;
@@ -74,6 +60,15 @@ public class GroupEngineer extends BaseObject implements Serializable {
         this.description = description;
     }
 
+    @Column(name = "unit")
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
     @Column(name = "cost")
     public Float getCost() {
         return cost;
@@ -81,40 +76,6 @@ public class GroupEngineer extends BaseObject implements Serializable {
 
     public void setCost(Float cost) {
         this.cost = cost;
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id", nullable = true)
-    public GroupEngineer getParent() {
-        return parent;
-    }
-
-    @Transient
-    public Integer getParentId() {
-        if (this.parent == null) {
-            return null;
-        }
-        return this.parent.getId();
-    }
-
-    @Transient
-    public String getParentName() {
-        if (this.parent == null) {
-            return null;
-        }
-        return this.parent.getName();
-    }
-
-    @Transient
-    public String getParentCode() {
-        if (this.parent == null) {
-            return null;
-        }
-        return this.parent.getCompleteCode();
-    }
-
-    public void setParent(GroupEngineer parent) {
-        this.parent = parent;
     }
 
     @Override

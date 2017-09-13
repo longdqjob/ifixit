@@ -1,9 +1,4 @@
-<%-- 
-    Document   : layout
-    Created on : Aug 26, 2017, 5:57:28 PM
-    Author     : thuyetlv
---%>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <script>
     Ext.onReady(function () {
         Ext.QuickTips.init();
@@ -33,7 +28,7 @@
                     layout: 'accordion',
                     items: [{
                             contentEl: 'west',
-                            title: 'Navigation',
+                            title: '<fmt:message key="workType"/>',
                             html: ' <div id="tree"></div>',
                             iconCls: 'navpn' // see the HEAD section for style used
                         }],

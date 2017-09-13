@@ -144,7 +144,7 @@
             params: {
                 id: companyId.getValue(),
                 parent: companyParentId.getValue(),
-                code: companyCode.getValue(),
+                code: companyFullCode.getValue(),
                 name: companyName.getValue(),
                 description: companyDescription.getValue(),
                 completeCode: companyFullCode.getValue()
@@ -176,7 +176,6 @@
             failure: function (response, opts) {
                 alertSystemError();
                 unmask();
-
             },
         });
     }
