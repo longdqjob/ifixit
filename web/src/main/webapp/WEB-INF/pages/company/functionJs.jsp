@@ -65,12 +65,14 @@
         companyForm.reset();
         companyId.setValue(data.get("id"));
         companyParentId.setValue(data.get("parent_id"));
-        companyParentName.setValue(data.get("parent_name"));
+        companyParentName.setValue(data.get("parentName"));
+        companyParentCode.setValue(data.get("completeParentCode"));
+
         companyName.setValue(data.get("name"));
         companyCode.setValue(data.get("code"));
-        companyFullCode.setValue(data.get("code"));
+        companyFullCode.setValue(data.get("completeCode"));
         companyDescription.setValue(data.get("description"));
-        
+
         disableCode();
 
         companyWindow.setTitle('<fmt:message key="editCompany"/>');
@@ -139,6 +141,7 @@
                 code: companyFullCode.getValue(),
                 name: companyName.getValue(),
                 description: companyDescription.getValue(),
+                completeCode: companyFullCode.getValue()
             },
             success: function (response) {
                 unmask();
@@ -166,6 +169,10 @@
     function chooseCompany(record) {
         Ext.getCmp('companyParentName').setValue(record.get('name'));
         Ext.getCmp('companyParentId').setValue(record.get('id'));
+        alert(record.get('completeParentCode'));
+     //   Ext.getCmp('companyParentCode').setValue(record.get('completeParentCode'));
+
+
         Ext.getCmp('systemName').setValue(record.get('name'));
         Ext.getCmp('systemId').setValue(record.get('id'));
     }

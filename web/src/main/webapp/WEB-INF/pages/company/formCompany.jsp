@@ -107,6 +107,13 @@
         margin: '10 10 10 10',
         width: 350,
         maxLength: 50,
+        listeners: {
+            change: function (code, newval, oldval, options) {
+                console.log(newval);
+                companyFullCode.setValue(companyParentCode.getValue() + "." + newval);
+
+            },
+        }
     });
     var companyFullCode = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
@@ -155,6 +162,19 @@
         width: 250,
         readOnly: true,
     });
+    var companyParentCode = Ext.create('Ext.form.field.Text', {
+        xtype: 'textfield',
+        grow: true,
+        fieldLabel: ' Higher ' + '<fmt:message key="companyFullCode"/>',
+        name: 'parentCode',
+        id: "parentCodeId",
+        labelAlign: 'left',
+        anchor: '100%',
+        allowBlank: false,
+        margin: '10 10 10 10',
+        width: 250,
+        readOnly: true,
+    });
 
     var companyParent = Ext.create('Ext.form.FieldContainer', {
         xtype: 'fieldcontainer',
@@ -190,8 +210,8 @@
                         columnWidth: 1,
                         height: '100%',
                         items: [
-                            companyId, companyParent,companyCode,
-                            companyName,companyFullCode, companyDescription]
+                            companyId, companyParent, companyParentCode, companyCode,
+                            companyName, companyFullCode, companyDescription]
                     }]
             },
         ]

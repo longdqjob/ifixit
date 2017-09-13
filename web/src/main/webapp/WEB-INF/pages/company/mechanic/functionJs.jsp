@@ -19,7 +19,7 @@
         mechanicWindow.setIconCls('add-cls');
         mechanicWindow.show();
         gridHis.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
-        mechanicName.focus();
+        mechanicCode.focus();
     }
 
     function editMechanic(data) {
@@ -37,8 +37,11 @@
         systemName.setValue(data.get("companyName"));
         fillSpecificValue(data.get("specification"));
         machineNote.setValue(data.get("note"));
-        
-        Ext.getCmp("sinceField").setValue(Ext.Date.parse(data.get("since").split(".")[0],'Y-d-m H:i:s'));
+        console.log(data.get("since"));
+        if (typeof data.get("since") !== "undefined") {
+            Ext.getCmp("sinceField").setValue(Ext.Date.parse(data.get("since").split(".")[0], 'Y-m-d H:i:s'));
+        }
+
 
         mechanicWindow.setTitle('<fmt:message key="machine.edit"/>');
         mechanicWindow.setIconCls('edit-cls');
@@ -236,6 +239,7 @@
         }
 
         maskTarget(mechanicWindow);
+        console.log(Ext.getCmp("sinceField").getRawValue());
         Ext.Ajax.request({
             url: "/machine/save",
             method: "POST",
@@ -249,7 +253,8 @@
                 companyId: systemId.getValue(),
                 machineTypeId: mechanicTypeId.getValue(),
                 note: machineNote.getValue(),
-                since: Ext.getCmp("sinceField").getRawValue()
+                since: Ext.getCmp("sinceField").getRawValue(),
+                completeCode: mechanicCompleteCode.getValue()
             },
             success: function (response) {
                 unMaskTarget();

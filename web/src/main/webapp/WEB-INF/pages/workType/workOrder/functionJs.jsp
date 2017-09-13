@@ -4,9 +4,13 @@
     function changeCode(oldValue, newValue) {
         if (mechanicTypeCode.getValue() != "") {
             Ext.getCmp("mechanicFullCode").setText('<fmt:message key="machine.fullCode"/>: ' + mechanicTypeCode.getValue() + "." + newValue);
+            mechanicCompleteCode.setValue(mechanicTypeCode.getValue() + "." + newValue)
         } else {
             Ext.getCmp("mechanicFullCode").setText('<fmt:message key="machine.fullCode"/>: ' + newValue);
+            mechanicCompleteCode.setValue(newValue)
         }
+        
+        
 
     }
     //--------------------------------Mechanic----------------------------------

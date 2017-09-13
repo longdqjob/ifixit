@@ -32,6 +32,7 @@ public class Machine extends BaseObject implements Serializable {
     private Company company;
     private MachineType machineType;
     private Timestamp since;
+    private String completeCode;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -85,6 +86,16 @@ public class Machine extends BaseObject implements Serializable {
     public void setSince(Timestamp since) {
         this.since = since;
     }
+
+    @Column(name = "completeCode")
+    public String getCompleteCode() {
+        return completeCode;
+    }
+
+    public void setCompleteCode(String completeCode) {
+        this.completeCode = completeCode;
+    }
+    
 
     @Transient
     public Integer getParentId() {

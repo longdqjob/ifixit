@@ -72,7 +72,7 @@
                         xtype: 'treecolumn', //this is so we know which column will show the tree
                         width: 350,
                         sortable: true,
-                        dataIndex: 'name',
+                        dataIndex: 'namedisplay',
                     }
                 ],
                 listeners: {

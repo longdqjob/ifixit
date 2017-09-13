@@ -61,8 +61,14 @@ public class CompanyDaoHibernate extends GenericDaoHibernate<Company, Integer> i
         JSONArray children = new JSONArray();
         Company currentGroup = root;
         obj.put("name", currentGroup.getName());
+        obj.put("namedisplay", currentGroup.getCode() + "." + currentGroup.getName());
         obj.put("description", currentGroup.getDescription());
         obj.put("code", currentGroup.getCode());
+        obj.put("completeCode", currentGroup.getCompleteCode());
+        
+        
+        obj.put("completeParentCode", currentGroup.getCompany().getCompleteCode());
+        obj.put("parentName", currentGroup.getCompany().getName());
         obj.put("parentId", currentGroup.getParentId());
         obj.put("state", currentGroup.getState());
         obj.put("leaf", false);

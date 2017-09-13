@@ -215,6 +215,7 @@ public class MachineAction extends BaseAction implements Preparable {
             String machineTypeId = getRequest().getParameter("machineTypeId");
             String note = getRequest().getParameter("note");
             String since = getRequest().getParameter("since");
+            String completeCode = getRequest().getParameter("completeCode");
 
             if (StringUtils.isBlank(code)) {
                 result.put("success", false);
@@ -224,20 +225,20 @@ public class MachineAction extends BaseAction implements Preparable {
 
             Boolean checkUnique = true;
 
-            Machine mechanic;
+            Machine machenic;
             if (!StringUtils.isBlank(idReq)) {
                 id = Long.parseLong(idReq);
-                mechanic = machineDao.get(id);
-                if (code.equals(mechanic.getCode())) {
+                machenic = machineDao.get(id);
+                if (code.equals(machenic.getCode())) {
                     checkUnique = false;
                 }
             } else {
-                mechanic = new Machine();
+                machenic = new Machine();
             }
 
             //Check unique
             if (checkUnique) {
-                checkUnique = machineDao.checkUnique(id, code);
+                checkUnique = machineDao.checkUnique(id, completeCode);
                 if (checkUnique == null) {
                     result.put("success", false);
                     result.put("message", ResourceBundleUtils.getName("systemError"));
@@ -251,28 +252,30 @@ public class MachineAction extends BaseAction implements Preparable {
 
             if (!StringUtils.isBlank(parentId)) {
                 Machine mParent = machineDao.get(Long.parseLong(parentId));
-                mechanic.setParent(mParent);
+                machenic.setParent(mParent);
             }
             if (!StringUtils.isBlank(companyId)) {
                 Company company = companyDao.get(Integer.parseInt(companyId));
-                mechanic.setCompany(company);
+                machenic.setCompany(company);
             }
             if (!StringUtils.isBlank(machineTypeId)) {
                 MachineType machineType = machineTypeDao.get(Integer.parseInt(machineTypeId));
-                mechanic.setMachineType(machineType);
+                machenic.setMachineType(machineType);
             }
             if (!StringUtils.isBlank(since)) {
                 Date d = DateUtil.convertStringToDate(since);
-                mechanic.setSince(new Timestamp(d.getTime()));
+                machenic.setSince(new Timestamp(d.getTime()));
             }
 
-            mechanic.setCode(code);
-            mechanic.setName(name);
-            mechanic.setDescription(description);
-            mechanic.setSpecification(specification);
-            mechanic.setNote(note);
-            mechanic = machineDao.save(mechanic);
-            if (mechanic != null) {
+            machenic.setCode(code);
+            machenic.setName(name);
+            machenic.setDescription(description);
+            machenic.setSpecification(specification);
+            machenic.setNote(note);
+            machenic.setCompleteCode(completeCode);
+            
+            machenic = machineDao.save(machenic);
+            if (machenic != null) {
                 result.put("success", true);
                 result.put("message", ResourceBundleUtils.getName("saveSuccess"));
             } else {

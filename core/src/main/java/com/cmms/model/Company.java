@@ -30,6 +30,7 @@ public class Company extends BaseObject implements Serializable {
     private Integer state;
 //    private Integer parentId;
     private String parentName;
+    private String completeCode;
 
     private Company company;
     private List<Machine> machines = new ArrayList<Machine>(0);
@@ -111,6 +112,17 @@ public class Company extends BaseObject implements Serializable {
     public Company getCompany() {
         return company;
     }
+
+    @Column(name = "completeCode")
+    public String getCompleteCode() {
+        return completeCode;
+    }
+
+    public void setCompleteCode(String completeCode) {
+        this.completeCode = completeCode;
+    }
+    
+    
 
     @Transient
     public Integer getParentId() {

@@ -8,6 +8,9 @@
             {name: 'name', type: 'string'},
             {name: 'state', type: 'int'},
             {name: 'description', type: 'string'},
+            {name: 'namedisplay', type: 'string'},
+            {name: 'completeParentCode', type: 'string'},
+            {name: 'parentName', type: 'string'},
         ],
         proxy: {
             type: 'ajax',
@@ -71,7 +74,7 @@
         header: false,
         collapsible: true,
         useArrows: false,
-        rootVisible: true,
+        rootVisible: false,
         lines: true,
         multiSelect: true,
         border: true,
@@ -81,7 +84,7 @@
                 xtype: 'treecolumn', //this is so we know which column will show the tree
                 width: 345,
                 sortable: true,
-                dataIndex: 'name',
+                dataIndex: 'namedisplay',
             }
         ],
         listeners: {
@@ -96,18 +99,21 @@
                 loadMachine("-10");
             },
             itemclick: function (view, node) {
-                console.log(node);
-                if (node.isLeaf()) {
-                    // some functionality to open the leaf(document) in a tabpanel
-                    alert(node.get("text"));
-                } else if (node.isExpanded()) {
-                    node.collapse();
-                } else {
-                    node.expand();
-                }
+                //console.log(node);
+//                if (node.isLeaf()) {
+//                    // some functionality to open the leaf(document) in a tabpanel
+//                    alert(node.get("text"));
+//                } else if (node.isExpanded()) {
+//                    node.collapse();
+//                } else {
+//                    node.expand();
+//                }
             },
-            itemdblclick : function( tree, record, item, index, e, eOpts ) {
-                console.log(record);
+            itemdblclick: function (tree, record, item, index, e, eOpts) {
+                //console.log(record);
+                //console.log(record.get("id"));
+                loadMachine(record.get("id"));
+                console.log("dbClick Load data " + record.get("id") + " - " + record.get("name"));
             },
             itemcontextmenu: function (tree, record, item, index, e, eOpts) {
                 // Optimize : create menu once

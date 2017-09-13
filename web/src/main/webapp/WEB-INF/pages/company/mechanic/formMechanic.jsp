@@ -78,7 +78,7 @@
         labelAlign: 'left',
         anchor: '100%',
         allowBlank: false,
-        margin: '20 10 10 10',
+        margin: '10 10 10 10',
         width: 250,
         maxLength: 50,
         listeners: {
@@ -126,7 +126,7 @@
         labelAlign: 'left',
         anchor: '100%',
         allowBlank: false,
-        margin: '10 10 10 10',
+        margin: '20 10 10 10',
         width: 350,
         maxLength: 50,
     });
@@ -491,12 +491,12 @@
                         xtype: 'container',
                         columnWidth: 0.5,
                         layout: 'anchor',
-                        items: [mechanicId, mechanicType, mechanicName]
+                        items: [mechanicId, mechanicType,mechanicCode ]
                     }, {
                         xtype: 'container',
                         columnWidth: 0.5,
                         layout: 'anchor',
-                        items: [mechanicTypeCode, mechanicCode]
+                        items: [mechanicTypeCode, mechanicName]
                     }, {
                         xtype: 'container',
                         columnWidth: 1,

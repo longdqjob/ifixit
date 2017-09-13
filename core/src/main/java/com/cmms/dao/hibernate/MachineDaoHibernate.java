@@ -198,7 +198,7 @@ public class MachineDaoHibernate extends GenericDaoHibernate<Machine, Long> impl
 
             //Code
             if (code != null && code.trim().length() > 0) {
-                criteria.add(Restrictions.eq("code", code));
+                criteria.add(Restrictions.eq("completeCode", code));
             }
 
             list = criteria.list();
