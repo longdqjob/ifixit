@@ -1,6 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <script>
     var store = Ext.create('Ext.data.TreeStore', {
+        id:"companyStoreId",
         fields: [
             {name: 'id', type: 'int'},
             {name: 'text', type: 'string'}

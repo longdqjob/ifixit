@@ -8,6 +8,7 @@
         Ext.getCmp('gridId').setWidth(Ext.getCmp("searchform").getWidth());
         Ext.getCmp('gridId').setHeight(Ext.getCmp("viewport").getHeight() - Ext.getCmp("searchform").getHeight() - 110);
         Ext.getCmp("gridId").updateLayout();
+        tree.setHeight(Ext.getCmp("viewport").getHeight() - 180);
     }
 
     function loadMachine(system) {
@@ -53,18 +54,23 @@
         if (data != null) {
             companyParentId.setValue(data.get("id"));
             companyParentName.setValue(data.get("name"));
+            companyParentCode.setValue(data.get("completeCode"));
+            //alert(data.get("completeParentCode"));
         }
         companyWindow.setTitle('<fmt:message key="addCompany"/>');
         companyWindow.setIconCls("add-cls");
         enableCode();
         companyWindow.show();
-        companyParent.focus();
+        companyCode.focus();
     }
 
     function editCompany(data) {
+        console.log(data);
+        console.log(data.get("parentId"));
+
         companyForm.reset();
         companyId.setValue(data.get("id"));
-        companyParentId.setValue(data.get("parent_id"));
+        companyParentId.setValue(data.get("parentId"));
         companyParentName.setValue(data.get("parentName"));
         companyParentCode.setValue(data.get("completeParentCode"));
 
@@ -78,15 +84,13 @@
         companyWindow.setTitle('<fmt:message key="editCompany"/>');
         companyWindow.setIconCls("edit-cls");
         companyWindow.show();
-        companyParent.focus();
+        companyCode.focus();
     }
     function enableCode() {
         companyCode.setReadOnly(false);
-        companyFullCode.setReadOnly(false);
     }
     function disableCode() {
         companyCode.setReadOnly(true);
-        companyFullCode.setReadOnly(true);
     }
 
     function deleteCompany(arrayList) {
@@ -111,6 +115,8 @@
                         alertSystemError();
                     }
                 }
+                //TODO reload store
+                store.reload();
             },
             failure: function (response, opts) {
                 showMask.hide();
@@ -138,7 +144,7 @@
             params: {
                 id: companyId.getValue(),
                 parent: companyParentId.getValue(),
-                code: companyFullCode.getValue(),
+                code: companyCode.getValue(),
                 name: companyName.getValue(),
                 description: companyDescription.getValue(),
                 completeCode: companyFullCode.getValue()
@@ -152,16 +158,25 @@
                 } else if ("true" == res.success || true === res.success) {
                     companyWindow.hide();
                 } else {
-                    if (res.message) {
+                    if (res.message || res.message == "true") {
                         alertError(res.message);
                     } else {
                         alertSystemError();
                     }
                 }
+                var path = store.findNode("id", companyId.getValue(), true, true, true).getPath();
+                store.load({
+                    callback: function (r, options, success) {
+                        tree.expandPath(path);
+                    }
+
+                });
+
             },
             failure: function (response, opts) {
                 alertSystemError();
                 unmask();
+
             },
         });
     }
@@ -169,8 +184,8 @@
     function chooseCompany(record) {
         Ext.getCmp('companyParentName').setValue(record.get('name'));
         Ext.getCmp('companyParentId').setValue(record.get('id'));
-        alert(record.get('completeParentCode'));
-     //   Ext.getCmp('companyParentCode').setValue(record.get('completeParentCode'));
+        console.log(record.get("completeCode"));
+        companyParentCode.setValue(record.get('completeCode'));
 
 
         Ext.getCmp('systemName').setValue(record.get('name'));

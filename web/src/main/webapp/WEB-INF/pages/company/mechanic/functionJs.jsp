@@ -11,12 +11,20 @@
         }
 
     }
+
+    function enableCode() {
+        mechanicCode.setReadOnly(false);
+    }
+    function disableCode() {
+        mechanicCode.setReadOnly(true);
+    }
     //--------------------------------Mechanic----------------------------------
     function addMechanic(data) {
         resetLabelSpec();
         mechanicForm.reset();
         mechanicWindow.setTitle('<fmt:message key="machine.add"/>');
         mechanicWindow.setIconCls('add-cls');
+        enableCode();
         mechanicWindow.show();
         gridHis.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
         mechanicCode.focus();
@@ -45,6 +53,7 @@
 
         mechanicWindow.setTitle('<fmt:message key="machine.edit"/>');
         mechanicWindow.setIconCls('edit-cls');
+        disableCode();
         mechanicWindow.show();
         gridHis.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
         mechanicName.focus();

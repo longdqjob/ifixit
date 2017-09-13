@@ -29,7 +29,7 @@
         anchor: '100%',
         editable: true,
         allowBlank: false,
-        width: 350,
+        width: 450,
         autoSelect: true,
         typeAhead: true,
         listConfig: {
@@ -75,7 +75,7 @@
 //        anchor: '100%',
 //        editable: true,
 //        allowBlank: false,
-//        width: 350,
+//        width: 450,
 //        listConfig: {
 //            itemTpl: '{code} - {name}'
 //        },
@@ -91,7 +91,7 @@
         anchor: '100%',
         allowBlank: false,
         margin: '10 10 10 10',
-        width: 350,
+        width: 450,
         maxLength: 50,
     });
 
@@ -105,7 +105,7 @@
         anchor: '100%',
         allowBlank: false,
         margin: '10 10 10 10',
-        width: 350,
+        width: 450,
         maxLength: 50,
         listeners: {
             change: function (code, newval, oldval, options) {
@@ -125,8 +125,9 @@
         anchor: '100%',
         allowBlank: false,
         margin: '10 10 10 10',
-        width: 350,
+        width: 450,
         maxLength: 50,
+        readOnly: true,
     });
 
     var companyDescription = Ext.create('Ext.form.field.Text', {
@@ -139,7 +140,7 @@
         anchor: '100%',
         allowBlank: false,
         margin: '10 10 10 10',
-        width: 350,
+        width: 450,
         maxLength: 50,
     });
 
@@ -159,20 +160,20 @@
         anchor: '100%',
         allowBlank: false,
         margin: '10 10 10 10',
-        width: 250,
+        width: 350,
         readOnly: true,
     });
     var companyParentCode = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         grow: true,
-        fieldLabel: ' Higher ' + '<fmt:message key="companyFullCode"/>',
+        fieldLabel: 'Higher ' + '<fmt:message key="companyCode"/>',
         name: 'parentCode',
         id: "parentCodeId",
         labelAlign: 'left',
         anchor: '100%',
         allowBlank: false,
         margin: '10 10 10 10',
-        width: 250,
+        width: 450,
         readOnly: true,
     });
 
@@ -211,7 +212,7 @@
                         height: '100%',
                         items: [
                             companyId, companyParent, companyParentCode, companyCode,
-                            companyName, companyFullCode, companyDescription]
+                            companyFullCode, companyName,companyDescription]
                     }]
             },
         ]
@@ -222,7 +223,7 @@
         closeAction: 'hide',
         id: 'companyWindow',
         autoEl: 'form',
-        width: 400,
+        width: 500,
         constrainHeader: true,
         layout: 'anchor',
         modal: true,

@@ -125,6 +125,7 @@ public class CompanyAction extends BaseAction implements Preparable {
             String name = getRequest().getParameter("name");
             String parent = getRequest().getParameter("parent");
             String description = getRequest().getParameter("description");
+             String completeCode = getRequest().getParameter("completeCode");
 
             if (StringUtils.isBlank(code)) {
                 result.put("success", false);
@@ -146,7 +147,7 @@ public class CompanyAction extends BaseAction implements Preparable {
 
             //Check unique
             if (checkUnique) {
-                checkUnique = companyDao.checkUnique(id, code);
+                checkUnique = companyDao.checkUnique(id, completeCode);
                 if (checkUnique == null) {
                     result.put("success", false);
                     result.put("message", ResourceBundleUtils.getName("systemError"));
@@ -164,6 +165,7 @@ public class CompanyAction extends BaseAction implements Preparable {
             company.setCode(code);
             company.setName(name);
             company.setDescription(description);
+            company.setCompleteCode(completeCode);
             company = companyDao.save(company);
             if (company != null) {
                 result.put("success", true);

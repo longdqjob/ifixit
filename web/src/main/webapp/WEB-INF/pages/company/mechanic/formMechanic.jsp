@@ -158,7 +158,7 @@
 
     var father = Ext.create('Ext.form.FieldContainer', {
         xtype: 'fieldcontainer',
-        columnWidth: 1,
+       // columnWidth: 1,
         layout: 'column',
         items: [fatherId, fatherName, {
                 xtype: 'button',
@@ -257,14 +257,9 @@
                 margin: '20 0 0 0',
                 items: [{
                         xtype: 'container',
-                        columnWidth: 0.5,
+                        columnWidth: 0.6,
                         layout: 'anchor',
-                        items: [father, sinceField]
-                    }, {
-                        xtype: 'container',
-                        columnWidth: 0.5,
-                        layout: 'anchor',
-                        items: [systemContainer]
+                        items: [father,systemContainer, sinceField]
                     }
                 ]
             }

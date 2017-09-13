@@ -253,7 +253,7 @@ public class CompanyDaoHibernate extends GenericDaoHibernate<Company, Integer> i
 
             //Code
             if (code != null && code.trim().length() > 0) {
-                criteria.add(Restrictions.eq("code", code));
+                criteria.add(Restrictions.eq("completeCode", code));
             }
 
             list = criteria.list();
