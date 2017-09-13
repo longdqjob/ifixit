@@ -1,7 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <script>
-    var selectedSystem = -10;
+    var selectedSystem = null;
 
     function updateLayOut() {
         Ext.getCmp("searchform").updateLayout();
@@ -12,7 +12,7 @@
 
     function loadMachine(system) {
         if (!system) {
-            system = selectedSystem;
+            system = (selectedSystem != null) ? selectedSystem.get("id") : -10;
         }
         mygrid.getStore().getProxy().extraParams = {
             system: system,

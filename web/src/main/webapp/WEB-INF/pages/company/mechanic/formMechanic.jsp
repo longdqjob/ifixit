@@ -66,7 +66,6 @@
         readOnly: true,
     });
 
-  
 
     var mechanicCode = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
@@ -114,7 +113,6 @@
 //            }
         ]
     });
-
 
     var mechanicName = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',

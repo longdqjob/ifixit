@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import com.cmms.model.User;
+import java.util.List;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -60,7 +62,9 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         Integer engineerGrpID = 1;
 
         session.setAttribute(SESSION_SYSTEM_ID, systemId);
-        session.setAttribute(SESSION_LIST_SYSTEM_ID, companyDao.getListChildren(systemId));
+        List<Integer> lstChild = companyDao.getListChildren(systemId);
+        System.out.println("lstChild: " + StringUtils.join(lstChild, " , ") );
+        session.setAttribute(SESSION_LIST_SYSTEM_ID, lstChild);
         session.setAttribute(SESSION_ENGINNER_GRP, engineerGrpID);
         System.out.println("SESSION_SYSTEM_ID: " + session.getAttribute(SESSION_SYSTEM_ID));
 

@@ -10,6 +10,7 @@ import com.cmms.service.MailEngine;
 import com.cmms.service.RoleManager;
 import com.cmms.service.UserManager;
 import com.cmms.webapp.security.LoginSuccessHandler;
+import java.text.SimpleDateFormat;
 import org.springframework.mail.SimpleMailMessage;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +32,7 @@ import java.util.Map;
 public class BaseAction extends ActionSupport {
 
     private static final long serialVersionUID = 3525445612504421307L;
+    public static final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
     /**
      * Constant for cancel result String
@@ -246,10 +248,11 @@ public class BaseAction extends ActionSupport {
 
     //Lay danh sach system thuoc user
     public List<Integer> getListSytem() {
-        if (getSession().getServletContext().getAttribute(LoginSuccessHandler.SESSION_LIST_SYSTEM_ID) != null) {
-            return (List<Integer>) getSession().getServletContext().getAttribute(LoginSuccessHandler.SESSION_LIST_SYSTEM_ID);
+        log.info("-------------SESSION_LIST_SYSTEM_ID: " + getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_LIST_SYSTEM_ID));
+        if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_LIST_SYSTEM_ID) != null) {
+            return (List<Integer>) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_LIST_SYSTEM_ID);
         }
-        return new ArrayList<Integer>(0);
+        return null;
     }
 
 }

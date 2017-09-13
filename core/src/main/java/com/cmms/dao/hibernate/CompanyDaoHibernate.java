@@ -37,7 +37,7 @@ public class CompanyDaoHibernate extends GenericDaoHibernate<Company, Integer> i
         try {
             List<Company> rtn = new LinkedList<>();
             String hql = "";
-            if (id == null || id == 0) {
+            if (id == null || id <= 0) {
                 hql = "SELECT * FROM company WHERE parent_id IS NULL";
                 rtn = getSession().createSQLQuery(hql)
                         .addEntity(Company.class)
@@ -265,6 +265,54 @@ public class CompanyDaoHibernate extends GenericDaoHibernate<Company, Integer> i
             return null;
         }
         return rtn;
+    }
+
+    /**
+     *
+     * @param lstId
+     * @return true neu duoc su dung
+     */
+    @Override
+    public Boolean checkUseParent(List<Integer> lstId) {
+        try {
+            if (lstId == null || lstId.isEmpty()) {
+                return false;
+            }
+            String hql = "SELECT COUNT(id) FROM company WHERE parent_id in (:lstId)";
+            Query query = getSession()
+                    .createSQLQuery(hql)
+                    .setParameterList("lstId", lstId);
+
+            List list = query.list();
+            return (((BigInteger) list.get(0)).intValue() > 0);
+        } catch (Exception ex) {
+            log.error("ERROR checkUseParent: ", ex);
+            return null;
+        }
+    }
+
+    /**
+     *
+     * @param lstId
+     * @return true neu duoc su dung
+     */
+    @Override
+    public Boolean checkUseByMachenic(List<Integer> lstId) {
+        try {
+            if (lstId == null || lstId.isEmpty()) {
+                return false;
+            }
+            String hql = "SELECT COUNT(id) FROM machine WHERE company_id in (:lstId)";
+            Query query = getSession()
+                    .createSQLQuery(hql)
+                    .setParameterList("lstId", lstId);
+
+            List list = query.list();
+            return (((BigInteger) list.get(0)).intValue() > 0);
+        } catch (Exception ex) {
+            log.error("ERROR checkUseByMachenic: ", ex);
+            return null;
+        }
     }
 
 }

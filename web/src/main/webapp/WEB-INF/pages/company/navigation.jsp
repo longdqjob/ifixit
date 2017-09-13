@@ -74,7 +74,7 @@
         header: false,
         collapsible: true,
         useArrows: false,
-        rootVisible: false,
+       rootVisible: false,
         lines: true,
         multiSelect: true,
         border: true,
@@ -99,7 +99,7 @@
                 loadMachine("-10");
             },
             itemclick: function (view, node) {
-                //console.log(node);
+                              //console.log(node);
 //                if (node.isLeaf()) {
 //                    // some functionality to open the leaf(document) in a tabpanel
 //                    alert(node.get("text"));
@@ -116,6 +116,7 @@
                 console.log("dbClick Load data " + record.get("id") + " - " + record.get("name"));
             },
             itemcontextmenu: function (tree, record, item, index, e, eOpts) {
+                selectedSystem = record;
                 // Optimize : create menu once
                 var menu_grid = new Ext.menu.Menu({
                     border: true,
@@ -123,8 +124,8 @@
                             text: '<fmt:message key="loadData"/>',
                             iconCls: "refresh",
                             handler: function () {
-                                selectedSystem = record.get("id");
-                                loadMachine(selectedSystem);
+                                selectedSystem = record;
+                                loadMachine(selectedSystem.get("id"));
                                 console.log("Load data " + record.get("id") + " - " + record.get("name"));
                             }}, {
                             text: '<fmt:message key="addCompany"/>',
@@ -142,7 +143,13 @@
                             text: '<fmt:message key="delete"/>',
                             iconCls: "delete-cls",
                             handler: function () {
-                                console.log("Delete " + record.get("id") + " - " + record.get("name"));
+                                var msg = '<fmt:message key="msgDelete.confirm.item"/>';
+                                Ext.MessageBox.confirm('Confirm', msg, function (btn) {
+                                    if (btn == 'yes') {
+                                        var param = '&ids=' + record.get('id');
+                                        deleteCompany(param);
+                                    }
+                                });
                             }}]
                 });
                 // HERE IS THE MAIN CHANGE

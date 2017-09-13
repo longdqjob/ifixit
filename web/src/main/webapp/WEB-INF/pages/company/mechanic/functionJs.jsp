@@ -282,4 +282,31 @@
             },
         });
     }
+
+    function deleteMachine(arrayList) {
+        maskTarget(Ext.getCmp('gridId'));
+        Ext.Ajax.request({
+            url: '../machine/delete?' + arrayList,
+            method: "POST",
+            timeout: 10000,
+            success: function (result, request) {
+                unMaskTarget();
+                jsonData = Ext.decode(result.responseText);
+                if (jsonData.success == true) {
+                    alertSuccess(jsonData.message);
+                    loadMachine(selectedSystem.get("id"));
+                } else {
+                    if (jsonData.message) {
+                        alertError(jsonData.message);
+                    } else {
+                        alertSystemError();
+                    }
+                }
+            },
+            failure: function (response, opts) {
+                unMaskTarget();
+                alertSystemError();
+            }
+        });
+    }
 </script>

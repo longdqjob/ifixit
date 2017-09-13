@@ -86,7 +86,6 @@ public class Machine extends BaseObject implements Serializable {
     public void setSince(Timestamp since) {
         this.since = since;
     }
-
     @Column(name = "completeCode")
     public String getCompleteCode() {
         return completeCode;
@@ -98,19 +97,19 @@ public class Machine extends BaseObject implements Serializable {
     
 
     @Transient
-    public Integer getParentId() {
-        if (this.company == null) {
+    public Long getParentId() {
+        if (this.parent == null) {
             return null;
         }
-        return this.company.getId();
+        return this.parent.getId();
     }
 
     @Transient
     public String getParentName() {
-        if (this.company == null) {
+        if (this.parent == null) {
             return "";
         }
-        return this.company.getName();
+        return this.parent.getName();
     }
 
     public void setParent(Machine parent) {
@@ -126,6 +125,7 @@ public class Machine extends BaseObject implements Serializable {
         this.itemTypeId = itemTypeId;
     }
 
+    
 //    @Transactional
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")

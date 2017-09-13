@@ -24,7 +24,7 @@
                     stateId: 'navigation-panel',
                     title: 'West',
                     split: true,
-                    width: 200,
+                    width: 400,
                     minWidth: 175,
                     maxWidth: 400,
                     collapsible: true,

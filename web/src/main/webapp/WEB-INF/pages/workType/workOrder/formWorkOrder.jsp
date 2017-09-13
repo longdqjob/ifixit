@@ -22,6 +22,7 @@
         margin: '10 10 10 10',
         width: 250,
         readOnly: true,
+        labelWidth: 80,
         listeners: {
             'render': function (cmp) {
                 this.getEl().on('click', function () {
@@ -47,15 +48,16 @@
             }]
     });
 
-    var workTypeId = Ext.create('Ext.form.field.Text', {
+    var wWorkTypeId = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         hidden: true,
     });
 
-    var workTypeName = Ext.create('Ext.form.field.Text', {
+    var wWorkTypeName = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         grow: true,
         tabIndex: -1,
+        id: "workTypeName",
         fieldLabel: '<fmt:message key="work.workType"/>',
         labelAlign: 'left',
         anchor: '100%',
@@ -63,6 +65,7 @@
         margin: '10 10 10 10',
         width: 250,
         readOnly: true,
+        labelWidth: 80,
         listeners: {
             'render': function (cmp) {
                 this.getEl().on('click', function () {
@@ -76,7 +79,7 @@
         xtype: 'fieldcontainer',
         columnWidth: 1,
         layout: 'column',
-        items: [workTypeId, workTypeName, {
+        items: [wWorkTypeId, wWorkTypeName, {
                 xtype: 'button',
                 text: '<fmt:message key="choose"/>',
                 tabIndex: 2,
@@ -101,23 +104,8 @@
         allowBlank: false,
         margin: '10 10 10 10',
         width: 200,
-        maxLength: 50,
-        listeners: {
-            'change': function (textfield, newValue, oldValue) {
-                changeCode(oldValue, newValue);
-            }
-        }
-    });
-
-    var workOrderCodeCtn = Ext.create('Ext.form.FieldContainer', {
-        xtype: 'fieldcontainer',
-        columnWidth: 1,
-        layout: 'column',
-        items: [workOrderCode, {
-                xtype: 'label',
-                id: 'workOrderFullCode',
-                margin: '15 10 10 10',
-            }]
+        maxLength: 20,
+        labelWidth: 80,
     });
 
     var workOrderName = Ext.create('Ext.form.field.Text', {
@@ -127,12 +115,39 @@
         fieldLabel: '<fmt:message key="machine.name"/>',
         name: 'name',
         id: "mechanicName",
-        labelAlign: 'left',
+        labelAlign: 'right',
         anchor: '100%',
         allowBlank: false,
         margin: '10 10 10 10',
         width: 350,
         maxLength: 50,
+        labelWidth: 80,
+    });
+
+    var workOrderInfo = Ext.create('Ext.form.FieldContainer', {
+        xtype: 'fieldcontainer',
+        columnWidth: 1,
+        layout: 'column',
+        items: [{
+                xtype: 'container',
+                anchor: '100%',
+                columnWidth: 1,
+                layout: 'column',
+                height: '100%',
+                items: [{
+                        xtype: 'container',
+                        columnWidth: 0.4,
+                        layout: 'anchor',
+                        items: [workOrderCode]
+                    }, {
+                        xtype: 'container',
+                        columnWidth: 0.6,
+                        layout: 'anchor',
+                        items: [workOrderName]
+                    }
+                ]
+            }
+        ]
     });
 
 
@@ -147,6 +162,7 @@
         margin: '10 10 10 10',
         width: 250,
         format: 'd/m/Y',
+        labelWidth: 80,
 //        altFormats: 'm,d,Y|m.d.Y',
     };
     var endTime = {
@@ -160,6 +176,7 @@
         margin: '20 10 10 10',
         width: 250,
         format: 'd/m/Y',
+        labelWidth: 80,
 //        altFormats: 'm,d,Y|m.d.Y',
     };
 
@@ -226,7 +243,7 @@
                         xtype: 'container',
                         columnWidth: 0.5,
                         layout: 'anchor',
-                        items: [workOrderId, mechanic, workType]
+                        items: [workOrderId, mechanic, workType, workOrderInfo]
                     }, {
                         xtype: 'container',
                         columnWidth: 0.5,
@@ -248,7 +265,7 @@
         closeAction: 'hide',
         id: 'workOrderWindow',
         autoEl: 'form',
-        width: '60%',
+        width: '80%',
         constrainHeader: true,
         layout: 'anchor',
         modal: true,
@@ -260,7 +277,7 @@
                 text: '<fmt:message key="button.save"/>',
                 type: 'submit',
                 handler: function () {
-                    saveMechanic();
+                    saveWorkOrder();
                 }
             }, {
                 text: '<fmt:message key="button.cancel"/>',
@@ -272,7 +289,7 @@
             afterRender: function (thisForm, options) {
                 this.keyNav = Ext.create('Ext.util.KeyNav', this.el, {
                     enter: function () {
-                        saveMechanic();
+                        saveWorkOrder();
                     }
                 });
             },

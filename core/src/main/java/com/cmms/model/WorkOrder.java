@@ -27,6 +27,7 @@ public class WorkOrder extends BaseObject implements Serializable {
     private Date endTime;
     private Integer status;
     private WorkType workType;
+    private Machine machine;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -91,6 +92,16 @@ public class WorkOrder extends BaseObject implements Serializable {
 
     public void setWorkType(WorkType workType) {
         this.workType = workType;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "machine_id")
+    public Machine getMachine() {
+        return machine;
+    }
+
+    public void setMachine(Machine machine) {
+        this.machine = machine;
     }
 
     @Override

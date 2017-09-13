@@ -4,6 +4,7 @@ import com.cmms.dao.GroupEngineerDao;
 import com.cmms.dao.MachineDao;
 import com.cmms.dao.WorkOrderDao;
 import com.cmms.dao.WorkTypeDao;
+import com.cmms.model.Machine;
 import com.cmms.model.WorkOrder;
 import com.cmms.model.WorkType;
 import com.cmms.webapp.security.LoginSuccessHandler;
@@ -12,6 +13,7 @@ import com.cmms.webapp.util.WebUtil;
 import com.opensymphony.xwork2.Preparable;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -107,9 +109,10 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             JSONArray jSONArray = new JSONArray();
             JSONObject tmp;
             WorkType workType;
+            Machine machine;
             for (WorkOrder workOrder : list) {
                 tmp = new JSONObject();
-                tmp = WebUtil.toJSONObject(workOrder, "workType");
+                tmp = WebUtil.toJSONObject(workOrder, "workType,machine");
                 workType = workOrder.getWorkType();
                 if (workOrder != null) {
                     tmp.put("workTypeId", workType.getId());
@@ -117,6 +120,14 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                 } else {
                     tmp.put("workTypeId", "");
                     tmp.put("workTypeName", "");
+                }
+                machine = workOrder.getMachine();
+                if (workOrder != null) {
+                    tmp.put("machineId", machine.getId());
+                    tmp.put("machineName", machine.getName());
+                } else {
+                    tmp.put("machineId", "");
+                    tmp.put("machineName", "");
                 }
                 jSONArray.put(tmp);
             }
@@ -139,6 +150,9 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             String code = getRequest().getParameter("code");
             String name = getRequest().getParameter("name");
             String workTypeId = getRequest().getParameter("workTypeId");
+            String mechanicId = getRequest().getParameter("mechanicId");
+            String startTime = getRequest().getParameter("startTime");
+            String endTime = getRequest().getParameter("endTime");
 
             if (StringUtils.isBlank(code)) {
                 result.put("success", false);
@@ -177,8 +191,14 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                 WorkType workType = workTypeDao.get(Integer.parseInt(workTypeId));
                 workOrder.setWorkType(workType);
             }
+            if (!StringUtils.isBlank(mechanicId)) {
+                Machine machine = machineDao.get(Long.parseLong(mechanicId));
+                workOrder.setMachine(machine);
+            }
             workOrder.setCode(code);
             workOrder.setName(name);
+            workOrder.setStartTime(sdf.parse(startTime));
+            workOrder.setEndTime(sdf.parse(endTime));
             workOrder = workOrderDao.save(workOrder);
             if (workOrder != null) {
                 result.put("success", true);

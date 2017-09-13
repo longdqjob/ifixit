@@ -63,9 +63,11 @@
     </bean>
     
     <bean id="workTypeAction" class="com.cmms.webapp.action.WorkTypeAction" scope="prototype">
+        <property name="companyDao" ref="companyDao"/>
         <property name="workTypeDao" ref="workTypeDao"/>
     </bean>
     <bean id="workOrderAction" class="com.cmms.webapp.action.WorkOrderAction" scope="prototype">
+        <property name="companyDao" ref="companyDao"/>
         <property name="groupEngineerDao" ref="groupEngineerDao"/>
         <property name="machineDao" ref="machineDao"/>
         <property name="workTypeDao" ref="workTypeDao"/>

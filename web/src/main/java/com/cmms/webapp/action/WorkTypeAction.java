@@ -51,12 +51,6 @@ public class WorkTypeAction extends BaseAction implements Preparable {
             if (!StringUtils.isBlank(idReq)) {
                 id = Integer.parseInt(idReq);
             }
-            if (id == null || id < -1) {
-                id = null;
-                if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID) != null) {
-                    id = (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID);
-                }
-            }
             return new ByteArrayInputStream(workTypeDao.getTreeView(id).toString().getBytes("UTF8"));
         } catch (Exception e) {
             log.error("ERROR getTreeCompany: ", e);
