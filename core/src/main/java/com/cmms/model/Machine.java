@@ -86,6 +86,7 @@ public class Machine extends BaseObject implements Serializable {
     public void setSince(Timestamp since) {
         this.since = since;
     }
+
     @Column(name = "completeCode")
     public String getCompleteCode() {
         return completeCode;
@@ -94,7 +95,6 @@ public class Machine extends BaseObject implements Serializable {
     public void setCompleteCode(String completeCode) {
         this.completeCode = completeCode;
     }
-    
 
     @Transient
     public Long getParentId() {
@@ -125,7 +125,6 @@ public class Machine extends BaseObject implements Serializable {
         this.itemTypeId = itemTypeId;
     }
 
-    
 //    @Transactional
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
@@ -160,6 +159,22 @@ public class Machine extends BaseObject implements Serializable {
     @JoinColumn(name = "machine_type_id")
     public MachineType getMachineType() {
         return machineType;
+    }
+
+    @Transient
+    public Integer getMachineTypeId() {
+        if (this.machineType == null) {
+            return null;
+        }
+        return this.machineType.getId();
+    }
+
+    @Transient
+    public String getMachineTypeName() {
+        if (this.machineType == null) {
+            return "";
+        }
+        return this.machineType.getName();
     }
 
     public void setMachineType(MachineType machineType) {

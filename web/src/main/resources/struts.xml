@@ -178,6 +178,12 @@
             <interceptor-ref name="adminCheck"/>
             <result name="success">/WEB-INF/pages/workType/index.jsp</result>
         </action>
+        
+        <!-- workOrder -->
+        <action name="workOrder" class="workOrderAction" method="index">
+            <interceptor-ref name="adminCheck"/>
+            <result name="success">/WEB-INF/pages/engineer/index.jsp</result>
+        </action>
     </package>
     
     <package name="itemType" extends="default" namespace="/itemType">
@@ -329,6 +335,11 @@
     
     <!-- materialAction -->
     <package name="material" extends="default" namespace="/material">
+        <action name="getTree" class="materialAction">
+            <result type="stream">
+                <param name="inputName">tree</param>
+            </result>
+        </action>
         <action name="loadData" class="materialAction">
             <result type="stream">
                 <param name="inputName">loadData</param>

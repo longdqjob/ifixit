@@ -1,5 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <script>
+    var systemId = ${systemId};
     var storeCompany = Ext.create('Ext.data.TreeStore', {
         proxy: {
             type: 'ajax',
@@ -7,7 +8,7 @@
         },
         root: {
             text: '<fmt:message key="company"/>',
-            id: '-10',
+            id: systemId,
             expanded: true
         },
         folderSort: true,

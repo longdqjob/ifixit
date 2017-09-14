@@ -10,26 +10,32 @@ import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "material")
 public class Material extends BaseObject implements Serializable {
 
     private static final long serialVersionUID = -1L;
-    private Integer id;
+    private Long id;
     private String code;
+    private String completeCode;
     private String name;
     private String description;
     private String unit;
     private Float cost;
+    private Material parent;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -40,6 +46,15 @@ public class Material extends BaseObject implements Serializable {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    @Column(name = "complete_code")
+    public String getCompleteCode() {
+        return completeCode;
+    }
+
+    public void setCompleteCode(String completeCode) {
+        this.completeCode = completeCode;
     }
 
     @Column(name = "name")
@@ -76,6 +91,40 @@ public class Material extends BaseObject implements Serializable {
 
     public void setCost(Float cost) {
         this.cost = cost;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    public Material getParent() {
+        return parent;
+    }
+
+    @Transient
+    public Long getParentId() {
+        if (this.parent == null) {
+            return null;
+        }
+        return this.parent.getId();
+    }
+
+    @Transient
+    public String getParentName() {
+        if (this.parent == null) {
+            return "";
+        }
+        return this.parent.getName();
+    }
+
+    @Transient
+    public String getParentCode() {
+        if (this.parent == null) {
+            return "";
+        }
+        return this.parent.getCode();
+    }
+
+    public void setParent(Material parent) {
+        this.parent = parent;
     }
 
     @Override

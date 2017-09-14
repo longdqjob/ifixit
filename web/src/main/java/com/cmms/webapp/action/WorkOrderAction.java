@@ -123,26 +123,38 @@ public class WorkOrderAction extends BaseAction implements Preparable {
     public InputStream getLoadData() {
         try {
             JSONObject result = new JSONObject();
-            //companyDao
-            String sWorkType = getRequest().getParameter("workType");
-            Integer companyId = null;
-            if (!StringUtils.isBlank(sWorkType)) {
-                companyId = Integer.parseInt(sWorkType);
-            }
-            List<Integer> listWorkType;
-            if (companyId == null || companyId < -1) {
-                companyId = null;
-                if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID) != null) {
-                    companyId = (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID);
-                }
-                listWorkType = getListSytem();
-            } else {
-                listWorkType = workTypeDao.getListChildren(companyId);
-            }
-
             String code = getRequest().getParameter("code");
             String name = getRequest().getParameter("name");
-            Map pagingMap = workOrderDao.getList(listWorkType, code, name, start, limit);
+            
+            //listWorkType
+            String sWorkType = getRequest().getParameter("workType");
+            Integer workTypeReq = null;
+            if (!StringUtils.isBlank(sWorkType)) {
+                workTypeReq = Integer.parseInt(sWorkType);
+            }
+            List<Integer> listWorkType = null;
+            if (workTypeReq != null && workTypeReq > 0) {
+                listWorkType = workTypeDao.getListChildren(workTypeReq);
+            }
+
+            //groupEngineerDao
+            String engineerIdReq = getRequest().getParameter("engineerId");
+            Integer engineerId = null;
+            if (!StringUtils.isBlank(engineerIdReq)) {
+                engineerId = Integer.parseInt(engineerIdReq);
+            }
+            List<Integer> listEng;
+            if (engineerId == null || engineerId <= 0) {
+                engineerId = null;
+                if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP) != null) {
+                    engineerId = (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP);
+                }
+                listEng = getListGrpEngineer();
+            } else {
+                listEng = groupEngineerDao.getListChildren(engineerId);
+            }
+
+            Map pagingMap = workOrderDao.getList(listEng, listWorkType, code, name, start, limit);
 
             ArrayList<WorkOrder> list = new ArrayList<WorkOrder>();
             if (pagingMap.get("list") != null) {

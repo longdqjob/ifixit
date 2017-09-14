@@ -68,6 +68,8 @@ public class GrpEngineerAction extends BaseAction implements Preparable {
             String name = getRequest().getParameter("name");
             String parent = getRequest().getParameter("parent");
             String description = getRequest().getParameter("description");
+            String cost = getRequest().getParameter("cost");
+            String completeCode = getRequest().getParameter("completeCode");
 
             if (StringUtils.isBlank(code)) {
                 result.put("success", false);
@@ -80,7 +82,7 @@ public class GrpEngineerAction extends BaseAction implements Preparable {
             if (!StringUtils.isBlank(idReq)) {
                 id = Integer.parseInt(idReq);
                 cGroupEngineer = groupEngineerDao.get(id);
-                if (code.equals(cGroupEngineer.getCode())) {
+                if (completeCode.equals(cGroupEngineer.getCompleteCode())) {
                     checkUnique = false;
                 }
             } else {
@@ -89,7 +91,7 @@ public class GrpEngineerAction extends BaseAction implements Preparable {
 
             //Check unique
             if (checkUnique) {
-                checkUnique = groupEngineerDao.checkUnique(id, code);
+                checkUnique = groupEngineerDao.checkUnique(id, completeCode);
                 if (checkUnique == null) {
                     result.put("success", false);
                     result.put("message", ResourceBundleUtils.getName("systemError"));
@@ -104,8 +106,10 @@ public class GrpEngineerAction extends BaseAction implements Preparable {
             GroupEngineer parentObj = groupEngineerDao.get(Integer.parseInt(parent));
             cGroupEngineer.setParent(parentObj);
             cGroupEngineer.setCode(code);
+            cGroupEngineer.setCompleteCode(completeCode);
             cGroupEngineer.setName(name);
             cGroupEngineer.setDescription(description);
+            cGroupEngineer.setCost(Float.parseFloat(cost));
             cGroupEngineer = groupEngineerDao.save(cGroupEngineer);
             if (cGroupEngineer != null) {
                 result.put("success", true);

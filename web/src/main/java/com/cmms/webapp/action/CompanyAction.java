@@ -51,12 +51,14 @@ public class CompanyAction extends BaseAction implements Preparable {
             if (!StringUtils.isBlank(idReq)) {
                 id = Integer.parseInt(idReq);
             }
-            if (id == null || id < -1) {
-                id = null;
-                if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID) != null) {
-                    id = (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID);
-                }
-            }
+            Integer sessionSystem = (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID);
+            id = ((sessionSystem != null) && (id == null || id < sessionSystem)) ? sessionSystem : id;
+//            if (id == null || id < -1) {
+//                id = null;
+//                if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID) != null) {
+//                    id = (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID);
+//                }
+//            }
 
 //            String result = "";
 //            JSONObject treeview = new JSONObject();
@@ -125,7 +127,7 @@ public class CompanyAction extends BaseAction implements Preparable {
             String name = getRequest().getParameter("name");
             String parent = getRequest().getParameter("parent");
             String description = getRequest().getParameter("description");
-             String completeCode = getRequest().getParameter("completeCode");
+            String completeCode = getRequest().getParameter("completeCode");
 
             if (StringUtils.isBlank(code)) {
                 result.put("success", false);

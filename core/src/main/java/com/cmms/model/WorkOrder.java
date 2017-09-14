@@ -90,7 +90,7 @@ public class WorkOrder extends BaseObject implements Serializable {
         this.status = status;
     }
 
-    @Column(name = "interval")
+    @Column(name = "i_interval")
     public Integer getInterval() {
         return interval;
     }

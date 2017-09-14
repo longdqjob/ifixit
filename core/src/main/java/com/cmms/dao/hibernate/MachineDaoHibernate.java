@@ -108,14 +108,15 @@ public class MachineDaoHibernate extends GenericDaoHibernate<Machine, Long> impl
         obj.put("name", currentGroup.getName());
         obj.put("description", currentGroup.getDescription());
         obj.put("code", currentGroup.getCode());
+        obj.put("completeCode", currentGroup.getCompleteCode());
         obj.put("parentId", currentGroup.getParentId());
         obj.put("parentName", currentGroup.getParentName());
+        obj.put("machineTypeId", currentGroup.getMachineTypeId());
+        obj.put("machineTypeName", currentGroup.getMachineTypeName());
+        obj.put("since", currentGroup.getSince());
         obj.put("leaf", false);
         obj.put("expand", true);
-        obj.put("iconCls", "folder");
-//        obj.put("iconCls", "task-folder");
         obj.put("id", currentGroup.getId());
-//        obj.put("children", children);
         return obj;
     }
 

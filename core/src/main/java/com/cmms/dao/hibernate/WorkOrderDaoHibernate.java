@@ -26,7 +26,7 @@ public class WorkOrderDaoHibernate extends GenericDaoHibernate<WorkOrder, Long> 
     }
 
     @Override
-    public Map getList(List<Integer> listWorkType, String code, String name, Integer start, Integer limit) {
+    public Map getList(List<Integer> listEng, List<Integer> listWorkType, String code, String name, Integer start, Integer limit) {
         try {
             Map result = new HashMap();
             Criteria criteria = getSession().createCriteria(WorkOrder.class);
@@ -39,6 +39,9 @@ public class WorkOrderDaoHibernate extends GenericDaoHibernate<WorkOrder, Long> 
                 criteria.add(Restrictions.like("name", "%" + name.trim() + "%").ignoreCase());
             }
 
+            if (listEng != null && !listEng.isEmpty()) {
+                criteria.add(Restrictions.in("groupEngineer.id", listEng));
+            }
             if (listWorkType != null && !listWorkType.isEmpty()) {
                 criteria.add(Restrictions.in("workType.id", listWorkType));
             }

@@ -21,7 +21,7 @@
         title: '<fmt:message key="machine"/>',
         id: 'mechanicTreeWindow',
         autoEl: 'form',
-        width: 500,
+        width: "70%",
         constrainHeader: true,
         layout: 'anchor',
         modal: true,
@@ -35,7 +35,8 @@
                 itemId: 'treeMechanic',
                 id: 'treeMechanic',
                 layout: 'fit',
-                height: 300,
+                minHeight: 300,
+                height: "60%",
                 name: 'treeMechanic',
                 store: storeMachine,
                 rootVisible: false,
@@ -43,9 +44,29 @@
                 columns: [{
                         xtype: 'treecolumn', //this is so we know which column will show the tree
                         width: 345,
-                        sortable: true,
+                        text: '<fmt:message key="machine.name"/>',
                         dataIndex: 'name',
-                    }
+                    },{
+                        text: '<fmt:message key="machine.code"/>',
+                        dataIndex: 'code',
+                        flex: 1
+                    },{
+                        text: '<fmt:message key="machine.fullCode"/>',
+                        dataIndex: 'completeCode',
+                        flex: 1
+                    },{
+                        text: '<fmt:message key="machine.description"/>',
+                        dataIndex: 'description',
+                        flex: 1
+                    },{
+                        text: '<fmt:message key="machine.type"/>',
+                        dataIndex: 'machineTypeName',
+                        flex: 1
+                    },{
+                        text: '<fmt:message key="machine.since"/>',
+                        dataIndex: 'since',
+                        flex: 1
+                    },
                 ],
                 listeners: {
                     itemdblclick: function (tree, record, index) {

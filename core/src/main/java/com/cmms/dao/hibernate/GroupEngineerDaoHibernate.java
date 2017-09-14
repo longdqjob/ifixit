@@ -32,12 +32,12 @@ public class GroupEngineerDaoHibernate extends GenericDaoHibernate<GroupEngineer
             List<GroupEngineer> rtn = new LinkedList<>();
             String hql = "";
             if (id == null || id <= 0) {
-                hql = "SELECT * FROM group_engineer WHERE parent_id IS NULL";
+                hql = "SELECT * FROM group_engineer WHERE parent_id IS NULL order by name";
                 rtn = getSession().createSQLQuery(hql)
                         .addEntity(GroupEngineer.class)
                         .list();
             } else {
-                hql = "SELECT * FROM group_engineer WHERE parent_id=:parent_id";
+                hql = "SELECT * FROM group_engineer WHERE parent_id=:parent_id order by name";
                 rtn = getSession().createSQLQuery(hql)
                         .addEntity(GroupEngineer.class)
                         .setParameter("parent_id", id)

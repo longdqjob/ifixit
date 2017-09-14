@@ -38,6 +38,25 @@ public class MaterialAction extends BaseAction implements Preparable {
         return SUCCESS;
     }
 
+    public InputStream getTree() {
+        try {
+            String idReq = getRequest().getParameter("id");
+            Long id = null;
+            if (!StringUtils.isBlank(idReq)) {
+                id = Long.parseLong(idReq);
+            } else {
+                idReq = getRequest().getParameter("node");
+            }
+            if (!StringUtils.isBlank(idReq)) {
+                id = Long.parseLong(idReq);
+            }
+            return new ByteArrayInputStream(materialDao.getTreeView(id).toString().getBytes("UTF8"));
+        } catch (Exception e) {
+            log.error("ERROR getTree: ", e);
+            return null;
+        }
+    }
+    
     public InputStream getLoadData() {
         try {
             JSONObject result = new JSONObject();

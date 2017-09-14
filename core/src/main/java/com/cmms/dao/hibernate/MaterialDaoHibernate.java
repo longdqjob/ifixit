@@ -1,13 +1,19 @@
 package com.cmms.dao.hibernate;
 
 import com.cmms.dao.MaterialDao;
+import com.cmms.model.GroupEngineer;
 import com.cmms.model.Material;
 import java.math.BigInteger;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -24,6 +30,61 @@ public class MaterialDaoHibernate extends GenericDaoHibernate<Material, Long> im
 
     public MaterialDaoHibernate() {
         super(Material.class);
+    }
+
+    @Override
+    public List<Material> getListItem(Long id) {
+        try {
+            List<Material> rtn = new LinkedList<>();
+            String hql = "";
+            if (id == null || id <= 0) {
+                hql = "SELECT * FROM material WHERE parent_id IS NULL  order by name";
+                rtn = getSession().createSQLQuery(hql)
+                        .addEntity(Material.class)
+                        .list();
+            } else {
+                hql = "SELECT * FROM material WHERE parent_id=:parent_id order by name";
+                rtn = getSession().createSQLQuery(hql)
+                        .addEntity(Material.class)
+                        .setParameter("parent_id", id)
+                        .list();
+            }
+            return rtn;
+        } catch (Exception ex) {
+            log.error("ERROR getListItem: ", ex);
+            return null;
+        }
+    }
+
+    public JSONObject getTree(Material root) throws JSONException, SQLException {
+        JSONObject obj = new JSONObject();
+        Material item = root;
+        obj.put("name", item.getName());
+        obj.put("namedisplay", item.getCode() + "." + item.getName());
+        obj.put("description", item.getDescription());
+        obj.put("code", item.getCode());
+        obj.put("unit", item.getUnit());
+        obj.put("cost", item.getCost());
+        obj.put("completeCode", item.getCompleteCode());
+        obj.put("completeParentCode", item.getParentCode());
+        obj.put("parentName", item.getParentName());
+        obj.put("parentId", item.getParentId());
+        obj.put("leaf", false);
+        obj.put("expand", true);
+        obj.put("id", item.getId());
+        return obj;
+    }
+
+    @Override
+    public JSONArray getTreeView(Long id) throws JSONException, SQLException {
+        List<Material> roots = getListItem(id);
+
+        JSONArray treeview = new JSONArray();
+        for (Material root : roots) {
+            JSONObject tree = getTree(root);
+            treeview.put(tree);
+        }
+        return treeview;
     }
 
     @Override
