@@ -58,7 +58,6 @@ public class WorkTypeDaoHibernate extends GenericDaoHibernate<WorkType, Integer>
         obj.put("parentId", currentGroup.getParentId());
         obj.put("leaf", false);
         obj.put("expand", true);
-        obj.put("iconCls", "folder");
         obj.put("id", currentGroup.getId());
         return obj;
     }
