@@ -81,6 +81,11 @@
         width: 250,
         readOnly: true,
         labelWidth: 80,
+        listeners: {
+            'change': function (textfield, newValue, oldValue) {
+                changeHrs(oldValue, newValue);
+            }
+        }
     });
     var mhfrmTotalCost = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',

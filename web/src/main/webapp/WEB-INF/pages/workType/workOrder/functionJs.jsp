@@ -176,7 +176,9 @@
     }
     ////--------ManHrs------------------
     function changeHrs(oldValue, newValue) {
-        mhfrmTotalCost.setValue(mhManHrs.getValue() * mhfrmCost.getValue());
+        if (mhManHrs.getValue() != "" && mhfrmCost.getValue() != "") {
+            mhfrmTotalCost.setValue(mhManHrs.getValue() * mhfrmCost.getValue());
+        }
     }
     function showManHrs(data) {
         manHrsForm.reset();
@@ -193,7 +195,36 @@
         manHrsWindow.show();
     }
 
+    function getManHrsFromFrm() {
+        return  {
+            id: 0,
+            workOrderId: 0,
+            engineerId: mhGrpEngineerId.getValue(),
+            engineerGrp: mhGrpEngineerName.getValue(),
+            engineerCost: mhfrmCost.getValue(),
+            mh: mhManHrs.getValue(),
+        };
+    }
     function saveManHrs() {
+        if (manHrsId.getValue() != "") {
+            var index = storeManHrs.findExact("id", parseInt(manHrsId.getValue()));
+            if (index > -1) {
+                var rec = storeManHrs.getAt(index);
+                rec.set("engineerId", parseInt(mhGrpEngineerId.getValue()));
+                rec.set("engineerGrp", parseInt(mhGrpEngineerName.getValue()));
+                rec.set("mh", parseInt(mhManHrs.getValue()));
+                rec.dirty = true;
+                try {
+                    storeManHrs.sync();
+                } catch (c) {
+                    console.log(c);
+                }
+            } else {
+                storeManHrs.add(getManHrsFromFrm());
+            }
+        } else {
+            storeManHrs.add(getManHrsFromFrm());
+        }
         manHrsWindow.hide();
     }
 

@@ -9,7 +9,7 @@
 //-----------------------------------------Grid---------------------------------------------------------------
     var storeManHrs = Ext.create('Ext.data.Store', {
         storeId: 'storeManHrs',
-        fields: ['id', 'engineerGrp', 'engineerId', 'engineerGrp', 'mh', 'engineerCost', 'workOrderId'],
+        fields: ['id', 'engineerId', 'engineerGrp', 'mh', 'engineerCost', 'workOrderId'],
         pageSize: 20,
     });
 

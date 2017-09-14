@@ -298,6 +298,8 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             String endTime = getRequest().getParameter("endTime");
             String task = getRequest().getParameter("task");
             String manHrs = getRequest().getParameter("manHrs");
+            String note = getRequest().getParameter("note");
+            String reason = getRequest().getParameter("reason");
             List<ManHoursObj> listManHours = null;
             Gson gson = new Gson();
             if (!StringUtils.isBlank(manHrs)) {
@@ -360,29 +362,42 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             workOrder.setInterval(Integer.parseInt(interval));
             workOrder.setIsRepeat(Integer.parseInt(repeat));
             workOrder.setTask(task);
+            workOrder.setNote(note);
+            workOrder.setReason(reason);
             workOrder = workOrderDao.save(workOrder);
             if (workOrder != null) {
                 if (listManHours != null && !listManHours.isEmpty()) {
                     ManHours manHours;
                     GroupEngineer groupEngineer;
                     Integer tmpEngineerId = -1;
+                    Boolean change = false;
                     for (ManHoursObj manHoursObj : listManHours) {
+                        change = false;
                         if (manHoursObj.getId() <= 0) {
                             //Add
                             manHours = new ManHours();
                             manHours.setWorkOrder(workOrder);
                             tmpEngineerId = -100;
+                            change = true;
                         } else {
                             //Edit
+                            log.info("Edit manHoursObj: " + manHoursObj.getId());
                             manHours = manHoursDao.get(manHoursObj.getId());
                             tmpEngineerId = manHours.getGroupEngineerId();
+                            if (!Objects.equals(manHoursObj.getMh(), manHours.getMh())) {
+                                change = true;
+                            }
                         }
                         if (!Objects.equals(tmpEngineerId, manHoursObj.getGroupEngineerId())) {
                             groupEngineer = groupEngineerDao.get(manHoursObj.getGroupEngineerId());
                             manHours.setGroupEngineer(groupEngineer);
+                            change = true;
                         }
-                        manHours.setMh(manHoursObj.getMh());
-                        manHoursDao.save(manHours);
+                        log.info("Edit manHoursObj change: " + change);
+                        if (change) {
+                            manHours.setMh(manHoursObj.getMh());
+                            manHoursDao.save(manHours);
+                        }
                     }
                 }
                 result.put("success", true);
