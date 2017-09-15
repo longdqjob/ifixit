@@ -5,6 +5,9 @@
     <meta name="menu" content="AdminMenu"/>
 </head>
 
+<script>
+    var numSpecification = 10;
+</script>
 <jsp:include page="../pagingmemory.jsp" />
 <jsp:include page="../common/require.jsp" />
 <jsp:include page="../script.jsp" />

@@ -135,6 +135,14 @@ public class CompanyAction extends BaseAction implements Preparable {
                 return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
             }
 
+            if (StringUtils.isBlank(parent)) {
+                if (getGrpEngineerId() > 0) {
+                    result.put("success", false);
+                    result.put("message", ResourceBundleUtils.getName("parentRequired"));
+                    return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                }
+            }
+
             Boolean checkUnique = true;
             Company company;
             if (!StringUtils.isBlank(idReq)) {
@@ -161,9 +169,10 @@ public class CompanyAction extends BaseAction implements Preparable {
                 }
             }
 
-            Company parentObj = companyDao.get(Integer.parseInt(parent));
-            company.setCompany(parentObj);
-//            company.setParentId(Integer.parseInt(parent));
+            if (!StringUtils.isBlank(parent)) {
+                Company parentObj = companyDao.get(Integer.parseInt(parent));
+                company.setCompany(parentObj);
+            }
             company.setCode(code);
             company.setName(name);
             company.setDescription(description);

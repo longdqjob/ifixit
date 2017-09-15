@@ -20,7 +20,7 @@ public interface MaterialDao extends GenericDao<Material, Long> {
     JSONArray getTreeView(Long id) throws JSONException, SQLException;
 
     @Transactional
-    Map getList(String code, String name, Integer start, Integer limit);
+    Map getList(List<Integer> lstItemType,String code, String name, Integer start, Integer limit);
 
     @Transactional
     Integer delete(List<Long> list);

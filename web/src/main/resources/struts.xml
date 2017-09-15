@@ -184,18 +184,28 @@
             <interceptor-ref name="adminCheck"/>
             <result name="success">/WEB-INF/pages/engineer/index.jsp</result>
         </action>
+        
+        <!--material-->
+        <action name="material" class="materialAction" method="index">
+            <interceptor-ref name="adminCheck"/>
+            <result name="success">/WEB-INF/pages/material/index.jsp</result>
+        </action>
     </package>
     
     <package name="itemType" extends="default" namespace="/itemType">
-        <action name="getListItem" class="itemAction">
+        <action name="getTree" class="itemAction">
             <result type="stream">
-                <param name="inputName">listItem</param>
+                <param name="inputName">tree</param>
             </result>
         </action>
-        
-        <action name="loadData" class="itemAction">
+        <action name="save" class="itemAction">
             <result type="stream">
-                <param name="inputName">loadData</param>
+                <param name="inputName">save</param>
+            </result>
+        </action>
+        <action name="delete" class="itemAction">
+            <result type="stream">
+                <param name="inputName">delete</param>
             </result>
         </action>
     </package>

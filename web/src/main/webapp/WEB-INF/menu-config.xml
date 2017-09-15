@@ -9,6 +9,7 @@
             <Item name="company" title="menu.admin.company" page="/admin/company"/>
             <Item name="machineType" title="menu.admin.machineType" page="/admin/machineType"/>
         </Menu>
+        <Menu name="materialMenu" title="menu.admin.material" page="../admin/material" roles="ROLE_ADMIN,ROLE_USER"/>
         <Menu name="workOrder" title="menu.admin.workOrder" page="../admin/workOrder" roles="ROLE_ADMIN,ROLE_USER"/>
         <Menu name="UserMenu" title="menu.user" description="User Menu" page="/editProfile" roles="ROLE_ADMIN,ROLE_USER"/>
         <Menu name="AdminMenu" title="menu.admin" description="Admin Menu" roles="ROLE_ADMIN" page="/admin/users">
