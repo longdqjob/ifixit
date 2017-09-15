@@ -15,7 +15,7 @@
 
     var cmItemTypeTreeWindow = Ext.create('Ext.window.Window', {
         closeAction: 'hide',
-        closable: false,
+        closable: true,
         title: '<fmt:message key="itemType"/>',
         id: 'cmItemTypeTreeWindow',
         autoEl: 'form',

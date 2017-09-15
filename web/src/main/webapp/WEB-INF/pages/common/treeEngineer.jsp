@@ -16,7 +16,7 @@
 
     var grpEngineerTreeWindow = Ext.create('Ext.window.Window', {
         closeAction: 'hide',
-        closable: false,
+        closable: true,
         title: '<fmt:message key="grpEngineer"/>',
         id: 'grpEngineerTreeWindow',
         autoEl: 'form',

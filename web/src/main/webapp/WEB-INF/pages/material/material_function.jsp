@@ -132,6 +132,7 @@
                     materialCode.setActiveError(res.message);
                 } else if ("true" == res.success || true === res.success) {
                     materialWindow.hide();
+                    alertSuccess(res.message);
                     loadMaterial(0);
                 } else {
                     if (res.message || res.message == "true") {

@@ -56,6 +56,7 @@
         margin: '10 10 10 10',
         width: 250,
         maxLength: 50,
+        readOnly: true,
         listeners: {
             'change': function (textfield, newValue, oldValue) {
                 genMaterialCode(oldValue, newValue);
@@ -164,7 +165,7 @@
         autoHeight: true,
         activeTab: 0,
         items: [{
-                title: '01-20',
+                title: '<fmt:message key="material.specification"/>',
                 tabIndex: 13,
                 items: [{
                         xtype: 'container',

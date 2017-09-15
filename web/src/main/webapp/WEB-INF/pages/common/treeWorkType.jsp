@@ -18,7 +18,7 @@
 
     var workTypeTreeWindow = Ext.create('Ext.window.Window', {
         closeAction: 'hide',
-        closable: false,
+        closable: true,
         title: '<fmt:message key="workType"/>',
         id: 'workTypeTreeWindow',
         autoEl: 'form',

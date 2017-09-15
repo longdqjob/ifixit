@@ -60,6 +60,13 @@
         margin: '10 10 10 10',
         width: 350,
         readOnly: true,
+        listeners: {
+            'render': function (cmp) {
+                this.getEl().on('click', function () {
+                    cmItemTypeTreeWindow.show();
+                });
+            }
+        }
     });
     var itemTypeParentCode = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
@@ -70,6 +77,13 @@
         margin: '10 10 10 10',
         width: 450,
         readOnly: true,
+        listeners: {
+            'render': function (cmp) {
+                this.getEl().on('click', function () {
+                    cmItemTypeTreeWindow.show();
+                });
+            }
+        }
     });
 
     var itemTypeParent = Ext.create('Ext.form.FieldContainer', {
@@ -82,7 +96,7 @@
                 margin: '10 0 6 10',
                 width: 80,
                 handler: function () {
-                    companyTreeWindow.show();
+                    cmItemTypeTreeWindow.show();
                 }
             }]
     });
