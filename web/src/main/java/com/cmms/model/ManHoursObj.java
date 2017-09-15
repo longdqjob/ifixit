@@ -7,7 +7,6 @@ package com.cmms.model;
 public class ManHoursObj {
 
     private Long id;
-    private Long workOrderId;
     private Integer groupEngineerId;
     private Float mh;
 
@@ -18,15 +17,7 @@ public class ManHoursObj {
     public void setId(Long id) {
         this.id = id;
     }
-
-    public Long getWorkOrderId() {
-        return workOrderId;
-    }
-
-    public void setWorkOrderId(Long workOrderId) {
-        this.workOrderId = workOrderId;
-    }
-
+    
     public Integer getGroupEngineerId() {
         return groupEngineerId;
     }

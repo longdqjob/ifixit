@@ -37,8 +37,8 @@
 //-----------------------------------------Grid---------------------------------------------------------------
     var storeGrid = Ext.create('Ext.data.Store', {
         storeId: 'storeGrid',
-        fields: ['id', 'code', 'name', 'startTime', 'endTime', 'status', 'workTypeId', 
-            'workTypeName','machineId','machineName','grpEngineerId','grpEngineerName'],
+//        fields: ['id', 'code', 'name', 'startTime', 'endTime', 'status', 'repeat', 'workTypeId',
+//            'workTypeName', 'machineId', 'machineName', 'grpEngineerId', 'grpEngineerName'],
         pageSize: 20,
         proxy: {
             type: 'ajax',
@@ -50,9 +50,9 @@
             }
         },
     });
-    
-    
-    
+
+
+
     var mygrid = Ext.create('Ext.grid.Panel', {
         title: '<fmt:message key="work.list"/>',
         id: 'gridId',

@@ -13,6 +13,7 @@ import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "stock_item")
@@ -48,6 +49,14 @@ public class StockItem extends BaseObject implements Serializable {
     @JoinColumn(name = "material_id")
     public Material getMaterial() {
         return material;
+    }
+    
+    @Transient
+    public Long getMaterialId() {
+        if (this.material == null) {
+            return null;
+        }
+        return this.material.getId();
     }
 
     public void setMaterial(Material material) {

@@ -1,15 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <script>
-    function changeCode(oldValue, newValue) {
-        if (mechanicTypeCode.getValue() != "") {
-            Ext.getCmp("mechanicFullCode").setText('<fmt:message key="machine.fullCode"/>: ' + mechanicTypeCode.getValue() + "." + newValue);
-            mechanicCompleteCode.setValue(mechanicTypeCode.getValue() + "." + newValue)
-        } else {
-            Ext.getCmp("mechanicFullCode").setText('<fmt:message key="machine.fullCode"/>: ' + newValue);
-            mechanicCompleteCode.setValue(newValue)
-        }
-    }
     //--------------------------------Mechanic----------------------------------
     function addWorkOrder(data) {
         workOrderForm.reset();
@@ -32,9 +23,12 @@
         grpEngineerName.setValue(data.get('grpEngineerName'));
         workOrderStatus.setValue(data.get('status'));
         workOrderInterval.setValue(data.get('interval'));
-        workOrderRepeat.setValue(data.get('repeat'));
+        workOrderRepeat.setValue((data.get('isRepeat') == "1"));                
         Ext.getCmp("startTime").setValue(new Date(data.get('startTime')));
         Ext.getCmp("endTime").setValue(new Date(data.get('endTime')));
+        workOrderTask.setValue(data.get('task')); 
+        workOrderReason.setValue(data.get('reason')); 
+        workOrderNote.setValue(data.get('note')); 
         workOrderWindow.show();
         loadInfo(data.get('id'));
     }
@@ -42,21 +36,6 @@
     function chooseMechanic(record) {
         mechanicName.setValue(record.get('name'));
         mechanicId.setValue(record.get('id'));
-    }
-
-    function choosegrpEngineer(record) {
-        console.log(record);
-        engneerParentName.setValue(record.get('name'));
-        engneerParentId.setValue(record.get('id'));
-        
-        grpEngineerName.setValue(record.get('name'));
-        grpEngineerId.setValue(record.get('id'));
-
-        mhfrmCost.setValue(record.get('cost'));
-        mhGrpEngineerName.setValue(record.get('name'));
-        mhGrpEngineerId.setValue(record.get('id'));
-        
-        generateFullCode();
     }
 
     function loadInfo(id) {
@@ -92,28 +71,6 @@
         }
     }
 
-    function getListManHrs() {
-        var data = [];
-        storeManHrs.each(function (rec) {
-            if (rec.get("id") != "") {
-                data.push({
-                    id: rec.get("id"),
-                    workOrderId: rec.get("workOrderId"),
-                    groupEngineerId: rec.get("engineerId"),
-                    mh: rec.get("mh"),
-                });
-            } else {
-                data.push({
-                    id: 0,
-                    workOrderId: rec.get("workOrderId"),
-                    groupEngineerId: rec.get("engineerId"),
-                    mh: rec.get("mh"),
-                });
-            }
-        });
-        return data;
-    }
-
     function saveWorkOrder() {
         var valid = workOrderForm.query("field{isValid()==false}");
         if (!valid || valid.length > 0) {
@@ -145,10 +102,12 @@
                 repeat: (workOrderRepeat.getValue()) ? 1 : 0,
                 startTime: Ext.getCmp("startTime").getRawValue(),
                 endTime: Ext.getCmp("endTime").getRawValue(),
-                task: workTypeTask.getValue(),
-                reason: workTypeReason.getValue(),
-                note: workTypeNote.getValue(),
-                manHrs: Ext.encode(getListManHrs())
+                task: workOrderTask.getValue(),
+                reason: workOrderReason.getValue(),
+                note: workOrderNote.getValue(),
+                manHrs: Ext.encode(getListManHrs()),
+                stock: Ext.encode(getListStock())
+                
             },
             success: function (response) {
                 unMaskTarget();
@@ -179,87 +138,6 @@
 
     function deleteWorkOrder(params) {
     }
-    ////--------ManHrs------------------
-    function changeHrs(oldValue, newValue) {
-        if (mhManHrs.getValue() != "" && mhfrmCost.getValue() != "") {
-            mhfrmTotalCost.setValue(mhManHrs.getValue() * mhfrmCost.getValue());
-        }
-    }
-    function showManHrs(data) {
-        manHrsForm.reset();
-        if (data !== null) {
-            manHrsId.setValue(data.get("id"));
-            mhGrpEngineerId.setValue(data.get("engineerId"));
-            mhGrpEngineerName.setValue(data.get("engineerGrp"));
-            mhfrmCost.setValue(data.get("engineerCost"));
-            mhManHrs.setValue(data.get("mh"));
-            manHrsWindow.setTitle('<fmt:message key="mh.edit"/>');
-        } else {
-            manHrsWindow.setTitle('<fmt:message key="mh.add"/>');
-        }
-        manHrsWindow.show();
-    }
-
-    function getManHrsFromFrm() {
-        return  {
-            id: 0,
-            workOrderId: 0,
-            engineerId: mhGrpEngineerId.getValue(),
-            engineerGrp: mhGrpEngineerName.getValue(),
-            engineerCost: mhfrmCost.getValue(),
-            mh: mhManHrs.getValue(),
-        };
-    }
-    function saveManHrs() {
-        if (manHrsId.getValue() != "") {
-            var index = storeManHrs.findExact("id", parseInt(manHrsId.getValue()));
-            if (index > -1) {
-                var rec = storeManHrs.getAt(index);
-                rec.set("engineerId", parseInt(mhGrpEngineerId.getValue()));
-                rec.set("engineerGrp", parseInt(mhGrpEngineerName.getValue()));
-                rec.set("mh", parseInt(mhManHrs.getValue()));
-                rec.dirty = true;
-                try {
-                    storeManHrs.sync();
-                } catch (c) {
-                    console.log(c);
-                }
-            } else {
-                storeManHrs.add(getManHrsFromFrm());
-            }
-        } else {
-            storeManHrs.add(getManHrsFromFrm());
-        }
-        manHrsWindow.hide();
-    }
-
-    function deleteManHrs(params) {
-    }
-
-    // --------------------------STOCK----------------------------
-    function chooseMaterial(record) {
-        stockMateId.setValue(record.get("id"));
-        stockMateName.setValue(record.get("name"));
-        stockUnit.setValue(record.get("unit"));
-        stockUnitCost.setValue(record.get("cost"));
-    }
-
-    function showStockForm(data) {
-        stockForm.reset();
-        if (data !== null) {
-            stockWindow.setTitle('<fmt:message key="material.edit"/>');
-        } else {
-            stockWindow.setTitle('<fmt:message key="material.add"/>');
-        }
-        stockWindow.show();
-    }
-
-    function saveStock() {
-        stockWindow.hide();
-    }
-
-    function deleteStock(params) {
-    }
 
     function loadListManHrs() {
         var data = [];
@@ -269,6 +147,11 @@
         storeManHrsPaging.proxy.data = data;
         console.log(data);
         storeManHrsPaging.load();
+    }
+    
+    function chooseWorkType(record) {
+        wWorkTypeName.setValue(record.get('name'));
+        wWorkTypeId.setValue(record.get('id'));
     }
 
 </script>

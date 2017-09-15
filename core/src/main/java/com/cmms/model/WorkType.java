@@ -22,6 +22,7 @@ public class WorkType extends BaseObject implements Serializable {
     private static final long serialVersionUID = -1L;
     private Integer id;
     private String code;
+    private String completeCode;
     private String name;
 
     private WorkType parent;
@@ -45,6 +46,15 @@ public class WorkType extends BaseObject implements Serializable {
         this.code = code;
     }
 
+    @Column(name = "complete_code")
+    public String getCompleteCode() {
+        return completeCode;
+    }
+
+    public void setCompleteCode(String completeCode) {
+        this.completeCode = completeCode;
+    }
+
     @Column(name = "name")
     public String getName() {
         return name;
@@ -59,6 +69,7 @@ public class WorkType extends BaseObject implements Serializable {
     public WorkType getParent() {
         return parent;
     }
+
     @Transient
     public Integer getParentId() {
         if (this.parent == null) {
@@ -66,7 +77,13 @@ public class WorkType extends BaseObject implements Serializable {
         }
         return this.parent.getId();
     }
-
+    @Transient
+    public String getParentCode() {
+        if (this.parent == null) {
+            return "";
+        }
+        return this.parent.getCompleteCode();
+    }
 
     public void setParent(WorkType parent) {
         this.parent = parent;

@@ -1,6 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <script>
-    var grpEngineerId = ${grpEngineerId};
+    var grpEngineerIdSs = ${grpEngineerId};
     var storeEngineer = Ext.create('Ext.data.TreeStore', {
         proxy: {
             type: 'ajax',
@@ -8,7 +8,7 @@
         },
         root: {
             text: '<fmt:message key="grpEngineer"/>',
-            id: grpEngineerId,
+            id: grpEngineerIdSs,
             expanded: true
         },
         autoload: false
@@ -54,7 +54,7 @@
                 if (storeEngineer.data.length == 1) {
                     loadWorkOrder(storeEngineer.data.items[0].data.id);
                 } else {
-                    loadWorkOrder(grpEngineerId);
+                    loadWorkOrder(grpEngineerIdSs);
                 }
             },
             itemclick: function (view, node) {

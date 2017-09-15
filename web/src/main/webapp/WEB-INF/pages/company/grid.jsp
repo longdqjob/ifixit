@@ -42,7 +42,7 @@
 //-----------------------------------------Grid---------------------------------------------------------------
     var storeGrid = Ext.create('Ext.data.Store', {
         storeId: 'storeGrid',
-        fields: ['id', 'code', 'name', 'description', 'note', 'companyId', 'companyName', 'machineTypeId', 'machineTypeCode', 'machineTypeName', 'parentId', 'parentName', 'specification'],
+        fields: ['id', 'code', 'name', 'description', 'note','specification', 'companyId', 'companyName', 'machineTypeId', 'machineTypeCode', 'machineTypeName', 'parentId', 'parentName', 'specification'],
         pageSize: 20,
         proxy: {
             type: 'ajax',

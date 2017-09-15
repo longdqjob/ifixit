@@ -381,5 +381,16 @@
                 <param name="inputName">delete</param>
             </result>
         </action>
+        
+        <action name="deleteManHour" class="workOrderAction">
+            <result type="stream">
+                <param name="inputName">deleteManHour</param>
+            </result>
+        </action>
+        <action name="deleteStock" class="workOrderAction">
+            <result type="stream">
+                <param name="inputName">deleteStock</param>
+            </result>
+        </action>
     </package>
 </struts>

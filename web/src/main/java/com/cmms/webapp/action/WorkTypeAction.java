@@ -71,6 +71,7 @@ public class WorkTypeAction extends BaseAction implements Preparable {
             Integer id = null;
 
             String code = getRequest().getParameter("code");
+            String completeCode = getRequest().getParameter("completeCode");
             String name = getRequest().getParameter("name");
             String parent = getRequest().getParameter("parent");
 
@@ -85,7 +86,7 @@ public class WorkTypeAction extends BaseAction implements Preparable {
             if (!StringUtils.isBlank(idReq)) {
                 id = Integer.parseInt(idReq);
                 workType = workTypeDao.get(id);
-                if (code.equals(workType.getCode())) {
+                if (completeCode.equals(workType.getCompleteCode())) {
                     checkUnique = false;
                 }
             } else {
@@ -94,7 +95,7 @@ public class WorkTypeAction extends BaseAction implements Preparable {
 
             //Check unique
             if (checkUnique) {
-                checkUnique = workTypeDao.checkUnique(id, code);
+                checkUnique = workTypeDao.checkUnique(id, completeCode);
                 if (checkUnique == null) {
                     result.put("success", false);
                     result.put("message", ResourceBundleUtils.getName("systemError"));
@@ -106,10 +107,12 @@ public class WorkTypeAction extends BaseAction implements Preparable {
                 }
             }
 
-            WorkType parentObj = workTypeDao.get(Integer.parseInt(parent));
-            workType.setParent(parentObj);
-//            company.setParentId(Integer.parseInt(parent));
+            if (!StringUtils.isBlank(parent)) {
+                WorkType parentObj = workTypeDao.get(Integer.parseInt(parent));
+                workType.setParent(parentObj);
+            }
             workType.setCode(code);
+            workType.setCompleteCode(completeCode);
             workType.setName(name);
             workType = workTypeDao.save(workType);
             if (workType != null) {

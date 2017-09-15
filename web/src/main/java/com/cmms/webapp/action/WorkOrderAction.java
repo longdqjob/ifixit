@@ -14,6 +14,7 @@ import com.cmms.model.ManHours;
 import com.cmms.model.ManHoursObj;
 import com.cmms.model.Material;
 import com.cmms.model.StockItem;
+import com.cmms.model.StockItemObj;
 import com.cmms.model.WorkOrder;
 import com.cmms.model.WorkType;
 import com.cmms.webapp.security.LoginSuccessHandler;
@@ -125,7 +126,7 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             JSONObject result = new JSONObject();
             String code = getRequest().getParameter("code");
             String name = getRequest().getParameter("name");
-            
+
             //listWorkType
             String sWorkType = getRequest().getParameter("workType");
             Integer workTypeReq = null;
@@ -175,7 +176,7 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                 tmp = new JSONObject();
                 tmp = WebUtil.toJSONObject(workOrder, "workType,machine,groupEngineer");
                 workType = workOrder.getWorkType();
-                if (workOrder != null) {
+                if (workType != null) {
                     tmp.put("workTypeId", workType.getId());
                     tmp.put("workTypeName", workType.getName());
                 } else {
@@ -183,7 +184,7 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                     tmp.put("workTypeName", "");
                 }
                 machine = workOrder.getMachine();
-                if (workOrder != null) {
+                if (machine != null) {
                     tmp.put("machineId", machine.getId());
                     tmp.put("machineName", machine.getName());
                 } else {
@@ -272,12 +273,14 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                     tmp.put("materialName", material.getName());
                     tmp.put("materialDesc", material.getDescription());
                     tmp.put("materialUnit", material.getUnit());
+                    tmp.put("materialCost", material.getCost());
                 } else {
                     tmp.put("materialId", "");
                     tmp.put("materialCode", "");
                     tmp.put("materialName", "");
                     tmp.put("materialDesc", "");
                     tmp.put("materialUnit", "");
+                    tmp.put("materialCost", "");
                 }
                 tmp.put("workOrderId", workOrderId);
                 jsArrayStock.put(tmp);
@@ -309,17 +312,10 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             String startTime = getRequest().getParameter("startTime");
             String endTime = getRequest().getParameter("endTime");
             String task = getRequest().getParameter("task");
-            String manHrs = getRequest().getParameter("manHrs");
             String note = getRequest().getParameter("note");
             String reason = getRequest().getParameter("reason");
             List<ManHoursObj> listManHours = null;
             Gson gson = new Gson();
-            if (!StringUtils.isBlank(manHrs)) {
-                listManHours = gson.fromJson(manHrs, new TypeToken<List<ManHoursObj>>() {
-                }.getType());
-            }
-
-            log.info("--------listManHours: " + listManHours.size());
 
             if (StringUtils.isBlank(code)) {
                 result.put("success", false);
@@ -378,6 +374,12 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             workOrder.setReason(reason);
             workOrder = workOrderDao.save(workOrder);
             if (workOrder != null) {
+                //<editor-fold defaultstate="collapsed" desc="Save list man_hour">
+                String manHrs = getRequest().getParameter("manHrs");
+                if (!StringUtils.isBlank(manHrs)) {
+                    listManHours = gson.fromJson(manHrs, new TypeToken<List<ManHoursObj>>() {
+                    }.getType());
+                }
                 if (listManHours != null && !listManHours.isEmpty()) {
                     ManHours manHours;
                     GroupEngineer groupEngineer;
@@ -411,7 +413,51 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                             manHoursDao.save(manHours);
                         }
                     }
-                }
+                }//</editor-fold>
+
+                //<editor-fold defaultstate="collapsed" desc="save stock_item">
+                String stockReq = getRequest().getParameter("stock");
+                List<StockItemObj> listStock = null;
+                if (!StringUtils.isBlank(stockReq)) {
+                    listStock = gson.fromJson(stockReq, new TypeToken<List<StockItemObj>>() {
+                    }.getType());
+
+                    if (listStock != null && !listStock.isEmpty()) {
+                        StockItem stockItem;
+                        Material material;
+                        Long materialId = -1L;
+                        Boolean change = false;
+                        for (StockItemObj stockItemObj : listStock) {
+                            change = false;
+                            if (stockItemObj.getId() <= 0) {
+                                //Add
+                                stockItem = new StockItem();
+                                stockItem.setWorkOrder(workOrder);
+                                materialId = -1L;
+                                change = true;
+                            } else {
+                                //Edit
+                                log.info("Edit stockItem: " + stockItemObj.getId());
+                                stockItem = stockItemDao.get(stockItemObj.getId());
+                                materialId = stockItem.getMaterialId();
+                                if (!Objects.equals(stockItem.getQuantity(), stockItemObj.getQuantity())) {
+                                    change = true;
+                                }
+                            }
+                            if (!Objects.equals(materialId, stockItemObj.getMaterialId())) {
+                                material = materialDao.get(stockItemObj.getMaterialId());
+                                stockItem.setMaterial(material);
+                                change = true;
+                            }
+                            log.info("Edit stockItem change: " + change);
+                            if (change) {
+                                stockItem.setQuantity(stockItemObj.getQuantity());
+                                stockItemDao.save(stockItem);
+                            }
+                        }
+                    }
+                }//</editor-fold>
+
                 result.put("success", true);
                 result.put("message", ResourceBundleUtils.getName("saveSuccess"));
             } else {
@@ -425,6 +471,7 @@ public class WorkOrderAction extends BaseAction implements Preparable {
         }
     }
 
+    //<editor-fold defaultstate="collapsed" desc="getDelete">
     private String[] ids;
 
     public String[] getIds() {
@@ -439,20 +486,16 @@ public class WorkOrderAction extends BaseAction implements Preparable {
         try {
             JSONObject result = new JSONObject();
             if (ids != null && ids.length > 0) {
-                if (ids.length == 1) {
-                    workOrderDao.remove(Long.parseLong(ids[0]));
-                } else {
-                    List<Long> list = new ArrayList<>(ids.length);
-                    for (String idTmp : ids) {
-                        list.add(Long.parseLong(idTmp));
-                    }
-                    int delete = workOrderDao.delete(list);
-                    if (delete != ids.length) {
-                        log.warn("deleteCompany rtn: " + delete + " list: " + ids.length);
-                        result.put("success", false);
-                        result.put("message", ResourceBundleUtils.getName("deleteFail"));
-                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
-                    }
+                List<Long> list = new ArrayList<>(ids.length);
+                for (String idTmp : ids) {
+                    list.add(Long.parseLong(idTmp));
+                }
+                int delete = workOrderDao.delete(list);
+                if (delete != ids.length) {
+                    log.warn("deleteCompany rtn: " + delete + " list: " + ids.length);
+                    result.put("success", false);
+                    result.put("message", ResourceBundleUtils.getName("deleteFail"));
+                    return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
                 }
                 result.put("success", true);
                 result.put("message", ResourceBundleUtils.getName("deleteSuccess"));
@@ -463,6 +506,50 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
         } catch (Exception ex) {
             log.error("ERROR getDelete: ", ex);
+            return null;
+        }
+    }//</editor-fold>
+
+    public InputStream getDeleteManHour() {
+        try {
+            String idReq = getRequest().getParameter("id");
+            JSONObject result = new JSONObject();
+            if (!StringUtils.isBlank(idReq)) {
+                Long id = Long.parseLong(idReq);
+                if (id > 0) {
+                    manHoursDao.remove(id);
+                }
+                result.put("success", true);
+                result.put("message", ResourceBundleUtils.getName("deleteSuccess"));
+            } else {
+                result.put("success", false);
+                result.put("message", ResourceBundleUtils.getName("notSelect"));
+            }
+            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+        } catch (Exception ex) {
+            log.error("ERROR getDeleteManHour: ", ex);
+            return null;
+        }
+    }
+
+    public InputStream getDeleteStock() {
+        try {
+            String idReq = getRequest().getParameter("id");
+            JSONObject result = new JSONObject();
+            if (!StringUtils.isBlank(idReq)) {
+                Long id = Long.parseLong(idReq);
+                if (id > 0) {
+                    stockItemDao.remove(id);
+                }
+                result.put("success", true);
+                result.put("message", ResourceBundleUtils.getName("deleteSuccess"));
+            } else {
+                result.put("success", false);
+                result.put("message", ResourceBundleUtils.getName("notSelect"));
+            }
+            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+        } catch (Exception ex) {
+            log.error("ERROR getDeleteStock: ", ex);
             return null;
         }
     }

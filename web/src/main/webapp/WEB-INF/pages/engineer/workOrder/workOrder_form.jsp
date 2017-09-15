@@ -19,10 +19,10 @@
         labelAlign: 'left',
         anchor: '100%',
         allowBlank: false,
-        margin: '10 10 10 10',
-        width: 250,
+        margin: '20 10 10 10',
+        width: 300,
         readOnly: true,
-        labelWidth: 80,
+        labelWidth: 100,
         listeners: {
             'render': function (cmp) {
                 this.getEl().on('click', function () {
@@ -40,7 +40,7 @@
                 xtype: 'button',
                 text: '<fmt:message key="choose"/>',
                 tabIndex: 2,
-                margin: '10 0 6 10',
+                margin: '20 0 6 10',
                 width: 80,
                 handler: function () {
                     mechanicTreeWindow.show();
@@ -63,9 +63,9 @@
         anchor: '100%',
         allowBlank: false,
         margin: '10 10 10 10',
-        width: 250,
+        width: 300,
         readOnly: true,
-        labelWidth: 80,
+        labelWidth: 100,
         listeners: {
             'render': function (cmp) {
                 this.getEl().on('click', function () {
@@ -107,7 +107,7 @@
         anchor: '100%',
         allowBlank: false,
         margin: '10 10 10 10',
-        width: 250,
+        width: 300,
         readOnly: true,
         labelWidth: 100,
         listeners: {
@@ -153,7 +153,7 @@
         queryMode: 'local',
         displayField: 'name',
         valueField: 'abbr',
-        margin: '20 10 10 10',
+        margin: '23 10 10 10',
         anchor: '100%',
         allowBlank: false,
         editable: false,
@@ -229,7 +229,7 @@
         labelAlign: 'right',
         anchor: '100%',
         allowBlank: false,
-        margin: '10 10 10 10',
+        margin: '13 10 10 10',
         width: 350,
         maxLength: 50,
         labelWidth: 100,
@@ -245,7 +245,7 @@
         labelAlign: 'right',
         anchor: '100%',
         allowBlank: false,
-        margin: '10 10 10 10',
+        margin: '13 10 10 10',
     });
 
     var workOrderIntervalCtn = Ext.create('Ext.form.FieldContainer', {
@@ -295,7 +295,7 @@
         labelAlign: 'left',
         anchor: '100%',
         allowBlank: false,
-        margin: '20 10 10 10',
+        margin: '23 10 10 10',
         width: 250,
         format: 'd/m/Y',
         labelWidth: 100,
@@ -309,14 +309,14 @@
         labelAlign: 'left',
         anchor: '100%',
         allowBlank: false,
-        margin: '20 10 10 10',
+        margin: '23 10 10 10',
         width: 250,
         format: 'd/m/Y',
         labelWidth: 100,
 //        altFormats: 'm,d,Y|m.d.Y',
     };
 
-    var workTypeTask = Ext.create('Ext.form.field.TextArea', {
+    var workOrderTask = Ext.create('Ext.form.field.TextArea', {
         xtype: 'textfield',
         grow: true,
         fieldLabel: '<fmt:message key="work.task"/>',
@@ -329,7 +329,7 @@
         tabIndex: 7,
     });
 
-    var workTypeReason = Ext.create('Ext.form.field.TextArea', {
+    var workOrderReason = Ext.create('Ext.form.field.TextArea', {
         xtype: 'textfield',
         grow: true,
         fieldLabel: '<fmt:message key="work.reason"/>',
@@ -342,7 +342,7 @@
         tabIndex: 15,
     });
 
-    var workTypeNote = Ext.create('Ext.form.field.TextArea', {
+    var workOrderNote = Ext.create('Ext.form.field.TextArea', {
         xtype: 'textfield',
         grow: true,
         fieldLabel: '<fmt:message key="work.note"/>',
@@ -365,7 +365,7 @@
                 title: '<fmt:message key="work.task"/>',
                 id: "tabTask",
                 tabIndex: 6,
-                items: [workTypeTask]
+                items: [workOrderTask]
             }, {
                 title: '<fmt:message key="work.manHour"/>',
                 id: "manHour",
@@ -380,12 +380,12 @@
                 title: '<fmt:message key="work.reason"/>',
                 tabIndex: 56,
                 id: "reason",
-                items: [workTypeReason]
+                items: [workOrderReason]
             }, {
                 title: '<fmt:message key="work.note"/>',
                 tabIndex: 56,
                 id: "note",
-                items: [workTypeNote]
+                items: [workOrderNote]
             }]
     });
 

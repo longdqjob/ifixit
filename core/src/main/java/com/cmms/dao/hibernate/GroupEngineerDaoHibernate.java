@@ -2,6 +2,7 @@ package com.cmms.dao.hibernate;
 
 import com.cmms.dao.GroupEngineerDao;
 import static com.cmms.dao.hibernate.ItemTypeDaoHibernate.TREE_LEVEL;
+import com.cmms.model.Company;
 import com.cmms.model.GroupEngineer;
 import java.math.BigInteger;
 import java.sql.SQLException;
@@ -86,32 +87,41 @@ public class GroupEngineerDaoHibernate extends GenericDaoHibernate<GroupEngineer
         try {
             List<Integer> rtn = null;
             Query query;
-            if (id == null || id <= 0) {
+            if (id == null) {
                 return new ArrayList<Integer>(0);
             }
-            String hql = "SELECT id,GetEngineerTree(id,:level) FamilyTree FROM group_engineer WHERE id=:parent_id";
-            query = getSession()
-                    .createSQLQuery(hql)
-                    .setParameter("level", TREE_LEVEL)
-                    .setParameter("parent_id", id);
-
-            List<Object[]> areaList = query.list();
-            rtn = new LinkedList<>();
-            rtn.add(id);
-            if (areaList != null && !areaList.isEmpty()) {
-                String familyTree = "";
-                for (Object[] obj : areaList) {
-                    familyTree = String.valueOf(obj[1]);
+            if (id <= 0) {
+                List<GroupEngineer> list = getAll();
+                rtn = new LinkedList<>();
+                for (GroupEngineer grp : list) {
+                    rtn.add(grp.getId());
                 }
-                if (familyTree.length() > 0) {
-                    String[] tmp = familyTree.split(",");
-                    for (String child : tmp) {
-                        rtn.add(Integer.valueOf(child));
+                return rtn;
+            } else {
+                String hql = "SELECT id,GetEngineerTree(id,:level) FamilyTree FROM group_engineer WHERE id=:parent_id";
+                query = getSession()
+                        .createSQLQuery(hql)
+                        .setParameter("level", TREE_LEVEL)
+                        .setParameter("parent_id", id);
+
+                List<Object[]> areaList = query.list();
+                rtn = new LinkedList<>();
+                rtn.add(id);
+                if (areaList != null && !areaList.isEmpty()) {
+                    String familyTree = "";
+                    for (Object[] obj : areaList) {
+                        familyTree = String.valueOf(obj[1]);
+                    }
+                    if (familyTree.length() > 0) {
+                        String[] tmp = familyTree.split(",");
+                        for (String child : tmp) {
+                            rtn.add(Integer.valueOf(child));
+                        }
                     }
                 }
-            }
 
-            return rtn;
+                return rtn;
+            }
         } catch (Exception ex) {
             log.error("ERROR getListChildren: ", ex);
             return null;

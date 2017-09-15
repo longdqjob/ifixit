@@ -37,12 +37,14 @@
         mechanicTypeId.setValue(data.get("machineTypeId"));
         mechanicTypeName.setValue(data.get("machineTypeName"));
         mechanicTypeCode.setValue(data.get("machineTypeCode"));
+        fillSpecific(data.get("machineTypeSpec"));
         mechanicCode.setValue(data.get("code").replace(data.get("machineTypeCode") + ".", ""));
         mechanicName.setValue(data.get("name"));
         fatherId.setValue(data.get("parentId"));
         fatherName.setValue(data.get("parentName"));
         systemId.setValue(data.get("companyId"));
         systemName.setValue(data.get("companyName"));
+        
         fillSpecificValue(data.get("specification"));
         machineNote.setValue(data.get("note"));
         console.log(data.get("since"));

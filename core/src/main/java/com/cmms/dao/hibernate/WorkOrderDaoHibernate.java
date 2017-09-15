@@ -2,6 +2,11 @@ package com.cmms.dao.hibernate;
 
 import com.cmms.dao.WorkOrderDao;
 import com.cmms.model.WorkOrder;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +19,7 @@ import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.jdbc.ReturningWork;
 
 /**
  *
@@ -70,15 +76,52 @@ public class WorkOrderDaoHibernate extends GenericDaoHibernate<WorkOrder, Long> 
     }
 
     @Override
-    public Integer delete(List<Long> list) {
+    public Integer delete(final List<Long> list) {
         try {
             if (list == null || list.isEmpty()) {
                 return 0;
             }
-            Query q = getSession().createSQLQuery("DELETE FROM work_order WHERE id in (:lstId)")
-                    .addEntity(WorkOrder.class)
-                    .setParameterList("lstId", list);
-            return q.executeUpdate();
+
+            return getSession().doReturningWork(new ReturningWork<Integer>() {
+                @Override
+                public Integer execute(Connection connection) throws SQLException {
+                    PreparedStatement ps = null;
+                    try {
+                        Integer rtn = 0;
+                        connection.setAutoCommit(false);
+                        String lstId = StringUtils.join(list, ",");
+                        String sql;
+
+                        //Delete in man_hours
+                        sql = "DELETE FROM man_hours WHERE id in (" + lstId + ")";
+                        ps = connection.prepareStatement(sql);
+                        ps.executeUpdate();
+                        //Delete in stock_item
+                        sql = "DELETE FROM stock_item WHERE id in (" + lstId + ")";
+                        ps = connection.prepareStatement(sql);
+                        ps.executeUpdate();
+
+                        //Delete work_order
+                        sql = "DELETE FROM work_order WHERE id in (" + lstId + ")";
+                        ps = connection.prepareStatement(sql);
+                        rtn = ps.executeUpdate();
+                        if (rtn > 0) {
+                            connection.commit();
+                        }
+                        return rtn;
+                    } catch (Exception ex) {
+                        log.error("ERROR delete: ", ex);
+                        connection.rollback();
+                        return null;
+                    } finally {
+                        if (ps != null) {
+                            ps.close();
+                            ps = null;
+                        }
+                        connection.setAutoCommit(true);
+                    }
+                }
+            });
         } catch (Exception ex) {
             log.error("ERROR delete: ", ex);
             return null;

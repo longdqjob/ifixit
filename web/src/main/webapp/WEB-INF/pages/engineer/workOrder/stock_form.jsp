@@ -1,5 +1,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <script>
+    var materialCode ="";
+    var materialDesc = "";
+    var materialUnit = "";
+    var materialCost = "";
     var stockItemId = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         id: "stockItemId",
@@ -60,7 +64,12 @@
         margin: '10 10 10 10',
         width: 350,
         maxLength: 50,
-        labelWidth: 50
+        labelWidth: 50,
+        listeners: {
+            'change': function (textfield, newValue, oldValue) {
+                calcQty();
+            }
+        }
     });
 
     var stockUnit = Ext.create('Ext.form.field.Text', {

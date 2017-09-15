@@ -65,8 +65,7 @@ public class CompanyDaoHibernate extends GenericDaoHibernate<Company, Integer> i
         obj.put("description", currentGroup.getDescription());
         obj.put("code", currentGroup.getCode());
         obj.put("completeCode", currentGroup.getCompleteCode());
-        
-        
+
         obj.put("completeParentCode", currentGroup.getParentCode());
         obj.put("parentName", currentGroup.getParentName());
         obj.put("parentId", currentGroup.getParentId());
@@ -97,32 +96,41 @@ public class CompanyDaoHibernate extends GenericDaoHibernate<Company, Integer> i
         try {
             List<Integer> rtn = null;
             Query query;
-            if (id == null || id <= 0) {
+            if (id == null) {
                 return new ArrayList<Integer>(0);
             }
-            String hql = "SELECT id,GetCompanyTree(id,:level) FamilyTree FROM company WHERE id=:parent_id";
-            query = getSession()
-                    .createSQLQuery(hql)
-                    .setParameter("level", TREE_LEVEL)
-                    .setParameter("parent_id", id);
-
-            List<Object[]> areaList = query.list();
-            rtn = new LinkedList<>();
-            rtn.add(id);
-            if (areaList != null && !areaList.isEmpty()) {
-                String familyTree = "";
-                for (Object[] obj : areaList) {
-                    familyTree = String.valueOf(obj[1]);
+            if (id <= 0) {
+                List<Company> list = getAll();
+                rtn = new LinkedList<>();
+                for (Company company : list) {
+                    rtn.add(company.getId());
                 }
-                if (familyTree.length() > 0) {
-                    String[] tmp = familyTree.split(",");
-                    for (String child : tmp) {
-                        rtn.add(Integer.valueOf(child));
+                return rtn;
+            } else {
+                String hql = "SELECT id,GetCompanyTree(id,:level) FamilyTree FROM company WHERE id=:parent_id";
+                query = getSession()
+                        .createSQLQuery(hql)
+                        .setParameter("level", TREE_LEVEL)
+                        .setParameter("parent_id", id);
+
+                List<Object[]> areaList = query.list();
+                rtn = new LinkedList<>();
+                rtn.add(id);
+                if (areaList != null && !areaList.isEmpty()) {
+                    String familyTree = "";
+                    for (Object[] obj : areaList) {
+                        familyTree = String.valueOf(obj[1]);
+                    }
+                    if (familyTree.length() > 0) {
+                        String[] tmp = familyTree.split(",");
+                        for (String child : tmp) {
+                            rtn.add(Integer.valueOf(child));
+                        }
                     }
                 }
-            }
 
-            return rtn;
+                return rtn;
+            }
         } catch (Exception ex) {
             log.error("ERROR getListChildren: ", ex);
             return null;

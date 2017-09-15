@@ -7,51 +7,29 @@
 
 <script>
 //-----------------------------------------Grid---------------------------------------------------------------
-    var storeManHrs = Ext.create('Ext.data.Store', {
-        storeId: 'storeManHrs',
-        fields: ['id', 'engineerId', 'engineerGrp', 'mh', 'engineerCost', 'workOrderId'],
+    var storeStock = Ext.create('Ext.data.Store', {
+        storeId: 'storeStock',
+        fields: ['id', 'workOrderId', 'quantity', 'materialId', 'materialCode', 'materialName', 'materialDesc', 'materialUnit', 'materialCost'],
         pageSize: 20,
     });
 
-    var storeManHrsPaging = Ext.create('Ext.data.Store', {
-        fields: ['id', 'engineerGrp', 'mh', 'engineerCost'],
-        autoLoad: false,
-        pageSize: 5,
-        proxy: {
-            type: 'pagingmemory'
-        }
-    });
-
-    var manHrsTotalMh = Ext.create('Ext.form.field.Text', {
+    var materialTotalCost = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         grow: true,
         tabIndex: -1,
-        id: "manHrsTotalMh",
-        fieldLabel: '<fmt:message key="work.manHour.totalHrs"/>',
+        id: "materialTotalCost",
+        fieldLabel: '<fmt:message key="work.material.totalCost"/>',
         labelAlign: 'left',
         anchor: '100%',
         margin: '10 10 10 10',
-        width: 150,
-        readOnly: true,
-        labelWidth: 70,
-    });
-    var manHrsTotalCost = Ext.create('Ext.form.field.Text', {
-        xtype: 'textfield',
-        grow: true,
-        tabIndex: -1,
-        id: "manHrsTotalCost",
-        fieldLabel: '<fmt:message key="work.manHour.totalCost"/>',
-        labelAlign: 'left',
-        anchor: '100%',
-        margin: '10 10 10 10',
-        width: 150,
+        width: 180,
         readOnly: true,
         labelWidth: 70,
     });
 
-    var gridManHrs = Ext.create('Ext.grid.Panel', {
-        id: 'gridManHrs',
-        store: storeManHrs,
+    var gridStock = Ext.create('Ext.grid.Panel', {
+        id: 'gridStock',
+        store: storeStock,
         autoWidth: true,
         border: true,
         layout: 'fit',
@@ -72,7 +50,7 @@
                                 if (btn == 'yes') {
                                     var rec = grid.getStore().getAt(rowIndex);
                                     var param = '&ids=' + rec.get('id');
-                                    deleteManHrs(param);
+                                    deleteStock(rowIndex, rec.get('id'), param);
                                 }
                             });
                         }
@@ -82,12 +60,12 @@
                         tooltip: '<fmt:message key="editItem"/>',
                         handler: function (grid, rowIndex, colIndex) {
                             var rec = grid.getStore().getAt(rowIndex);
-                            showManHrs(rec);
+                            showStockForm(rec);
                         }
                     },
                 ],
             },
-            ///RowNumberer
+            ////RowNumberer
             Ext.create('Ext.grid.RowNumberer', {
                 text: 'No.',
                 width: 50,
@@ -101,9 +79,12 @@
                 }
             }),
             ////////////////ITEM
-            {text: '<fmt:message key="work.manHour.enginnerGrp"/>', dataIndex: 'engineerGrp', flex: 1, },
-            {text: '<fmt:message key="work.manHour.manHrs"/>', dataIndex: 'mh', flex: 1, },
-            {text: '<fmt:message key="work.manHour.cost"/>', dataIndex: 'engineerCost', flex: 1, },
+            {text: '<fmt:message key="work.material.code"/>', dataIndex: 'materialCode', flex: 1, },
+            {text: '<fmt:message key="work.material.name"/>', dataIndex: 'materialName', flex: 1, },
+            {text: '<fmt:message key="work.material.description"/>', dataIndex: 'materialDesc', flex: 1, },
+            {text: '<fmt:message key="work.material.qty"/>', dataIndex: 'quantity', flex: 1, },
+            {text: '<fmt:message key="work.material.unit"/>', dataIndex: 'materialUnit', flex: 1, },
+            {text: '<fmt:message key="work.material.cost"/>', dataIndex: 'materialCost', flex: 1, },
         ],
         viewConfig: {
             autoFit: true,
@@ -121,7 +102,6 @@
         dockedItems: [{
                 xtype: 'pagingtoolbar',
                 dock: 'bottom',
-                store: storeManHrsPaging,
                 displayInfo: true
             }, {
                 xtype: 'toolbar',
@@ -131,10 +111,10 @@
                         text: '<fmt:message key="add"/>',
                         listeners: {
                             click: function (el) {
-                                showManHrs(null);
+                                showStockForm(null);
                             }
                         }//end of listeners
-                    }, manHrsTotalMh, manHrsTotalCost
+                    }, materialTotalCost
                 ]
             }],
         listeners: {
@@ -144,10 +124,10 @@
         }
     });
 
-    var gridManHrsPanel = Ext.create('Ext.panel.Panel', {
+    var gridStockPanel = Ext.create('Ext.panel.Panel', {
         autoScroll: true,
         layout: 'fit',
-        items: [gridManHrs]
+        items: [gridStock]
     });
 
 

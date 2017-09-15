@@ -186,10 +186,12 @@ public class MachineAction extends BaseAction implements Preparable {
                     tmp.put("machineTypeId", machineType.getId());
                     tmp.put("machineTypeName", machineType.getName());
                     tmp.put("machineTypeCode", machineType.getCode());
+                    tmp.put("machineTypeSpec", machineType.getSpecification());
                 } else {
                     tmp.put("machineTypeId", "");
                     tmp.put("machineTypeName", "");
                     tmp.put("machineTypeCode", "");
+                    tmp.put("machineTypeSpec", machineType.getSpecification());
                 }
                 parent = machine.getParent();
                 if (parent != null) {

@@ -71,8 +71,12 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         session.setAttribute(SESSION_USER_NAME, userName);
         session.setAttribute(SESSION_USER_ID, userId);
 
-        Integer systemId = 1;
-        Integer engineerGrpID = 1;
+        Integer systemId = 3;
+        Integer engineerGrpID = 2;
+        if(userId < 0){
+            systemId = 0;
+            engineerGrpID = 0;
+        }
 
         //System
         session.setAttribute(SESSION_SYSTEM_ID, systemId);

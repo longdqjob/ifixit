@@ -28,7 +28,7 @@
                     layout: 'accordion',
                     items: [{
                             contentEl: 'west',
-                            title: '<fmt:message key="workType"/>',
+                            title: '<fmt:message key="grpEngineer"/>',
                             html: ' <div id="tree"></div>',
                             iconCls: 'navpn' // see the HEAD section for style used
                         }],
