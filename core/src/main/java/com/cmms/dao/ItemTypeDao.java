@@ -27,5 +27,14 @@ public interface ItemTypeDao extends GenericDao<ItemType, Integer> {
     
     @Transactional
     Boolean checkUnique(Integer id,String code);
+    
+    @Transactional
+    Integer delete(List<Integer> list);
+
+    @Transactional
+    Boolean checkUseParent(List<Integer> lstId);
+
+    @Transactional
+    Boolean checkUseByManHrs(List<Integer> lstId);
 
 }

@@ -76,6 +76,13 @@ public class GrpEngineerAction extends BaseAction implements Preparable {
                 result.put("message", ResourceBundleUtils.getName("message.codeRequired"));
                 return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
             }
+            if (StringUtils.isBlank(parent)) {
+                if (getGrpEngineerId() > 0) {
+                    result.put("success", false);
+                    result.put("message", ResourceBundleUtils.getName("parentRequired"));
+                    return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                }
+            }
 
             Boolean checkUnique = true;
             GroupEngineer cGroupEngineer;
@@ -102,9 +109,10 @@ public class GrpEngineerAction extends BaseAction implements Preparable {
                     return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
                 }
             }
-
-            GroupEngineer parentObj = groupEngineerDao.get(Integer.parseInt(parent));
-            cGroupEngineer.setParent(parentObj);
+            if (!StringUtils.isBlank(parent)) {
+                GroupEngineer parentObj = groupEngineerDao.get(Integer.parseInt(parent));
+                cGroupEngineer.setParent(parentObj);
+            }
             cGroupEngineer.setCode(code);
             cGroupEngineer.setCompleteCode(completeCode);
             cGroupEngineer.setName(name);

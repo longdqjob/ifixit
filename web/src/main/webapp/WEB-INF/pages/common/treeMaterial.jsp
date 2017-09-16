@@ -15,7 +15,7 @@
 
     var materialTreeWindow = Ext.create('Ext.window.Window', {
         closeAction: 'hide',
-        closable: false,
+        closable: true,
         title: '<fmt:message key="material"/>',
         id: 'materialTreeWindow',
         autoEl: 'form',
@@ -57,11 +57,11 @@
                         dataIndex: 'description',
                         flex: 1
                     }, {
-                        text: '<fmt:message key="material.unitCost"/>',
+                        text: '<fmt:message key="material.unit"/>',
                         dataIndex: 'unit',
                         flex: 1
                     }, {
-                        text: '<fmt:message key="material.cost"/>',
+                        text: '<fmt:message key="material.unitCost"/>',
                         dataIndex: 'cost',
                         flex: 1
                     }

@@ -88,11 +88,15 @@ public class MaterialDaoHibernate extends GenericDaoHibernate<Material, Long> im
     }
 
     @Override
-    public Map getList(String code, String name, Integer start, Integer limit) {
+    public Map getList(List<Integer> lstItemType, String code, String name, Integer start, Integer limit) {
         try {
             Map result = new HashMap();
             Criteria criteria = getSession().createCriteria(Material.class);
 
+            if (lstItemType != null) {
+                criteria.add(Restrictions.in("itemType.id", lstItemType));
+            }
+            
             //Name
             if (!StringUtils.isBlank(code)) {
                 criteria.add(Restrictions.like("code", "%" + code.trim() + "%").ignoreCase());

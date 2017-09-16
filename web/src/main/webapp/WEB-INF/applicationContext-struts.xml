@@ -63,6 +63,7 @@
     </bean>
     
     <bean id="materialAction" class="com.cmms.webapp.action.MaterialAction" scope="prototype">
+        <property name="itemTypeDao" ref="itemTypeDao"/>
         <property name="materialDao" ref="materialDao"/>
     </bean>
     <bean id="machineTypeAction" class="com.cmms.webapp.action.MachineTypeAction" scope="prototype">

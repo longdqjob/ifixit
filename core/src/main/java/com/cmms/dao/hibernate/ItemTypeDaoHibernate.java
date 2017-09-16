@@ -2,6 +2,7 @@ package com.cmms.dao.hibernate;
 
 import com.cmms.dao.ItemTypeDao;
 import com.cmms.model.ItemType;
+import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -10,6 +11,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
@@ -27,12 +29,19 @@ public class ItemTypeDaoHibernate extends GenericDaoHibernate<ItemType, Integer>
     public List<ItemType> getListItem(Integer id) {
         try {
             List<ItemType> rtn = new LinkedList<>();
-            id = (id == null) ? 0 : id;
-            String hql = "SELECT * FROM item_type WHERE parent_id=:parent_id";
-            rtn = getSession().createSQLQuery(hql)
-                    .addEntity(ItemType.class)
-                    .setParameter("parent_id", id)
-                    .list();
+            String hql;
+            if (id == null || id <= 0) {
+                hql = "SELECT * FROM item_type WHERE parent_id IS NULL";
+                rtn = getSession().createSQLQuery(hql)
+                        .addEntity(ItemType.class)
+                        .list();
+            } else {
+                hql = "SELECT * FROM item_type WHERE parent_id=:parent_id";
+                rtn = getSession().createSQLQuery(hql)
+                        .addEntity(ItemType.class)
+                        .setParameter("parent_id", id)
+                        .list();
+            }
             return rtn;
         } catch (Exception ex) {
             log.error("ERROR getListItem: ", ex);
@@ -54,16 +63,18 @@ public class ItemTypeDaoHibernate extends GenericDaoHibernate<ItemType, Integer>
 
     public JSONObject getTree(ItemType root) throws JSONException, SQLException {
         JSONObject obj = new JSONObject();
-        JSONArray children = new JSONArray();
         ItemType currentGroup = root;
-        obj.put("text", currentGroup.getName());
-//        obj.put("description", currentGroup.getDescription());
+        obj.put("name", currentGroup.getName());
+        obj.put("code", currentGroup.getCode());
+        obj.put("text", currentGroup.getText());
+        obj.put("completeCode", currentGroup.getCompleteCode());
+        obj.put("specification", currentGroup.getSpecification());
+        obj.put("parentId", currentGroup.getParentId());
+        obj.put("parentName", currentGroup.getParentName());
+        obj.put("parentCode", currentGroup.getParentCode());
         obj.put("leaf", false);
         obj.put("expand", true);
-        obj.put("iconCls", "folder");
-//        obj.put("iconCls", "task-folder");
         obj.put("id", currentGroup.getId());
-//        obj.put("children", children);
         return obj;
     }
 
@@ -74,7 +85,7 @@ public class ItemTypeDaoHibernate extends GenericDaoHibernate<ItemType, Integer>
         try {
             StringBuffer rtn = null;
             id = (id == null) ? 0 : id;
-            String hql = "SELECT id,GetFamilyTree(id,:level) FamilyTree FROM item_type WHERE id=:parent_id";
+            String hql = "SELECT id,GetItemTypeTree(id,:level) FamilyTree FROM item_type WHERE id=:parent_id";
             List<Object[]> areaList = getSession().createSQLQuery(hql)
                     .setParameter("level", TREE_LEVEL)
                     .setParameter("parent_id", id)
@@ -93,13 +104,13 @@ public class ItemTypeDaoHibernate extends GenericDaoHibernate<ItemType, Integer>
             return null;
         }
     }
-    
+
     @Override
     public List<Integer> getListChildren(Integer id) {
         try {
             List<Integer> rtn = null;
             id = (id == null) ? 0 : id;
-            String hql = "SELECT id,GetFamilyTree(id,:level) FamilyTree FROM item_type WHERE id=:parent_id";
+            String hql = "SELECT id,GetItemTypeTree(id,:level) FamilyTree FROM item_type WHERE id=:parent_id";
 
             List<Object[]> areaList = getSession()
                     .createSQLQuery(hql)
@@ -127,7 +138,7 @@ public class ItemTypeDaoHibernate extends GenericDaoHibernate<ItemType, Integer>
             return null;
         }
     }
-    
+
     @Override
     public Boolean checkUnique(Integer id, String code) {
         Boolean rtn = null;
@@ -151,7 +162,7 @@ public class ItemTypeDaoHibernate extends GenericDaoHibernate<ItemType, Integer>
 
             //Code
             if (code != null && code.trim().length() > 0) {
-                criteria.add(Restrictions.eq("code", code));
+                criteria.add(Restrictions.eq("completeCode", code));
             }
 
             list = criteria.list();
@@ -163,5 +174,68 @@ public class ItemTypeDaoHibernate extends GenericDaoHibernate<ItemType, Integer>
             return null;
         }
         return rtn;
+    }
+
+    //--------------------
+    @Override
+    public Integer delete(List<Integer> list) {
+        try {
+            if (list == null || list.isEmpty()) {
+                return 0;
+            }
+            Query q = getSession().createSQLQuery("DELETE FROM item_type WHERE id in (:lstId)")
+                    .setParameterList("lstId", list);
+            return q.executeUpdate();
+        } catch (Exception ex) {
+            log.error("ERROR delete: ", ex);
+            return null;
+        }
+    }
+
+    /**
+     *
+     * @param lstId
+     * @return true neu duoc su dung
+     */
+    @Override
+    public Boolean checkUseParent(List<Integer> lstId) {
+        try {
+            if (lstId == null || lstId.isEmpty()) {
+                return false;
+            }
+            String hql = "SELECT COUNT(id) FROM item_type WHERE parent_id in (:lstId)";
+            Query query = getSession()
+                    .createSQLQuery(hql)
+                    .setParameterList("lstId", lstId);
+
+            List list = query.list();
+            return (((BigInteger) list.get(0)).intValue() > 0);
+        } catch (Exception ex) {
+            log.error("ERROR checkUseParent: ", ex);
+            return null;
+        }
+    }
+
+    /**
+     *
+     * @param lstId
+     * @return true neu duoc su dung
+     */
+    @Override
+    public Boolean checkUseByManHrs(List<Integer> lstId) {
+        try {
+            if (lstId == null || lstId.isEmpty()) {
+                return false;
+            }
+            String hql = "SELECT COUNT(id) FROM material WHERE item_type_id in (:lstId)";
+            Query query = getSession()
+                    .createSQLQuery(hql)
+                    .setParameterList("lstId", lstId);
+            List list = query.list();
+            return (((BigInteger) list.get(0)).intValue() > 0);
+        } catch (Exception ex) {
+            log.error("ERROR checkUseByManHrs: ", ex);
+            return null;
+        }
     }
 }

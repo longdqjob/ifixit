@@ -44,7 +44,7 @@
 
     var companyTreeWindow = Ext.create('Ext.window.Window', {
         closeAction: 'hide',
-        closable: false,
+        closable: true,
         title: '<fmt:message key="company"/>',
         id: 'companyTreeWindow',
         autoEl: 'form',

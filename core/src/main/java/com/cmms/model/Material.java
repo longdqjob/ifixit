@@ -26,8 +26,10 @@ public class Material extends BaseObject implements Serializable {
     private String name;
     private String description;
     private String unit;
+    private String specification;
     private Float cost;
     private Material parent;
+    private ItemType itemType;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -93,6 +95,15 @@ public class Material extends BaseObject implements Serializable {
         this.cost = cost;
     }
 
+    @Column(name = "specification")
+    public String getSpecification() {
+        return specification;
+    }
+
+    public void setSpecification(String specification) {
+        this.specification = specification;
+    }
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     public Material getParent() {
@@ -125,6 +136,16 @@ public class Material extends BaseObject implements Serializable {
 
     public void setParent(Material parent) {
         this.parent = parent;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_type_id")
+    public ItemType getItemType() {
+        return itemType;
+    }
+
+    public void setItemType(ItemType itemType) {
+        this.itemType = itemType;
     }
 
     @Override

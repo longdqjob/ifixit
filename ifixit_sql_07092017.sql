@@ -39,7 +39,7 @@ CREATE TABLE `app_user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK_1j9d9a06i600gd43uu3km82jw` (`email`),
   UNIQUE KEY `UK_3k4cplvh82srueuttfkwnylq0` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
 /*Data for the table `app_user` */
 
@@ -92,15 +92,18 @@ insert  into `group_engineer`(`id`,`code`,`complete_code`,`cost`,`description`,`
 DROP TABLE IF EXISTS `item_type`;
 
 CREATE TABLE `item_type` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `code` varchar(255) DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `name` varchar(255) DEFAULT NULL,
-  `specification` varchar(255) DEFAULT NULL,
+  `id` int(5) NOT NULL AUTO_INCREMENT,
+  `code` varchar(20) DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `specification` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `parent_id` int(5) DEFAULT NULL,
+  `complete_code` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
 /*Data for the table `item_type` */
+
+insert  into `item_type`(`id`,`code`,`name`,`specification`,`parent_id`,`complete_code`) values (1,'AA','AA NAME','{\"01\":\"dfgsdf\",\"02\":\"gfnh\",\"06\":\"6ujj\"}',NULL,'AA');
 
 /*Table structure for table `machine` */
 
@@ -180,17 +183,19 @@ CREATE TABLE `material` (
   `complete_code` varchar(255) DEFAULT NULL,
   `cost` float DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,
-  `name` varchar(255) DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `unit` varchar(255) DEFAULT NULL,
   `parent_id` bigint(20) DEFAULT NULL,
+  `item_type_id` int(5) DEFAULT NULL,
+  `specification` varchar(1024) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_rveuv7odl1m50fbvdvkxxqqin` (`parent_id`),
   CONSTRAINT `FK_rveuv7odl1m50fbvdvkxxqqin` FOREIGN KEY (`parent_id`) REFERENCES `material` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 
 /*Data for the table `material` */
 
-insert  into `material`(`id`,`code`,`complete_code`,`cost`,`description`,`name`,`unit`,`parent_id`) values (1,'DT','DT',32,'Dien thoai','Dient hoai','Cai',NULL),(2,'NAP','DT.NAP',12,'Nap dt','Nap','Cai',1);
+insert  into `material`(`id`,`code`,`complete_code`,`cost`,`description`,`name`,`unit`,`parent_id`,`item_type_id`,`specification`) values (1,'DT','DT',32,'Dien thoai','Dient hoai','Cai',NULL,1,NULL),(2,'NAP','DT.NAP',12,'Nap dt','Nap','Cai',1,1,NULL),(4,'00122','DT.00122',23,NULL,'Vo 01','kg',1,1,'{\"01\":{\"label\":\"dfgsdf\",\"value\":\"aaa\"},\"02\":{\"label\":\"gfnh\",\"value\":\"bbb\"},\"06\":{\"label\":\"6ujj\",\"value\":\"cccc\"}}');
 
 /*Table structure for table `role` */
 
@@ -510,6 +515,75 @@ BEGIN
         SELECT IFNULL(qc,'') INTO queue_children
         FROM (SELECT GROUP_CONCAT(CONCAT(id,':',front_ht+1)) qc
         FROM item_type WHERE parent_id = front_id) A;
+        IF LENGTH(queue_children) = 0 THEN
+            IF LENGTH(queue) = 0 THEN
+                SET queue_length = 0;
+            END IF;
+        ELSE
+            IF LENGTH(rv) = 0 THEN
+                IF front_ht < LevelLimit THEN
+                    SET rv = queue_children;
+                END IF;
+            ELSE
+                IF front_ht < LevelLimit THEN
+                    SET rv = CONCAT(rv,',',queue_children);
+                END IF;
+            END IF;
+            IF LENGTH(queue) = 0 THEN
+                SET queue = queue_children;
+            ELSE
+                SET queue = CONCAT(queue,',',queue_children);
+            END IF;
+            SET queue_length = LENGTH(queue) - LENGTH(REPLACE(queue,',','')) + 1;
+        END IF;
+    END WHILE;
+    #
+    # Strip away level parts of the output
+    #
+    IF LENGTH(rv) > 0 THEN
+        SET curr_level = 1;
+        WHILE curr_level <= LevelLimit DO
+            SET level_part = CONCAT(':',curr_level);
+            SET rv = REPLACE(rv,level_part,'');
+            SET curr_level = curr_level + 1;
+        END WHILE;
+    END IF;
+    RETURN rv;
+END */$$
+DELIMITER ;
+
+/* Function  structure for function  `GetItemTypeTree` */
+
+/*!50003 DROP FUNCTION IF EXISTS `GetItemTypeTree` */;
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` FUNCTION `GetItemTypeTree`(GivenID INT,LevelLimit INT) RETURNS varchar(1024) CHARSET latin1
+    DETERMINISTIC
+BEGIN
+    DECLARE rv,q,queue,queue_children,front_rc,level_part VARCHAR(1024);
+    DECLARE queue_length,front_id,front_ht,pos,curr_level INT;
+    SET rv = '';
+    SET queue = CONCAT(GivenID,':0');
+    SET queue_length = 1;
+    WHILE queue_length > 0 DO
+        SET front_id = FORMAT(queue,0);
+        IF queue_length = 1 THEN
+            SET front_rc = queue;
+            SET queue = '';
+            SET pos = LOCATE(':',front_rc);
+        ELSE
+            SET pos = LOCATE(',',queue);
+            SET front_rc = LEFT(queue,pos - 1);
+            SET q = SUBSTR(queue,pos + 1);
+            SET queue = q;
+            SET pos = LOCATE(':',front_rc);
+        END IF;
+        SET front_id = LEFT(front_rc,pos - 1);
+        SET front_ht = SUBSTR(front_rc,pos + 1);
+        SET queue_length = queue_length - 1;
+        SELECT IFNULL(qc,'') INTO queue_children
+        FROM (SELECT GROUP_CONCAT(CONCAT(id,':',front_ht+1)) qc
+        FROM `item_type` WHERE parent_id = front_id) A;
         IF LENGTH(queue_children) = 0 THEN
             IF LENGTH(queue) = 0 THEN
                 SET queue_length = 0;

@@ -182,7 +182,7 @@
             }
             if (Ext.getCmp("specification_" + tmp).getValue() != "") {
                 rtn[tmp] = {
-                    "label": Ext.getCmp("specification_" + tmp).getFieldLabel(),
+                    "label": Ext.getCmp("specification_" + tmp).getValue(),
                     "value": Ext.getCmp("specification_" + tmp).getValue()
                 };
             }
