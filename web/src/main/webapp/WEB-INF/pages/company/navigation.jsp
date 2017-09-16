@@ -74,7 +74,7 @@
         header: false,
         collapsible: true,
         useArrows: false,
-       rootVisible: false,
+        rootVisible: false,
         lines: true,
         multiSelect: true,
         border: true,
@@ -98,7 +98,7 @@
                 loadMachine("-10");
             },
             itemclick: function (view, node) {
-                              //console.log(node);
+                //console.log(node);
 //                if (node.isLeaf()) {
 //                    // some functionality to open the leaf(document) in a tabpanel
 //                    alert(node.get("text"));

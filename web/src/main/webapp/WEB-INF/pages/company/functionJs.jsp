@@ -144,7 +144,7 @@
             params: {
                 id: companyId.getValue(),
                 parent: companyParentId.getValue(),
-                code: companyFullCode.getValue(),
+                code: companyCode.getValue(),
                 name: companyName.getValue(),
                 description: companyDescription.getValue(),
                 completeCode: companyFullCode.getValue()
@@ -164,6 +164,7 @@
                         alertSystemError();
                     }
                 }
+                alert (companyId.getValue())
                 var path = store.findNode("id", companyId.getValue(), true, true, true).getPath();
                 store.load({
                     callback: function (r, options, success) {

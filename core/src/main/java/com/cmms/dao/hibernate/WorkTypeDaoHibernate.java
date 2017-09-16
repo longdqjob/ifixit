@@ -56,6 +56,7 @@ public class WorkTypeDaoHibernate extends GenericDaoHibernate<WorkType, Integer>
         obj.put("name", currentGroup.getName());
         obj.put("code", currentGroup.getCode());
         obj.put("completeCode", currentGroup.getCompleteCode());
+        obj.put("displayname",  currentGroup.getCode()+"-"+currentGroup.getName());
         obj.put("parentId", currentGroup.getParentId());
         obj.put("parentCode", currentGroup.getParentCode());
         obj.put("leaf", false);
