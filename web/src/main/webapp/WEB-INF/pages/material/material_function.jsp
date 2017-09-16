@@ -118,7 +118,7 @@
             method: "POST",
             params: {
                 id: materialId.getValue(),
-                parent: materialFatherId.getValue(),
+                itemTypeId: materialFatherId.getValue(),
                 code: materialCode.getValue(),
                 completeCode: materialCompleteCode.getValue(),
                 name: materialName.getValue(),

@@ -2,6 +2,7 @@ package com.cmms.webapp.action;
 
 import com.cmms.dao.ItemTypeDao;
 import com.cmms.dao.MaterialDao;
+import com.cmms.model.ItemType;
 import com.cmms.model.Material;
 import com.cmms.webapp.util.ResourceBundleUtils;
 import com.cmms.webapp.util.WebUtil;
@@ -119,6 +120,7 @@ public class MaterialAction extends BaseAction implements Preparable {
             String cost = getRequest().getParameter("cost");
             String specification = getRequest().getParameter("specification");
             String parent = getRequest().getParameter("parent");
+            String itemTypeId = getRequest().getParameter("itemTypeId");
             String quantity = getRequest().getParameter("quantity");
 
             if (StringUtils.isBlank(code)) {
@@ -153,6 +155,10 @@ public class MaterialAction extends BaseAction implements Preparable {
             if (!StringUtils.isBlank(parent)) {
                 Material parentObj = materialDao.get(Long.parseLong(parent));
                 material.setParent(parentObj);
+            }
+            if (!StringUtils.isBlank(itemTypeId)) {
+                ItemType itemType = itemTypeDao.get(Integer.parseInt(itemTypeId));
+                material.setItemType(itemType);
             }
 
             material.setCode(code);
