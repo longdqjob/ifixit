@@ -119,6 +119,7 @@ public class MaterialAction extends BaseAction implements Preparable {
             String cost = getRequest().getParameter("cost");
             String specification = getRequest().getParameter("specification");
             String parent = getRequest().getParameter("parent");
+            String quantity = getRequest().getParameter("quantity");
 
             if (StringUtils.isBlank(code)) {
                 result.put("success", false);
@@ -161,6 +162,7 @@ public class MaterialAction extends BaseAction implements Preparable {
             material.setUnit(unit);
             material.setCost(Float.valueOf(cost));
             material.setSpecification(specification);
+            material.setQuantity(Integer.parseInt(quantity));
             material = materialDao.save(material);
             if (material != null) {
                 result.put("success", true);
@@ -181,6 +183,7 @@ public class MaterialAction extends BaseAction implements Preparable {
         try {
             JSONObject result = new JSONObject();
             String idReq = getRequest().getParameter("id");
+            String quantity = getRequest().getParameter("quantity");
             String unit = getRequest().getParameter("unit");
             String cost = getRequest().getParameter("cost");
             Material material = materialDao.get(Long.parseLong(idReq));
@@ -189,6 +192,7 @@ public class MaterialAction extends BaseAction implements Preparable {
                 result.put("message", ResourceBundleUtils.getName("systemError"));
                 return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
             }
+            material.setQuantity(Integer.parseInt(quantity));
             material.setUnit(unit);
             material.setCost(Float.valueOf(cost));
             material = materialDao.save(material);

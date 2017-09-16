@@ -113,7 +113,18 @@
             {text: '<fmt:message key="material.code"/>', dataIndex: 'code', flex: 1, },
             {text: '<fmt:message key="material.completeCode"/>', dataIndex: 'completeCode', flex: 1, },
             {text: '<fmt:message key="material.name"/>', dataIndex: 'name', flex: 1, },
-            {text: '<fmt:message key="material.qty"/>', dataIndex: 'quantity', flex: 1, },
+            {text: '<fmt:message key="material.qty"/>', dataIndex: 'quantity', flex: 1,
+                editor: {
+                    completeOnEnter: true,
+                    field: {
+                        xtype: 'numberfield',
+                        allowBlank: false,
+                        allowDecimals: false,
+                        allowNegative: false,
+                        minValue: 0,
+                    },
+                }
+            },
             {text: '<fmt:message key="material.unit"/>', dataIndex: 'unit', flex: 1,
                 editor: {
                     xtype: 'combobox',
@@ -131,7 +142,8 @@
                         allowBlank: false,
                         allowDecimals: true,
                         allowNegative: false,
-                    }
+                        minValue: 0,
+                    },
                 }
             },
         ],
@@ -200,23 +212,53 @@
                 //console.log(usergrid);
             },
             validateedit: function (editor, context, eOpts) {
+                if (!editor.editors.items[0].field.wasValid) {
+                    context.cancel = true;
+                    return false;
+                }
                 var record = context.record;
                 var unit = record.get("unit");
                 var cost = record.get("cost");
+                var quantity = record.get("quantity");
                 if (context.field == "unit") {
+                    if (context.value == "") {
+                        context.cancel = true;
+                        return false;
+                    } else if (unit == context.value) {
+                        return true;
+                    }
                     unit = context.value;
                 } else if (context.field == "cost") {
+                    if (parseFloat(context.value) < 0) {
+                        context.cancel = true;
+                        return false;
+                    } else if (cost == context.value) {
+                        return true;
+                    }
                     cost = context.value;
+                } else if (context.field == "quantity") {
+                    if (parseInt(context.value) < 0) {
+                        context.cancel = true;
+                        return false;
+                    } else if (quantity == context.value) {
+                        return true;
+                    }
+                    quantity = context.value;
                 }
 
-                saveChangeMaterial(record.get("id"), unit, cost, function () {
-                    context.cancel = true;
-//                    context.record.data[context.field] = context.value;
-                    return false;
-                });
+                saveChangeMaterial(record.get("id"), quantity, unit, cost,
+                        function () {
+                            context.record.dirty = true;
+                            return true;
+                        },
+                        function () {
+                            context.cancel = true;
+                            return false;
+                        });
             },
             edit: function (editor, e) {
                 var record = e.record;
+                record.dirty = true;
             }
         }
     });

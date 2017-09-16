@@ -152,7 +152,7 @@
         fieldLabel: '<fmt:message key="material.qty"/>',
         labelAlign: 'left',
         anchor: '100%',
-        allowBlank: true,
+        allowBlank: false,
         margin: '20 10 10 10',
         width: 350,
         maxLength: 50,

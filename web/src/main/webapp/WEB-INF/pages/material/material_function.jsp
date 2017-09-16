@@ -124,6 +124,7 @@
                 name: materialName.getValue(),
                 cost: materialCost.getValue(),
                 unit: materialUnit.getValue(),
+                quantity: materialQty.getValue(),
                 specification: Ext.encode(materialCreateSpec())
             },
             success: function (response) {
@@ -151,13 +152,14 @@
         });
     }
 
-    function saveChangeMaterial(id, unit, cost, callbackFail) {
+    function saveChangeMaterial(id,quantity, unit, cost, callbackSuccess,callbackFail) {
         maskTarget(Ext.getCmp("gridId"));
         Ext.Ajax.request({
             url: "../material/saveChange",
             method: "POST",
             params: {
                 id: id,
+                quantity: quantity,
                 cost: cost,
                 unit: unit,
             },
@@ -166,7 +168,9 @@
                 var res = JSON.parse(response.responseText);
                 if ("true" == res.success || true === res.success) {
                     alertSuccess(res.message);
-//                    loadMaterial(0);
+                    if (isFunction(callbackSuccess)) {
+                        callbackSuccess();
+                    }
                 } else {
                     if (res.message || res.message == "true") {
                         alertError(res.message);
