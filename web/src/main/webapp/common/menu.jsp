@@ -11,6 +11,7 @@
             <menu:displayMenu name="Home"/>
             <menu:displayMenu name="SystemMenu"/>
             <menu:displayMenu name="workOrder"/>
+            <menu:displayMenu name="MaterialMenu"/>
             <menu:displayMenu name="UserMenu"/>
             <menu:displayMenu name="AdminMenu"/>
             <menu:displayMenu name="Logout"/>
