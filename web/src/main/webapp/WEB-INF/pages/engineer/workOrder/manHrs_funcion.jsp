@@ -90,6 +90,10 @@
         manHrsTotalCost.setValue(totalcost);
     }
     function saveManHrs() {
+        var valid = manHrsForm.query("field{isValid()==false}");
+        if (!valid || valid.length > 0) {
+            return false;
+        }
         if (manHrsId.getValue() != "" && manHrsId.getValue() != "0") {
             var index = storeManHrs.findExact("id", parseInt(manHrsId.getValue()));
             if (index > -1) {
@@ -128,7 +132,7 @@
                     if (jsonData.success == true) {
                         alertSuccess(jsonData.message);
                         try {
-                            gridManHrs.removeAt(rowIndex);
+                            storeManHrs.removeAt(rowIndex);
                         } catch (c) {
                             console.log(c);
                         }
@@ -147,7 +151,7 @@
             });
         } else {
             try {
-                gridManHrs.removeAt(rowIndex);
+                storeManHrs.removeAt(rowIndex);
                 alertSuccess('<fmt:message key="deleteSuccess"/>');
             } catch (c) {
                 console.log(c);

@@ -112,6 +112,7 @@
             {text: '<fmt:message key="material.description"/>', dataIndex: 'description', flex: 1},
             {text: '<fmt:message key="work.material.unit"/>', dataIndex: 'unit', flex: 1},
             {text: '<fmt:message key="work.material.cost"/>', dataIndex: 'cost', flex: 1},
+            {text: '<fmt:message key="material.qty"/>', dataIndex: 'quantity', flex: 1},
         ],
         viewConfig: {
             autoFit: true,

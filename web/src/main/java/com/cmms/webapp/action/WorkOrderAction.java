@@ -444,8 +444,12 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                         Material material;
                         Long materialId = -1L;
                         Boolean change = false;
+                        int lastQty = 0;
+                        Boolean changeQty = false;
                         for (StockItemObj stockItemObj : listStock) {
+                            lastQty = 0;
                             change = false;
+                            changeQty = false;
                             material = materialDao.get(stockItemObj.getMaterialId());
                             if (stockItemObj.getId() <= 0) {
                                 //Add
@@ -453,13 +457,16 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                                 stockItem.setWorkOrder(workOrder);
                                 materialId = -1L;
                                 change = true;
+                                changeQty = true;
                             } else {
                                 //Edit
                                 log.info("Edit stockItem: " + stockItemObj.getId());
                                 stockItem = stockItemDao.get(stockItemObj.getId());
+                                lastQty = stockItem.getQuantity();
                                 materialId = stockItem.getMaterialId();
                                 if (!Objects.equals(stockItem.getQuantity(), stockItemObj.getQuantity())) {
                                     change = true;
+                                    changeQty = true;
                                 }
                             }
                             if (!Objects.equals(materialId, stockItemObj.getMaterialId())) {
@@ -470,6 +477,12 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                             if (change) {
                                 stockItem.setQuantity(stockItemObj.getQuantity());
                                 stockItemDao.save(stockItem);
+                            }
+
+                            //Cap nhat Qty cua material
+                            if (changeQty) {
+                                material.setQuantity(material.getQuantity() - stockItem.getQuantity() + lastQty);
+                                material = materialDao.save(material);
                             }
                             sotckTotalCost += stockItem.getQuantity() * material.getCost();
                         }
@@ -590,10 +603,17 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             JSONObject result = new JSONObject();
             if (!StringUtils.isBlank(idReq)) {
                 Long id = Long.parseLong(idReq);
+                int lastQty = 0;
                 StockItem stockItem = stockItemDao.get(id);
+                lastQty = stockItem.getQuantity();
+                Material material = stockItem.getMaterial();
                 WorkOrder workOrder = stockItem.getWorkOrder();
                 if (id > 0) {
                     stockItemDao.remove(id);
+                    if (lastQty > 0) {
+                        material.setQuantity(material.getQuantity() + lastQty);
+                        materialDao.save(material);
+                    }
                 }
                 calcToTalStock(workOrder);
                 result.put("success", true);
@@ -640,10 +660,16 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             JSONObject result = new JSONObject();
             String idReq = getRequest().getParameter("id");
             String quantityReq = getRequest().getParameter("quantity");
+            int lastQty = 0;
             StockItem stockItem = stockItemDao.get(Long.parseLong(idReq));
+            lastQty = stockItem.getQuantity();
+            Material material = stockItem.getMaterial();
             stockItem.setQuantity(Integer.parseInt(quantityReq));
             stockItem = stockItemDao.save(stockItem);
             if (stockItem != null) {
+                //Cap nhat quantity cua material
+                material.setQuantity(material.getQuantity() - stockItem.getQuantity() + lastQty);
+                material = materialDao.save(material);
                 //Tinh tai total
                 calcToTalStock(stockItem.getWorkOrder());
                 result.put("success", true);

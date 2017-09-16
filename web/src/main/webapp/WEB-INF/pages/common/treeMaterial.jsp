@@ -64,6 +64,10 @@
                         text: '<fmt:message key="material.unitCost"/>',
                         dataIndex: 'cost',
                         flex: 1
+                    },{
+                        text: '<fmt:message key="material.qty"/>',
+                        dataIndex: 'quantity',
+                        flex: 1
                     }
                 ],
                 listeners: {

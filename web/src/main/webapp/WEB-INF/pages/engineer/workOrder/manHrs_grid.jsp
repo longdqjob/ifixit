@@ -71,7 +71,7 @@
                             Ext.MessageBox.confirm('Confirm', msg, function (btn) {
                                 if (btn == 'yes') {
                                     var rec = grid.getStore().getAt(rowIndex);
-                                    var param = '&ids=' + rec.get('id');
+                                    var param = '&id=' + rec.get('id');
                                     deleteManHrs(rowIndex, rec.get('id'), param);
                                 }
                             });

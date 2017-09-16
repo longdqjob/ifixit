@@ -68,16 +68,19 @@
                 // Optimize : create menu once
                 var menu_grid = new Ext.menu.Menu({items: [{
                             text: '<fmt:message key="loadData"/>',
+                            iconCls: "refresh",
                             handler: function () {
                                 selectedSystem = record;
                                 console.log(selectedSystem);
                                 loadWorkOrder(selectedSystem.get("id"));
                             }}, {
-                            text: '<fmt:message key="grpEngineer.add"/>',
+                            text: '<fmt:message key="button.add"/>',
+                            iconCls: "add-cls",
                             handler: function () {
                                 addEngineer(record);
                             }}, {
-                            text: '<fmt:message key="grpEngineer.edit"/>',
+                            text: '<fmt:message key="button.edit"/>',
+                            iconCls: "edit-cls",
                             handler: function () {
                                 editEngineer(record);
                             }}, {
@@ -85,7 +88,8 @@
                             handler: function () {
                                 console.log("Moreils: " + record.get("id") + " - " + record.get("name"));
                             }}, {
-                            text: '<fmt:message key="grpEngineer.delete"/>',
+                            text: '<fmt:message key="button.delete"/>',
+                            iconCls: "delete-cls",
                             handler: function () {
                                 console.log("Delete " + record.get("id") + " - " + record.get("name"));
                             }}]

@@ -27,6 +27,7 @@ public class Material extends BaseObject implements Serializable {
     private String description;
     private String unit;
     private String specification;
+    private Integer quantity;
     private Float cost;
     private Material parent;
     private ItemType itemType;
@@ -93,6 +94,15 @@ public class Material extends BaseObject implements Serializable {
 
     public void setCost(Float cost) {
         this.cost = cost;
+    }
+
+    @Column(name = "quantity")
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
     @Column(name = "specification")

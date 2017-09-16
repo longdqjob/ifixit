@@ -113,6 +113,7 @@
             {text: '<fmt:message key="material.code"/>', dataIndex: 'code', flex: 1, },
             {text: '<fmt:message key="material.completeCode"/>', dataIndex: 'completeCode', flex: 1, },
             {text: '<fmt:message key="material.name"/>', dataIndex: 'name', flex: 1, },
+            {text: '<fmt:message key="material.qty"/>', dataIndex: 'quantity', flex: 1, },
             {text: '<fmt:message key="material.unit"/>', dataIndex: 'unit', flex: 1,
                 editor: {
                     xtype: 'combobox',

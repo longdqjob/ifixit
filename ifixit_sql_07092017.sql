@@ -188,6 +188,7 @@ CREATE TABLE `material` (
   `parent_id` bigint(20) DEFAULT NULL,
   `item_type_id` int(5) DEFAULT NULL,
   `specification` varchar(1024) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `quantity` int(5) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `FK_rveuv7odl1m50fbvdvkxxqqin` (`parent_id`),
   CONSTRAINT `FK_rveuv7odl1m50fbvdvkxxqqin` FOREIGN KEY (`parent_id`) REFERENCES `material` (`id`)
@@ -195,7 +196,7 @@ CREATE TABLE `material` (
 
 /*Data for the table `material` */
 
-insert  into `material`(`id`,`code`,`complete_code`,`cost`,`description`,`name`,`unit`,`parent_id`,`item_type_id`,`specification`) values (1,'DT','DT',32,'Dien thoai','Dient hoai','Cai',NULL,1,NULL),(2,'NAP','DT.NAP',12,'Nap dt','Nap','Cai',1,1,NULL),(4,'0012','AA.0012',23,NULL,'Vo 01','m2',1,1,'{\"01\":{\"label\":\"dfgsdf\",\"value\":\"aaa\"},\"02\":{\"label\":\"gfnh\",\"value\":\"bbb\"},\"06\":{\"label\":\"6ujj\",\"value\":\"cccc\"}}'),(5,'DEN','DT.NAP.DEN',2,NULL,'mau den','un',2,1,'{\"01\":{\"label\":\"dfgsdf\",\"value\":\"111\"},\"02\":{\"label\":\"gfnh\",\"value\":\"222\"},\"06\":{\"label\":\"6ujj\",\"value\":\"666\"}}');
+insert  into `material`(`id`,`code`,`complete_code`,`cost`,`description`,`name`,`unit`,`parent_id`,`item_type_id`,`specification`,`quantity`) values (1,'DT','DT',32,'Dien thoai','Dient hoai','Cai',NULL,1,NULL,100),(2,'NAP','DT.NAP',12,'Nap dt','Nap','Cai',1,1,NULL,100),(4,'0012','AA.0012',23,NULL,'Vo 01','m2',1,1,'{\"01\":{\"label\":\"dfgsdf\",\"value\":\"aaa\"},\"02\":{\"label\":\"gfnh\",\"value\":\"bbb\"},\"06\":{\"label\":\"6ujj\",\"value\":\"cccc\"}}',100),(5,'DEN','DT.NAP.DEN',2,NULL,'mau den','un',2,1,'{\"01\":{\"label\":\"dfgsdf\",\"value\":\"111\"},\"02\":{\"label\":\"gfnh\",\"value\":\"222\"},\"06\":{\"label\":\"6ujj\",\"value\":\"666\"}}',100);
 
 /*Table structure for table `role` */
 

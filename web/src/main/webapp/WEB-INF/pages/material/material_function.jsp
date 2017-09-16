@@ -31,7 +31,7 @@
         materialName.setValue(data.get("name"));
         materialCost.setValue(data.get("cost"));
         materialUnit.setValue(data.get("unit"));
-        materialQty.setValue("");
+        materialQty.setValue(data.get("quantity"));
         disableCode();
         materialFillSpecValue(data.get("specification"));
         materialWindow.setTitle('<fmt:message key="material.edit"/>');

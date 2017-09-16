@@ -1,6 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <script>
-    var materialCode ="";
+    var materialCode = "";
     var materialDesc = "";
     var materialUnit = "";
     var materialCost = "";
@@ -72,6 +72,10 @@
         }
     });
 
+    var stockMatQty = Ext.create('Ext.form.field.Text', {
+        xtype: 'textfield',
+        hidden: true,
+    });
     var stockUnit = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         grow: true,

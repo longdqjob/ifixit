@@ -27,6 +27,7 @@
         stockMateName.setValue(record.get("name"));
         stockUnit.setValue(record.get("unit"));
         stockUnitCost.setValue(record.get("cost"));
+        stockMatQty.setValue(record.get("quantity"));
         materialCode = record.get("completeCode");
         materialDesc = record.get("description");
         calcQty();
@@ -85,6 +86,15 @@
     }
 
     function saveStock() {
+        var valid = stockForm.query("field{isValid()==false}");
+        if (!valid || valid.length > 0) {
+            return false;
+        }
+        if (parseInt(stockQty.getValue()) > parseInt(stockMatQty.getValue())) {
+            alertError('<fmt:message key="errors.wo.quantity.greater"/>' + stockMatQty.getValue());
+            stockQty.setActiveError(res.message);
+            return false;
+        }
         if (stockItemId.getValue() != "" && stockItemId.getValue() != "0") {
             var index = storeStock.findExact("id", parseInt(stockItemId.getValue()));
             if (index > -1) {
