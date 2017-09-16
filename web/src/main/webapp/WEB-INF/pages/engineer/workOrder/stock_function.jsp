@@ -59,6 +59,14 @@
         stockWindow.show();
     }
 
+    function sumStockCost() {
+        var totalcost = 0;
+        storeStock.each(function (rec) {
+            totalcost += ((parseFloat(rec.get('quantity'))) * parseFloat(rec.get('materialCost')));
+        });
+        materialTotalCost.setValue(totalcost);
+    }
+
     var idStockStore = -1;
     function getStockFromFrm() {
         idStockStore--;
@@ -72,6 +80,7 @@
             materialUnit: stockUnit.getValue(),
             materialCost: stockUnitCost.getValue(),
             quantity: stockQty.getValue(),
+            materialTotalCost: parseFloat(stockUnitCost.getValue()) * parseFloat(stockQty.getValue()),
         };
     }
 
@@ -85,8 +94,9 @@
                 rec.set("materialName", parseInt(stockMateName.getValue()));
                 rec.set("materialDesc", materialDesc);
                 rec.set("materialUnit", stockUnit.getValue());
-                rec.set("materialCost:", stockUnitCost.getValue());
+                rec.set("materialCost", stockUnitCost.getValue());
                 rec.set("quantity", stockQty.getValue());
+                rec.set("materialTotalCost", parseFloat(stockUnitCost.getValue()) * parseFloat(stockQty.getValue()));
                 rec.dirty = true;
                 try {
                     storeStock.sync();
@@ -99,6 +109,7 @@
         } else {
             storeStock.add(getStockFromFrm());
         }
+        sumStockCost();
         stockWindow.hide();
     }
 
@@ -116,6 +127,7 @@
                         alertSuccess(jsonData.message);
                         try {
                             storeStock.removeAt(rowIndex);
+                            sumStockCost();
                         } catch (c) {
                             console.log(c);
                         }
@@ -135,6 +147,7 @@
         } else {
             try {
                 storeStock.removeAt(rowIndex);
+                sumStockCost();
                 alertSuccess('<fmt:message key="deleteSuccess"/>');
             } catch (c) {
                 console.log(c);
@@ -144,4 +157,46 @@
         }
     }
 
+
+    function saveChangeStock(id, quantity, callbackSuccess, callbackFail) {
+        maskTarget(Ext.getCmp("gridStock"));
+        Ext.Ajax.request({
+            url: "../workOrder/saveChangeStock",
+            method: "POST",
+            params: {
+                id: id,
+                quantity: quantity,
+            },
+            success: function (response) {
+                unMaskTarget();
+                console.log("---------success:---------");
+                var res = JSON.parse(response.responseText);
+                if ("true" == res.success || true === res.success) {
+                    alertSuccess(res.message);
+                    if (isFunction(callbackSuccess)) {
+                        callbackSuccess();
+                    }
+                } else {
+                    if (res.message || res.message == "true") {
+                        alertError(res.message);
+                    } else {
+                        alertSystemError();
+                    }
+                    if (isFunction(callbackFail)) {
+                        console.log("---------callbackFail---------");
+                        callbackFail();
+                    }
+                }
+            },
+            failure: function (response, opts) {
+                alertSystemError();
+                unMaskTarget();
+                console.log("---------response---------");
+                if (isFunction(callbackFail)) {
+                    console.log("---------callbackFail---------");
+                    callbackFail();
+                }
+            },
+        });
+    }
 </script>

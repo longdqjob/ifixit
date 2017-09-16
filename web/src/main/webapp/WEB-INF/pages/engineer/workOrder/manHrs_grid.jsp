@@ -9,7 +9,7 @@
 //-----------------------------------------Grid---------------------------------------------------------------
     var storeManHrs = Ext.create('Ext.data.Store', {
         storeId: 'storeManHrs',
-        fields: ['id', 'engineerId', 'engineerGrp', 'mh', 'engineerCost', 'workOrderId'],
+        fields: ['id', 'engineerId', 'engineerGrp', 'mh', 'engineerCost', 'workOrderId', 'totalCost'],
         pageSize: 20,
     });
 
@@ -102,8 +102,19 @@
             }),
             ////////////////ITEM
             {text: '<fmt:message key="work.manHour.enginnerGrp"/>', dataIndex: 'engineerGrp', flex: 1, },
-            {text: '<fmt:message key="work.manHour.manHrs"/>', dataIndex: 'mh', flex: 1, },
+            {text: '<fmt:message key="work.manHour.manHrs"/>', dataIndex: 'mh', flex: 1,
+                editor: {
+                    completeOnEnter: true,
+                    field: {
+                        xtype: 'numberfield',
+                        allowBlank: false,
+                        allowDecimals: true,
+                        allowNegative: false,
+                    }
+                }
+            },
             {text: '<fmt:message key="work.manHour.cost"/>', dataIndex: 'engineerCost', flex: 1, },
+            {text: '<fmt:message key="work.manHour.totalCost"/>', dataIndex: 'totalCost', flex: 1, },
         ],
         viewConfig: {
             autoFit: true,
@@ -140,6 +151,29 @@
         listeners: {
             afterrender: function (usergrid, eOpts) {
                 //console.log(usergrid);
+            },
+            validateedit: function (editor, context, eOpts) {
+                var record = context.record;
+                if (record.get("mh") == context.value) {
+                    return true;
+                }
+                saveChangeMh(record.get("id"), context.value,
+                        function () {
+                            context.record.data["totalCost"] = (context.record.get("engineerCost") * context.value);
+                            context.cancel = false;
+                            context.record.dirty = true;
+                            storeManHrs.sync();
+                            sumMhs();
+                            loadWorkOrder();
+                            return true;
+                        }, function () {
+                    context.cancel = true;
+                    return false;
+                });
+            },
+            edit: function (editor, e) {
+                var record = e.record;
+                console.log(record.data);
             }
         }
     });

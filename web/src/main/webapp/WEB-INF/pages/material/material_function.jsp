@@ -4,12 +4,6 @@
     function addMaterial(data) {
         materialResetSpec();
         materialForm.reset();
-        if (data != null) {
-//            materialFatherId.setValue(data.get("id"));
-//            materialFatherName.setValue(data.get("name"));
-//            materialFatherCode.setValue(data.get("completeCode"));
-            materialFillSpec(data.get("specification"));
-        }
         materialWindow.setTitle('<fmt:message key="material.add"/>');
         materialWindow.setIconCls("add-cls");
         enableCode();
@@ -19,11 +13,19 @@
 
     function editMaterial(data) {
         materialResetSpec();
+        var itemTypeObj = null;
+        
         materialForm.reset();
         materialId.setValue(data.get("id"));
-        materialFatherId.setValue(data.get("parentId"));
-        materialFatherName.setValue(data.get("parentName"));
-        materialFatherCode.setValue(data.get("parentCode"));
+        
+        if (data.get("itemType")) {
+            itemTypeObj = Ext.decode(data.get("itemType"));
+            console.log(itemTypeObj);
+            materialFatherId.setValue(itemTypeObj.id);
+            materialFatherName.setValue(itemTypeObj.name);
+            materialFatherCode.setValue(itemTypeObj.completeCode);
+        }
+
         materialCode.setValue(data.get("code"));
         materialCompleteCode.setValue(data.get("completeCode"));
         materialName.setValue(data.get("name"));
@@ -145,6 +147,43 @@
             failure: function (response, opts) {
                 alertSystemError();
                 unMaskTarget();
+            },
+        });
+    }
+
+    function saveChangeMaterial(id, unit, cost, callbackFail) {
+        maskTarget(Ext.getCmp("gridId"));
+        Ext.Ajax.request({
+            url: "../material/saveChange",
+            method: "POST",
+            params: {
+                id: id,
+                cost: cost,
+                unit: unit,
+            },
+            success: function (response) {
+                unMaskTarget();
+                var res = JSON.parse(response.responseText);
+                if ("true" == res.success || true === res.success) {
+                    alertSuccess(res.message);
+//                    loadMaterial(0);
+                } else {
+                    if (res.message || res.message == "true") {
+                        alertError(res.message);
+                    } else {
+                        alertSystemError();
+                    }
+                    if (isFunction(callbackFail)) {
+                        callbackFail();
+                    }
+                }
+            },
+            failure: function (response, opts) {
+                alertSystemError();
+                unMaskTarget();
+                if (isFunction(callbackFail)) {
+                    callbackFail();
+                }
             },
         });
     }

@@ -19,35 +19,37 @@ import org.codehaus.jettison.json.JSONObject;
  * Action for MachineTypeAction
  */
 public class MaterialAction extends BaseAction implements Preparable {
-    
+
     private static final long serialVersionUID = -1L;
+    //<editor-fold defaultstate="collapsed" desc="comment">
     private MaterialDao materialDao;
     private ItemTypeDao itemTypeDao;
-    
+
     public ItemTypeDao getItemTypeDao() {
         return itemTypeDao;
     }
-    
+
     public void setItemTypeDao(ItemTypeDao itemTypeDao) {
         this.itemTypeDao = itemTypeDao;
     }
-    
+
     public MaterialDao getMaterialDao() {
         return materialDao;
     }
-    
+
     public void setMaterialDao(MaterialDao materialDao) {
         this.materialDao = materialDao;
     }
-    
+
     @Override
     public void prepare() throws Exception {
     }
-    
+
     public String index() {
         return SUCCESS;
-    }
-    
+    }//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="getTree">
     public InputStream getTree() {
         try {
             String idReq = getRequest().getParameter("id");
@@ -65,8 +67,9 @@ public class MaterialAction extends BaseAction implements Preparable {
             log.error("ERROR getTree: ", e);
             return null;
         }
-    }
-    
+    }//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="getLoadData">
     public InputStream getLoadData() {
         try {
             JSONObject result = new JSONObject();
@@ -77,36 +80,37 @@ public class MaterialAction extends BaseAction implements Preparable {
             if (!StringUtils.isBlank(itemId)) {
                 listItemType = itemTypeDao.getListChildren(Integer.parseInt(itemId));
             }
-            
+
             Map pagingMap = materialDao.getList(listItemType, code, name, start, limit);
-            
+
             ArrayList<Material> list = new ArrayList<Material>();
             if (pagingMap.get("list") != null) {
                 list = (ArrayList<Material>) pagingMap.get("list");
             }
-            
+
             Long count = 0L;
             if (pagingMap.get("count") != null) {
                 count = (Long) pagingMap.get("count");
             }
-            
+
             JSONArray jSONArray = WebUtil.toJSONArray(list);
             result.put("list", jSONArray);
             result.put("totalCount", count);
-            
+
             return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
         } catch (Exception ex) {
             log.error("ERROR getLoadData: ", ex);
             return null;
         }
-    }
-    
+    }//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="getSave">
     public InputStream getSave() {
         try {
             JSONObject result = new JSONObject();
             String idReq = getRequest().getParameter("id");
             Long id = null;
-            
+
             String code = getRequest().getParameter("code");
             String completeCode = getRequest().getParameter("completeCode");
             String name = getRequest().getParameter("name");
@@ -115,13 +119,13 @@ public class MaterialAction extends BaseAction implements Preparable {
             String cost = getRequest().getParameter("cost");
             String specification = getRequest().getParameter("specification");
             String parent = getRequest().getParameter("parent");
-            
+
             if (StringUtils.isBlank(code)) {
                 result.put("success", false);
                 result.put("message", ResourceBundleUtils.getName("message.codeRequired"));
                 return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
             }
-            
+
             Boolean checkUnique = true;
             Material material = new Material();
             if (!StringUtils.isBlank(idReq)) {
@@ -144,12 +148,12 @@ public class MaterialAction extends BaseAction implements Preparable {
                     return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
                 }
             }
-            
+
             if (!StringUtils.isBlank(parent)) {
                 Material parentObj = materialDao.get(Long.parseLong(parent));
                 material.setParent(parentObj);
             }
-            
+
             material.setCode(code);
             material.setCompleteCode(completeCode);
             material.setName(name);
@@ -170,24 +174,55 @@ public class MaterialAction extends BaseAction implements Preparable {
             log.error("ERROR getSave: ", ex);
             return null;
         }
-    }
-    
+    }//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="getSaveChange">
+    public InputStream getSaveChange() {
+        try {
+            JSONObject result = new JSONObject();
+            String idReq = getRequest().getParameter("id");
+            String unit = getRequest().getParameter("unit");
+            String cost = getRequest().getParameter("cost");
+            Material material = materialDao.get(Long.parseLong(idReq));
+            if (material == null) {
+                result.put("success", false);
+                result.put("message", ResourceBundleUtils.getName("systemError"));
+                return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+            }
+            material.setUnit(unit);
+            material.setCost(Float.valueOf(cost));
+            material = materialDao.save(material);
+            if (material != null) {
+                result.put("success", true);
+                result.put("message", ResourceBundleUtils.getName("saveSuccess"));
+            } else {
+                result.put("success", false);
+                result.put("message", ResourceBundleUtils.getName("saveFail"));
+            }
+            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+        } catch (Exception ex) {
+            log.error("ERROR getSaveChange: ", ex);
+            return null;
+        }
+    }//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="getDelete">
     private String[] ids;
-    
+
     public String[] getIds() {
         return ids;
     }
-    
+
     public void setIds(String[] ids) {
         this.ids = ids;
     }
-    
+
     public InputStream getDelete() {
         try {
             JSONObject result = new JSONObject();
             if (ids != null && ids.length > 0) {
                 List<Long> list = new ArrayList<>(ids.length);
-                
+
                 if (ids.length == 1) {
                     list.add(Long.parseLong(ids[0]));
                     if (materialDao.checkUse(list)) {
@@ -224,5 +259,5 @@ public class MaterialAction extends BaseAction implements Preparable {
             log.error("ERROR getDelete: ", ex);
             return null;
         }
-    }
+    }//</editor-fold>
 }

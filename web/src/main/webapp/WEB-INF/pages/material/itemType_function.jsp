@@ -20,10 +20,18 @@
     }
 
     function chooseTreeCmItemType(record) {
-        itemTypeParentId.setValue(record.get("id"));
-        itemTypeParentName.setValue(record.get("name"));
-        itemTypeParentCode.setValue(record.get("completeCode"));
-        genItemTypeCode();
+        if (itemTypeWindow.isVisible()) {
+            itemTypeParentId.setValue(record.get("id"));
+            itemTypeParentName.setValue(record.get("name"));
+            itemTypeParentCode.setValue(record.get("completeCode"));
+            genItemTypeCode();
+        }
+        if (materialWindow.isVisible()) {
+            materialFatherId.setValue(record.get("id"));
+            materialFatherName.setValue(record.get("name"));
+            materialFatherCode.setValue(record.get("completeCode"));
+            materialFillSpec(record.get("specification"));
+        }
     }
     function loadMaterial(id) {
         var itemId = 0;

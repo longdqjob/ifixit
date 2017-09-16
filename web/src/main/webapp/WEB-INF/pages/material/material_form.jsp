@@ -23,7 +23,7 @@
         listeners: {
             'render': function (cmp) {
                 this.getEl().on('click', function () {
-                    materialTreeWindow.show();
+                    cmItemTypeTreeWindow.show();
                 });
             }
         }
@@ -40,7 +40,7 @@
                 margin: '10 0 6 10',
                 width: 80,
                 handler: function () {
-                    materialTreeWindow.show();
+                    cmItemTypeTreeWindow.show();
                 }
             }]
     });

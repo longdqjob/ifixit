@@ -47,7 +47,6 @@ public class UserRoleAuthorizationInterceptor implements Interceptor {
      * @throws Exception when setting the error on the response fails
      */
     public String intercept(ActionInvocation invocation) throws Exception {
-        log.info("---------------UserRoleAuthorizationInterceptor intercept------------");
         HttpServletRequest request = ServletActionContext.getRequest();
 
         //System

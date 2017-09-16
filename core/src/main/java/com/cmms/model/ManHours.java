@@ -45,7 +45,7 @@ public class ManHours extends BaseObject implements Serializable {
         this.workOrder = workOrder;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "group_engineer_id")
     public GroupEngineer getGroupEngineer() {
         return groupEngineer;

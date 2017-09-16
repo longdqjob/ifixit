@@ -31,6 +31,9 @@ public class WorkOrder extends BaseObject implements Serializable {
     private String task;
     private String reason;
     private String note;
+    private Float mhTotal;
+    private Float mhTotalCost;
+    private Float stockTotalCost;
     private WorkType workType;
     private Machine machine;
     private GroupEngineer groupEngineer;
@@ -133,6 +136,33 @@ public class WorkOrder extends BaseObject implements Serializable {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    @Column(name = "mh_total")
+    public Float getMhTotal() {
+        return mhTotal;
+    }
+
+    public void setMhTotal(Float mhTotal) {
+        this.mhTotal = mhTotal;
+    }
+
+    @Column(name = "mh_total_cost")
+    public Float getMhTotalCost() {
+        return mhTotalCost;
+    }
+
+    public void setMhTotalCost(Float mhTotalCost) {
+        this.mhTotalCost = mhTotalCost;
+    }
+
+    @Column(name = "stock_total_cost")
+    public Float getStockTotalCost() {
+        return stockTotalCost;
+    }
+
+    public void setStockTotalCost(Float stockTotalCost) {
+        this.stockTotalCost = stockTotalCost;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)

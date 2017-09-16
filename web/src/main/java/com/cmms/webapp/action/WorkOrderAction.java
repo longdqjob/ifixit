@@ -121,6 +121,7 @@ public class WorkOrderAction extends BaseAction implements Preparable {
         return SUCCESS;
     }
 
+    //<editor-fold defaultstate="collapsed" desc="getLoadData">
     public InputStream getLoadData() {
         try {
             JSONObject result = new JSONObject();
@@ -209,8 +210,9 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             log.error("ERROR getLoadData: ", ex);
             return null;
         }
-    }
+    }//</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="getLoadInfo">
     public InputStream getLoadInfo() {
         try {
             JSONObject result = new JSONObject();
@@ -230,7 +232,9 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             JSONArray jsArrayManHrs = new JSONArray();
             JSONObject tmp;
             GroupEngineer engineer;
+            Float cost;
             for (ManHours manHours : listManHrs) {
+                cost = 0F;
                 tmp = new JSONObject();
                 tmp = WebUtil.toJSONObject(manHours, "workOrder,groupEngineer");
                 engineer = manHours.getGroupEngineer();
@@ -238,11 +242,13 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                     tmp.put("engineerId", engineer.getId());
                     tmp.put("engineerGrp", engineer.getName());
                     tmp.put("engineerCost", engineer.getCost());
+                    cost = engineer.getCost();
                 } else {
                     tmp.put("engineerId", "");
                     tmp.put("engineerGrp", "");
                     tmp.put("engineerCost", "");
                 }
+                tmp.put("totalCost", manHours.getMh() * cost);
                 tmp.put("workOrderId", workOrderId);
                 jsArrayManHrs.put(tmp);
             }
@@ -263,6 +269,7 @@ public class WorkOrderAction extends BaseAction implements Preparable {
 
             JSONArray jsArrayStock = new JSONArray();
             Material material;
+            Float stockTotalCost = 0F;
             for (StockItem item : listStock) {
                 tmp = new JSONObject();
                 tmp = WebUtil.toJSONObject(item, "workOrder,material");
@@ -274,6 +281,8 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                     tmp.put("materialDesc", material.getDescription());
                     tmp.put("materialUnit", material.getUnit());
                     tmp.put("materialCost", material.getCost());
+                    tmp.put("materialTotalCost", material.getCost() * item.getQuantity());
+                    stockTotalCost += material.getCost() * item.getQuantity();
                 } else {
                     tmp.put("materialId", "");
                     tmp.put("materialCode", "");
@@ -281,7 +290,9 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                     tmp.put("materialDesc", "");
                     tmp.put("materialUnit", "");
                     tmp.put("materialCost", "");
+                    tmp.put("materialTotalCost", "0");
                 }
+                tmp.put("stockTotalCost", stockTotalCost);
                 tmp.put("workOrderId", workOrderId);
                 jsArrayStock.put(tmp);
             }
@@ -293,8 +304,9 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             log.error("ERROR getLoadInfo: ", ex);
             return null;
         }
-    }
+    }//</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="getSave">
     public InputStream getSave() {
         try {
             JSONObject result = new JSONObject();
@@ -374,6 +386,8 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             workOrder.setReason(reason);
             workOrder = workOrderDao.save(workOrder);
             if (workOrder != null) {
+                Float totalMh = 0F;
+                Float totalCost = 0F;
                 //<editor-fold defaultstate="collapsed" desc="Save list man_hour">
                 String manHrs = getRequest().getParameter("manHrs");
                 if (!StringUtils.isBlank(manHrs)) {
@@ -386,6 +400,7 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                     Integer tmpEngineerId = -1;
                     Boolean change = false;
                     for (ManHoursObj manHoursObj : listManHours) {
+                        groupEngineer = groupEngineerDao.get(manHoursObj.getGroupEngineerId());
                         change = false;
                         if (manHoursObj.getId() <= 0) {
                             //Add
@@ -403,7 +418,6 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                             }
                         }
                         if (!Objects.equals(tmpEngineerId, manHoursObj.getGroupEngineerId())) {
-                            groupEngineer = groupEngineerDao.get(manHoursObj.getGroupEngineerId());
                             manHours.setGroupEngineer(groupEngineer);
                             change = true;
                         }
@@ -412,9 +426,12 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                             manHours.setMh(manHoursObj.getMh());
                             manHoursDao.save(manHours);
                         }
+                        totalMh += manHoursObj.getMh();
+                        totalCost += manHoursObj.getMh() * groupEngineer.getCost();
                     }
                 }//</editor-fold>
 
+                Float sotckTotalCost = 0F;
                 //<editor-fold defaultstate="collapsed" desc="save stock_item">
                 String stockReq = getRequest().getParameter("stock");
                 List<StockItemObj> listStock = null;
@@ -429,6 +446,7 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                         Boolean change = false;
                         for (StockItemObj stockItemObj : listStock) {
                             change = false;
+                            material = materialDao.get(stockItemObj.getMaterialId());
                             if (stockItemObj.getId() <= 0) {
                                 //Add
                                 stockItem = new StockItem();
@@ -445,7 +463,6 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                                 }
                             }
                             if (!Objects.equals(materialId, stockItemObj.getMaterialId())) {
-                                material = materialDao.get(stockItemObj.getMaterialId());
                                 stockItem.setMaterial(material);
                                 change = true;
                             }
@@ -454,9 +471,16 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                                 stockItem.setQuantity(stockItemObj.getQuantity());
                                 stockItemDao.save(stockItem);
                             }
+                            sotckTotalCost += stockItem.getQuantity() * material.getCost();
                         }
                     }
                 }//</editor-fold>
+
+                //Save total
+                workOrder.setMhTotal(totalMh);
+                workOrder.setMhTotalCost(totalCost);
+                workOrder.setStockTotalCost(sotckTotalCost);
+                workOrder = workOrderDao.save(workOrder);
 
                 result.put("success", true);
                 result.put("message", ResourceBundleUtils.getName("saveSuccess"));
@@ -469,7 +493,30 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             log.error("ERROR getSave: ", ex);
             return null;
         }
-    }
+    }//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="getSaveChange">
+    public InputStream getSaveChange() {
+        try {
+            JSONObject result = new JSONObject();
+            String idReq = getRequest().getParameter("id");
+            String statusReq = getRequest().getParameter("status");
+            WorkOrder workOrder = workOrderDao.get(Long.parseLong(idReq));
+            workOrder.setStatus(Integer.parseInt(statusReq));
+            workOrder = workOrderDao.save(workOrder);
+            if (workOrder != null) {
+                result.put("success", true);
+                result.put("message", ResourceBundleUtils.getName("saveSuccess"));
+            } else {
+                result.put("success", false);
+                result.put("message", ResourceBundleUtils.getName("saveFail"));
+            }
+            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+        } catch (Exception ex) {
+            log.error("ERROR getSaveChange: ", ex);
+            return null;
+        }
+    }//</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="getDelete">
     private String[] ids;
@@ -510,15 +557,19 @@ public class WorkOrderAction extends BaseAction implements Preparable {
         }
     }//</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="getDeleteManHour">
     public InputStream getDeleteManHour() {
         try {
             String idReq = getRequest().getParameter("id");
             JSONObject result = new JSONObject();
             if (!StringUtils.isBlank(idReq)) {
                 Long id = Long.parseLong(idReq);
+                ManHours manHours = manHoursDao.get(id);
+                WorkOrder workOrder = manHours.getWorkOrder();
                 if (id > 0) {
                     manHoursDao.remove(id);
                 }
+                calcToTalMh(workOrder);
                 result.put("success", true);
                 result.put("message", ResourceBundleUtils.getName("deleteSuccess"));
             } else {
@@ -530,17 +581,21 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             log.error("ERROR getDeleteManHour: ", ex);
             return null;
         }
-    }
+    }//</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="getDeleteStock">
     public InputStream getDeleteStock() {
         try {
             String idReq = getRequest().getParameter("id");
             JSONObject result = new JSONObject();
             if (!StringUtils.isBlank(idReq)) {
                 Long id = Long.parseLong(idReq);
+                StockItem stockItem = stockItemDao.get(id);
+                WorkOrder workOrder = stockItem.getWorkOrder();
                 if (id > 0) {
                     stockItemDao.remove(id);
                 }
+                calcToTalStock(workOrder);
                 result.put("success", true);
                 result.put("message", ResourceBundleUtils.getName("deleteSuccess"));
             } else {
@@ -552,5 +607,98 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             log.error("ERROR getDeleteStock: ", ex);
             return null;
         }
-    }
+    }//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="getSaveChangeMh">
+    public InputStream getSaveChangeMh() {
+        try {
+            JSONObject result = new JSONObject();
+            String idReq = getRequest().getParameter("id");
+            String mhReq = getRequest().getParameter("mh");
+            ManHours manHours = manHoursDao.get(Long.parseLong(idReq));
+            manHours.setMh(Float.parseFloat(mhReq));
+            manHours = manHoursDao.save(manHours);
+            if (manHours != null) {
+                //Tinh tai total
+                calcToTalMh(manHours.getWorkOrder());
+                result.put("success", true);
+                result.put("message", ResourceBundleUtils.getName("saveSuccess"));
+            } else {
+                result.put("success", false);
+                result.put("message", ResourceBundleUtils.getName("saveFail"));
+            }
+            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+        } catch (Exception ex) {
+            log.error("ERROR getSaveChangeMh: ", ex);
+            return null;
+        }
+    }//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="getSaveChangeStock">
+    public InputStream getSaveChangeStock() {
+        try {
+            JSONObject result = new JSONObject();
+            String idReq = getRequest().getParameter("id");
+            String quantityReq = getRequest().getParameter("quantity");
+            StockItem stockItem = stockItemDao.get(Long.parseLong(idReq));
+            stockItem.setQuantity(Integer.parseInt(quantityReq));
+            stockItem = stockItemDao.save(stockItem);
+            if (stockItem != null) {
+                //Tinh tai total
+                calcToTalStock(stockItem.getWorkOrder());
+                result.put("success", true);
+                result.put("message", ResourceBundleUtils.getName("saveSuccess"));
+            } else {
+                result.put("success", false);
+                result.put("message", ResourceBundleUtils.getName("saveFail"));
+            }
+            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+        } catch (Exception ex) {
+            log.error("ERROR getSaveChangeStock: ", ex);
+            return null;
+        }
+    }//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="calcToTalMh">
+    private void calcToTalMh(WorkOrder workOrder) {
+        Map mapManHours = manHoursDao.getList(workOrder.getId(), null, null);
+        ArrayList<ManHours> listManHrs = new ArrayList<ManHours>();
+        if (mapManHours.get("list") != null) {
+            listManHrs = (ArrayList<ManHours>) mapManHours.get("list");
+        }
+
+        GroupEngineer engineer;
+        Float totalMh = 0F;
+        Float totalCost = 0F;
+        for (ManHours manHours : listManHrs) {
+            totalMh += manHours.getMh();
+            engineer = manHours.getGroupEngineer();
+            if (engineer != null) {
+                totalCost += (manHours.getMh() * engineer.getCost());
+            }
+        }
+        workOrder.setMhTotal(totalMh);
+        workOrder.setMhTotalCost(totalCost);
+        workOrder = workOrderDao.save(workOrder);
+    }//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="calcToTalStock">
+    private void calcToTalStock(WorkOrder workOrder) {
+        Map mapStock = stockItemDao.getList(workOrder.getId(), null, null);
+        ArrayList<StockItem> listStock = new ArrayList<StockItem>();
+        if (mapStock.get("list") != null) {
+            listStock = (ArrayList<StockItem>) mapStock.get("list");
+        }
+
+        Material material;
+        Float totalCost = 0F;
+        for (StockItem stockItem : listStock) {
+            material = stockItem.getMaterial();
+            if (material != null) {
+                totalCost += (stockItem.getQuantity() * material.getCost());
+            }
+        }
+        workOrder.setStockTotalCost(totalCost);
+        workOrder = workOrderDao.save(workOrder);
+    }//</editor-fold>
 }

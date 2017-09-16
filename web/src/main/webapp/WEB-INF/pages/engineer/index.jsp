@@ -2,7 +2,7 @@
 
 <head>
     <title><fmt:message key="work.list"/></title>
-    <meta name="menu" content="AdminMenu"/>
+    <meta name="menu" content="workOrder"/>
 </head>
 
 <script>

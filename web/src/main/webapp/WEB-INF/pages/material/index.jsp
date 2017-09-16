@@ -2,7 +2,7 @@
 
 <head>
     <title><fmt:message key="material.title"/></title>
-    <meta name="menu" content="materialMenu"/>
+    <meta name="menu" content="MaterialMenu"/>
 </head>
 
 <script>
@@ -11,7 +11,6 @@
 
 <jsp:include page="../common/require.jsp" />
 <jsp:include page="../script.jsp" />
-<jsp:include page="../common/treeMaterial.jsp" />
 <jsp:include page="../common/treeItemType.jsp" />
 <jsp:include page="material_function.jsp" />
 <jsp:include page="itemType_function.jsp" />

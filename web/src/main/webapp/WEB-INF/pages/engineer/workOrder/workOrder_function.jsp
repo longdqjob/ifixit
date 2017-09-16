@@ -4,6 +4,8 @@
     //--------------------------------Mechanic----------------------------------
     function addWorkOrder(data) {
         workOrderForm.reset();
+        manHrsTotalCost.reset();
+        manHrsTotalMh.reset();        
         workOrderWindow.setTitle('<fmt:message key="work.add"/>');
         workOrderWindow.show();
         loadInfo(null);
@@ -11,6 +13,8 @@
 
     function editWorkOrder(data) {
         workOrderForm.reset();
+        manHrsTotalCost.setValue(data.get('mhTotalCost'));
+        manHrsTotalMh.setValue(data.get('mhTotal'));
         workOrderWindow.setTitle('<fmt:message key="work.edit"/>');
         workOrderId.setValue(data.get('id'));
         mechanicName.setValue(data.get('machineName'));
@@ -29,6 +33,7 @@
         workOrderTask.setValue(data.get('task')); 
         workOrderReason.setValue(data.get('reason')); 
         workOrderNote.setValue(data.get('note')); 
+        materialTotalCost.setValue(data.get('stockTotalCost')); 
         workOrderWindow.show();
         loadInfo(data.get('id'));
     }
@@ -106,8 +111,7 @@
                 reason: workOrderReason.getValue(),
                 note: workOrderNote.getValue(),
                 manHrs: Ext.encode(getListManHrs()),
-                stock: Ext.encode(getListStock())
-                
+                stock: Ext.encode(getListStock())                
             },
             success: function (response) {
                 unMaskTarget();
@@ -135,6 +139,44 @@
             },
         });
     }
+    
+    function saveChangeWO(id, status, callbackSuccess, callbackFail) {
+        maskTarget(Ext.getCmp("gridId"));
+        Ext.Ajax.request({
+            url: "../workOrder/saveChange",
+            method: "POST",
+            params: {
+                id: id,
+                status: status,
+            },
+            success: function (response) {
+                unMaskTarget();
+                var res = JSON.parse(response.responseText);
+                if ("true" == res.success || true === res.success) {
+                    alertSuccess(res.message);
+                    if (isFunction(callbackSuccess)) {
+                        callbackSuccess();
+                    }
+                } else {
+                    if (res.message || res.message == "true") {
+                        alertError(res.message);
+                    } else {
+                        alertSystemError();
+                    }
+                    if (isFunction(callbackFail)) {
+                        callbackFail();
+                    }
+                }
+            },
+            failure: function (response, opts) {
+                alertSystemError();
+                unMaskTarget();
+                if (isFunction(callbackFail)) {
+                    callbackFail();
+                }
+            },
+        });
+    }
 
     function deleteWorkOrder(params) {
     }
@@ -145,7 +187,6 @@
             data.push(rec.data);
         });
         storeManHrsPaging.proxy.data = data;
-        console.log(data);
         storeManHrsPaging.load();
     }
     

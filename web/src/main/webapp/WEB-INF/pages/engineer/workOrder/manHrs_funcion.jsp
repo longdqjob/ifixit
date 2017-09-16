@@ -74,7 +74,8 @@
             workOrderId: 1,
             engineerId: mhGrpEngineerId.getValue(),
             engineerGrp: mhGrpEngineerName.getValue(),
-            engineerCost: mhfrmTotalCost.getValue(),
+            engineerCost: mhfrmCost.getValue(),
+            totalCost: mhfrmTotalCost.getValue(),
             mh: mhManHrs.getValue(),
         };
     }
@@ -82,8 +83,8 @@
         var totalmhs = 0;
         var totalcost = 0;
         storeManHrs.each(function (rec) {
-            totalmhs += parseInt(rec.get('mh'));
-            totalcost += parseInt(rec.get('engineerCost'));
+            totalmhs += parseFloat(rec.get('mh'));
+            totalcost += ((parseFloat(rec.get('mh'))) * parseFloat(rec.get('engineerCost')));
         });
         manHrsTotalMh.setValue(totalmhs);
         manHrsTotalCost.setValue(totalcost);
@@ -95,14 +96,14 @@
                 var rec = storeManHrs.getAt(index);
                 rec.set("engineerId", parseInt(mhGrpEngineerId.getValue()));
                 rec.set("engineerGrp", mhGrpEngineerName.getValue());
-                rec.set("mh", parseInt(mhManHrs.getValue()));
-                rec.set("engineerCost", parseInt(mhfrmTotalCost.getValue()));
+                rec.set("mh", parseFloat(mhManHrs.getValue()));
+                rec.set("engineerCost", parseFloat(mhfrmCost.getValue()));
+                rec.set("totalCost", parseFloat(mhManHrs.getValue()) * parseFloat(mhfrmCost.getValue()));
                 rec.dirty = true;
             } else {
                 storeManHrs.insert(0, getManHrsFromFrm());
             }
         } else {
-            console.log("-----add---");
             storeManHrs.insert(0, getManHrsFromFrm());
         }
         try {
@@ -110,7 +111,6 @@
         } catch (c) {
             console.log(c);
         }
-        console.log("length: " + storeManHrs.data.length);
         sumMhs();
         manHrsWindow.hide();
     }
@@ -156,5 +156,50 @@
             unMaskTarget();
         }
         sumMhs();
+    }
+    
+    
+    function saveChangeMh(id, mh, callbackSuccess, callbackFail) {
+        maskTarget(Ext.getCmp("gridManHrs"));
+        Ext.Ajax.request({
+            url: "../workOrder/saveChangeMh",
+            method: "POST",
+            params: {
+                id: id,
+                mh: mh,
+            },
+            success: function (response) {
+                unMaskTarget();
+                console.log("---------success:---------");
+                var res = JSON.parse(response.responseText);
+                if ("true" == res.success || true === res.success) {
+                    alertSuccess(res.message);
+                    if (isFunction(callbackSuccess)) {
+                        console.log("---------callbackSuccess---------");
+                        callbackSuccess();
+                        sumMhs();
+                    }
+                } else {
+                    if (res.message || res.message == "true") {
+                        alertError(res.message);
+                    } else {
+                        alertSystemError();
+                    }
+                    if (isFunction(callbackFail)) {
+                        console.log("---------callbackFail---------");
+                        callbackFail();
+                    }
+                }
+            },
+            failure: function (response, opts) {
+                alertSystemError();
+                unMaskTarget();
+                console.log("---------response---------");
+                if (isFunction(callbackFail)) {
+                    console.log("---------callbackFail---------");
+                    callbackFail();
+                }
+            },
+        });
     }
 </script>

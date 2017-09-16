@@ -35,7 +35,7 @@
         multiSelect: true,
         border: true,
         store: storeEngineer,
-        minHeight: 500,
+        minHeight: 400,
         columns: [{
                 xtype: 'treecolumn', //this is so we know which column will show the tree
                 width: 345,

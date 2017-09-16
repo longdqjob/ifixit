@@ -37,8 +37,6 @@
 //-----------------------------------------Grid---------------------------------------------------------------
     var storeGrid = Ext.create('Ext.data.Store', {
         storeId: 'storeGrid',
-//        fields: ['id', 'code', 'name', 'startTime', 'endTime', 'status', 'repeat', 'workTypeId',
-//            'workTypeName', 'machineId', 'machineName', 'grpEngineerId', 'grpEngineerName'],
         pageSize: 20,
         proxy: {
             type: 'ajax',
@@ -50,8 +48,6 @@
             }
         },
     });
-
-
 
     var mygrid = Ext.create('Ext.grid.Panel', {
         title: '<fmt:message key="work.list"/>',
@@ -123,13 +119,36 @@
                             return '<fmt:message key="work.status.approval"/>';
                         case 3 :
                             return '<fmt:message key="work.status.inProgress"/>';
-                        case 3 :
+                        case 4 :
                             return '<fmt:message key="work.status.pendding"/>';
                     }
+                },
+                editor: {
+                    xtype: 'combobox',
+                    queryMode: 'local',
+                    displayField: 'name',
+                    valueField: 'abbr',
+                    store: statusStore,
+                },
+            },
+            {text: '<fmt:message key="work.start"/>', type: 'date', dataIndex: 'startTime', flex: 1,
+                renderer: function (value) {
+                    if (value) {
+                        value = value.replace(".0", "");
+//                        return Ext.Date.format(Ext.Date.parse(value, 'Y-m-d H:i:s'), 'm/d/Y H:i:s');
+                        return Ext.Date.format(Ext.Date.parse(value, 'Y-m-d H:i:s'), 'm/d/Y');
+                    }
+                    return "";
+                }},
+            {text: '<fmt:message key="work.end"/>', dataIndex: 'endTime', flex: 1,
+                renderer: function (value) {
+                    if (value) {
+                        value = value.replace(".0", "");
+                        return Ext.Date.format(Ext.Date.parse(value, 'Y-m-d H:i:s'), 'm/d/Y');
+                    }
+                    return "";
                 }
             },
-            {text: '<fmt:message key="work.start"/>', dataIndex: 'startTime', flex: 1, },
-            {text: '<fmt:message key="work.end"/>', dataIndex: 'endTime', flex: 1, },
             {text: '<fmt:message key="work.workType"/>', dataIndex: 'workTypeName', flex: 1, },
         ],
         viewConfig: {
@@ -196,6 +215,25 @@
         listeners: {
             afterrender: function (usergrid, eOpts) {
                 //console.log(usergrid);
+            },
+            validateedit: function (editor, context, eOpts) {
+                var record = context.record;
+                if (record.get("status") == context.value) {
+                    return true;
+                }
+                saveChangeWO(record.get("id"), context.value,
+                        function () {
+                            context.cancel = false;
+                            context.record.dirty = true;
+                            storeGrid.sync();
+                            return true;
+                        }, function () {
+                    context.cancel = true;
+                    return false;
+                });
+            },
+            edit: function (editor, e) {
+                var record = e.record;
             }
         }
     });

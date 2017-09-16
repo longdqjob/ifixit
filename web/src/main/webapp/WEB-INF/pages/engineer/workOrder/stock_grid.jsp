@@ -9,7 +9,7 @@
 //-----------------------------------------Grid---------------------------------------------------------------
     var storeStock = Ext.create('Ext.data.Store', {
         storeId: 'storeStock',
-        fields: ['id', 'workOrderId', 'quantity', 'materialId', 'materialCode', 'materialName', 'materialDesc', 'materialUnit', 'materialCost'],
+        fields: ['id', 'workOrderId', 'quantity', 'materialId', 'materialCode', 'materialName', 'materialDesc', 'materialUnit', 'materialCost','materialTotalCost'],
         pageSize: 20,
     });
 
@@ -82,9 +82,20 @@
             {text: '<fmt:message key="work.material.code"/>', dataIndex: 'materialCode', flex: 1, },
             {text: '<fmt:message key="work.material.name"/>', dataIndex: 'materialName', flex: 1, },
             {text: '<fmt:message key="work.material.description"/>', dataIndex: 'materialDesc', flex: 1, },
-            {text: '<fmt:message key="work.material.qty"/>', dataIndex: 'quantity', flex: 1, },
+            {text: '<fmt:message key="work.material.qty"/>', dataIndex: 'quantity', flex: 1,
+                editor: {
+                    completeOnEnter: true,
+                    field: {
+                        xtype: 'numberfield',
+                        allowBlank: false,
+                        allowDecimals: false,
+                        allowNegative: false,
+                    }
+                }
+            },
             {text: '<fmt:message key="work.material.unit"/>', dataIndex: 'materialUnit', flex: 1, },
             {text: '<fmt:message key="work.material.cost"/>', dataIndex: 'materialCost', flex: 1, },
+            {text: '<fmt:message key="work.material.totalCost"/>', dataIndex: 'materialTotalCost', flex: 1, },
         ],
         viewConfig: {
             autoFit: true,
@@ -120,6 +131,28 @@
         listeners: {
             afterrender: function (usergrid, eOpts) {
                 //console.log(usergrid);
+            },
+            validateedit: function (editor, context, eOpts) {
+                var record = context.record;
+                if (record.get("quantity") == context.value) {
+                    return true;
+                }
+                saveChangeStock(record.get("id"), context.value,
+                        function () {
+                            context.record.data["materialTotalCost"] = (context.record.get("materialCost") * context.value);
+                            context.cancel = false;
+                            context.record.dirty = true;
+                            storeStock.sync();
+                            sumStockCost();
+                            loadWorkOrder();
+                            return true;
+                        }, function () {
+                    context.cancel = true;
+                    return false;
+                });
+            },
+            edit: function (editor, e) {
+                var record = e.record;
             }
         }
     });

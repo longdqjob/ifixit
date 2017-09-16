@@ -45,7 +45,7 @@ public class StockItem extends BaseObject implements Serializable {
         this.workOrder = workOrder;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "material_id")
     public Material getMaterial() {
         return material;

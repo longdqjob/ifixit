@@ -212,6 +212,7 @@
     
     <package name="company" extends="default" namespace="/company">
         <action name="getTreeCompany" class="companyAction">
+            <interceptor-ref name="adminOnly"/>
             <result type="stream">
                 <param name="inputName">treeCompany</param>
             </result>
@@ -241,6 +242,7 @@
     <!--grpEngineer-->
     <package name="grpEngineer" extends="default" namespace="/grpEngineer">
         <action name="getTree" class="grpEngineerAction">
+            <interceptor-ref name="adminOnly"/>
             <result type="stream">
                 <param name="inputName">tree</param>
             </result>
@@ -355,6 +357,11 @@
                 <param name="inputName">loadData</param>
             </result>
         </action>
+        <action name="saveChange" class="materialAction">
+            <result type="stream">
+                <param name="inputName">saveChange</param>
+            </result>
+        </action>
         <action name="save" class="materialAction">
             <result type="stream">
                 <param name="inputName">save</param>
@@ -386,9 +393,25 @@
                 <param name="inputName">save</param>
             </result>
         </action>
+        <action name="saveChange" class="workOrderAction">
+            <result type="stream">
+                <param name="inputName">saveChange</param>
+            </result>
+        </action>
         <action name="delete" class="workOrderAction">
             <result type="stream">
                 <param name="inputName">delete</param>
+            </result>
+        </action>
+        
+        <action name="saveChangeMh" class="workOrderAction">
+            <result type="stream">
+                <param name="inputName">saveChangeMh</param>
+            </result>
+        </action>
+        <action name="saveChangeStock" class="workOrderAction">
+            <result type="stream">
+                <param name="inputName">saveChangeStock</param>
             </result>
         </action>
         

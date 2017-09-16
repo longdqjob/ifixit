@@ -99,11 +99,11 @@ CREATE TABLE `item_type` (
   `parent_id` int(5) DEFAULT NULL,
   `complete_code` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 
 /*Data for the table `item_type` */
 
-insert  into `item_type`(`id`,`code`,`name`,`specification`,`parent_id`,`complete_code`) values (1,'AA','AA NAME','{\"01\":\"dfgsdf\",\"02\":\"gfnh\",\"06\":\"6ujj\"}',NULL,'AA');
+insert  into `item_type`(`id`,`code`,`name`,`specification`,`parent_id`,`complete_code`) values (1,'AA','AA NAME','{\"01\":\"dfgsdf\",\"02\":\"gfnh\",\"06\":\"6ujj\"}',NULL,'AA'),(2,'001','name 01','{\"01\":\"tr\\u1ecdng l\\u01b0\\u1ee3ng\",\"02\":\"k\\u00edch th\\u01b0\\u1edbc\",\"03\":\"\\u0111\\u1ed9 cao\"}',1,'AA.001');
 
 /*Table structure for table `machine` */
 
@@ -171,7 +171,7 @@ CREATE TABLE `man_hours` (
 
 /*Data for the table `man_hours` */
 
-insert  into `man_hours`(`id`,`mh`,`group_engineer_id`,`work_order_id`) values (1,3,2,1),(2,3,6,1),(3,2,2,1),(4,123,2,1);
+insert  into `man_hours`(`id`,`mh`,`group_engineer_id`,`work_order_id`) values (1,1,2,1),(2,1,6,1),(3,1,2,1),(4,2,2,1);
 
 /*Table structure for table `material` */
 
@@ -191,11 +191,11 @@ CREATE TABLE `material` (
   PRIMARY KEY (`id`),
   KEY `FK_rveuv7odl1m50fbvdvkxxqqin` (`parent_id`),
   CONSTRAINT `FK_rveuv7odl1m50fbvdvkxxqqin` FOREIGN KEY (`parent_id`) REFERENCES `material` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 
 /*Data for the table `material` */
 
-insert  into `material`(`id`,`code`,`complete_code`,`cost`,`description`,`name`,`unit`,`parent_id`,`item_type_id`,`specification`) values (1,'DT','DT',32,'Dien thoai','Dient hoai','Cai',NULL,1,NULL),(2,'NAP','DT.NAP',12,'Nap dt','Nap','Cai',1,1,NULL),(4,'00122','DT.00122',23,NULL,'Vo 01','kg',1,1,'{\"01\":{\"label\":\"dfgsdf\",\"value\":\"aaa\"},\"02\":{\"label\":\"gfnh\",\"value\":\"bbb\"},\"06\":{\"label\":\"6ujj\",\"value\":\"cccc\"}}');
+insert  into `material`(`id`,`code`,`complete_code`,`cost`,`description`,`name`,`unit`,`parent_id`,`item_type_id`,`specification`) values (1,'DT','DT',32,'Dien thoai','Dient hoai','Cai',NULL,1,NULL),(2,'NAP','DT.NAP',12,'Nap dt','Nap','Cai',1,1,NULL),(4,'0012','AA.0012',23,NULL,'Vo 01','m2',1,1,'{\"01\":{\"label\":\"dfgsdf\",\"value\":\"aaa\"},\"02\":{\"label\":\"gfnh\",\"value\":\"bbb\"},\"06\":{\"label\":\"6ujj\",\"value\":\"cccc\"}}'),(5,'DEN','DT.NAP.DEN',2,NULL,'mau den','un',2,1,'{\"01\":{\"label\":\"dfgsdf\",\"value\":\"111\"},\"02\":{\"label\":\"gfnh\",\"value\":\"222\"},\"06\":{\"label\":\"6ujj\",\"value\":\"666\"}}');
 
 /*Table structure for table `role` */
 
@@ -230,7 +230,7 @@ CREATE TABLE `stock_item` (
 
 /*Data for the table `stock_item` */
 
-insert  into `stock_item`(`id`,`quantity`,`material_id`,`work_order_id`) values (1,2,2,1);
+insert  into `stock_item`(`id`,`quantity`,`material_id`,`work_order_id`) values (1,10,2,1);
 
 /*Table structure for table `supplier` */
 
@@ -276,17 +276,20 @@ CREATE TABLE `work_order` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `code` varchar(255) DEFAULT NULL,
   `end_time` datetime DEFAULT NULL,
-  `i_interval` int(11) DEFAULT NULL,
-  `is_repeat` int(11) DEFAULT NULL,
-  `name` varchar(255) DEFAULT NULL,
-  `note` varchar(255) DEFAULT NULL,
-  `reason` varchar(255) DEFAULT NULL,
+  `i_interval` int(5) DEFAULT NULL,
+  `is_repeat` int(1) DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `note` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `reason` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `start_time` datetime DEFAULT NULL,
-  `status` int(11) DEFAULT NULL,
-  `task` varchar(255) DEFAULT NULL,
+  `status` int(1) DEFAULT NULL,
+  `task` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `group_engineer_id` int(11) DEFAULT NULL,
   `machine_id` bigint(20) DEFAULT NULL,
   `work_type_id` int(11) DEFAULT NULL,
+  `mh_total` float DEFAULT NULL,
+  `mh_total_cost` float DEFAULT NULL,
+  `stock_total_cost` float DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_2y2rdnljsreriuijm6tc6ynjm` (`group_engineer_id`),
   KEY `FK_e0lp16k0jddk506tbhjb47hpx` (`machine_id`),
@@ -298,7 +301,7 @@ CREATE TABLE `work_order` (
 
 /*Data for the table `work_order` */
 
-insert  into `work_order`(`id`,`code`,`end_time`,`i_interval`,`is_repeat`,`name`,`note`,`reason`,`start_time`,`status`,`task`,`group_engineer_id`,`machine_id`,`work_type_id`) values (1,'AA','2017-09-15 00:00:00',45,1,'test','','','2017-09-13 00:00:00',1,'task 1\ntask 2',1,1,1);
+insert  into `work_order`(`id`,`code`,`end_time`,`i_interval`,`is_repeat`,`name`,`note`,`reason`,`start_time`,`status`,`task`,`group_engineer_id`,`machine_id`,`work_type_id`,`mh_total`,`mh_total_cost`,`stock_total_cost`) values (1,'AA','2017-09-15 00:00:00',45,1,'test','note ne','due datge','2017-09-13 00:00:00',4,'task 1\ntask 2',1,1,1,5,140,120);
 
 /*Table structure for table `work_type` */
 

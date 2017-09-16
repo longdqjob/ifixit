@@ -113,8 +113,26 @@
             {text: '<fmt:message key="material.code"/>', dataIndex: 'code', flex: 1, },
             {text: '<fmt:message key="material.completeCode"/>', dataIndex: 'completeCode', flex: 1, },
             {text: '<fmt:message key="material.name"/>', dataIndex: 'name', flex: 1, },
-            {text: '<fmt:message key="material.unit"/>', dataIndex: 'unit', flex: 1},
-            {text: '<fmt:message key="material.unitCost"/>', dataIndex: 'cost', flex: 1},
+            {text: '<fmt:message key="material.unit"/>', dataIndex: 'unit', flex: 1,
+                editor: {
+                    xtype: 'combobox',
+                    queryMode: 'local',
+                    displayField: 'name',
+                    valueField: 'abbr',
+                    store: unitStore,
+                },
+            },
+            {text: '<fmt:message key="material.unitCost"/>', dataIndex: 'cost', flex: 1,
+                editor: {
+                    completeOnEnter: true,
+                    field: {
+                        xtype: 'numberfield',
+                        allowBlank: false,
+                        allowDecimals: true,
+                        allowNegative: false,
+                    }
+                }
+            },
         ],
         viewConfig: {
             autoFit: true,
@@ -179,6 +197,25 @@
         listeners: {
             afterrender: function (usergrid, eOpts) {
                 //console.log(usergrid);
+            },
+            validateedit: function (editor, context, eOpts) {
+                var record = context.record;
+                var unit = record.get("unit");
+                var cost = record.get("cost");
+                if (context.field == "unit") {
+                    unit = context.value;
+                } else if (context.field == "cost") {
+                    cost = context.value;
+                }
+
+                saveChangeMaterial(record.get("id"), unit, cost, function () {
+                    context.cancel = true;
+//                    context.record.data[context.field] = context.value;
+                    return false;
+                });
+            },
+            edit: function (editor, e) {
+                var record = e.record;
             }
         }
     });
