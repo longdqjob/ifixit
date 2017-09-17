@@ -4,15 +4,23 @@ import com.cmms.dao.ItemTypeDao;
 import com.cmms.dao.MaterialDao;
 import com.cmms.model.ItemType;
 import com.cmms.model.Material;
+import com.cmms.webapp.util.ImageUtil;
 import com.cmms.webapp.util.ResourceBundleUtils;
 import com.cmms.webapp.util.WebUtil;
 import com.opensymphony.xwork2.Preparable;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang.StringUtils;
+import org.apache.struts2.ServletActionContext;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -25,6 +33,24 @@ public class MaterialAction extends BaseAction implements Preparable {
     //<editor-fold defaultstate="collapsed" desc="comment">
     private MaterialDao materialDao;
     private ItemTypeDao itemTypeDao;
+    private File file;
+    private String fileFileName;
+
+    public File getFile() {
+        return file;
+    }
+
+    public void setFile(File file) {
+        this.file = file;
+    }
+
+    public String getFileFileName() {
+        return fileFileName;
+    }
+
+    public void setFileFileName(String fileFileName) {
+        this.fileFileName = fileFileName;
+    }
 
     public ItemTypeDao getItemTypeDao() {
         return itemTypeDao;
@@ -122,6 +148,8 @@ public class MaterialAction extends BaseAction implements Preparable {
             String parent = getRequest().getParameter("parent");
             String itemTypeId = getRequest().getParameter("itemTypeId");
             String quantity = getRequest().getParameter("quantity");
+            String imgUrl = getRequest().getParameter("imgUrl");
+            String imgPath = getRequest().getParameter("imgPath");
 
             if (StringUtils.isBlank(code)) {
                 result.put("success", false);
@@ -129,11 +157,13 @@ public class MaterialAction extends BaseAction implements Preparable {
                 return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
             }
 
+            String lastPath = "";
             Boolean checkUnique = true;
             Material material = new Material();
             if (!StringUtils.isBlank(idReq)) {
                 id = Long.parseLong(idReq);
                 material = materialDao.get(id);
+                lastPath = material.getImgPath();
                 if (completeCode.equals(material.getCompleteCode())) {
                     checkUnique = false;
                 }
@@ -169,8 +199,13 @@ public class MaterialAction extends BaseAction implements Preparable {
             material.setCost(Float.valueOf(cost));
             material.setSpecification(specification);
             material.setQuantity(Integer.parseInt(quantity));
+            material.setImgPath(imgPath);
+            material.setImgUrl(imgUrl);
             material = materialDao.save(material);
             if (material != null) {
+                if (!StringUtils.isBlank(lastPath) && !lastPath.equals(material.getImgPath())) {
+                    WebUtil.deleteFile(lastPath);
+                }
                 result.put("success", true);
                 result.put("message", ResourceBundleUtils.getName("saveSuccess"));
             } else {
@@ -240,7 +275,9 @@ public class MaterialAction extends BaseAction implements Preparable {
                         result.put("message", ResourceBundleUtils.getName("deleteUsing"));
                         return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
                     }
+                    String path = materialDao.get(Long.parseLong(ids[0])).getImgPath();
                     materialDao.remove(Long.parseLong(ids[0]));
+                    WebUtil.deleteFile(path);
                 } else {
                     for (String idTmp : ids) {
                         list.add(Long.parseLong(idTmp));
@@ -250,12 +287,21 @@ public class MaterialAction extends BaseAction implements Preparable {
                         result.put("message", ResourceBundleUtils.getName("deleteUsing"));
                         return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
                     }
+                    String[] lstPath = new String[ids.length];
+                    int i = 0;
+                    for (String idTmp : ids) {
+                        lstPath[i++] = materialDao.get(Long.parseLong(idTmp)).getImgPath();
+                    }
+
                     int delete = materialDao.delete(list);
                     if (delete != ids.length) {
                         log.warn("deleteCompany rtn: " + delete + " list: " + ids.length);
                         result.put("success", false);
                         result.put("message", ResourceBundleUtils.getName("deleteFail"));
                         return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                    }
+                    for (String path : lstPath) {
+                        WebUtil.deleteFile(path);
                     }
                 }
                 result.put("success", true);
@@ -269,5 +315,72 @@ public class MaterialAction extends BaseAction implements Preparable {
             log.error("ERROR getDelete: ", ex);
             return null;
         }
+    }//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="getSaveImg">
+    public InputStream getSaveImg() {
+        try {
+            JSONObject result = new JSONObject();
+            String rtn = saveFile();
+            if (rtn != null) {
+                String uploadDir = ServletActionContext.getServletContext().getRealPath("/");
+                uploadDir += File.separator + PATH_UPLOAD + File.separator + PATH_MATERIAL + File.separator;
+                result.put("success", true);
+                result.put("url", "../" + PATH_UPLOAD + "/" + PATH_MATERIAL + "/" + rtn);
+                result.put("path", uploadDir + fileFileName);
+                result.put("message", ResourceBundleUtils.getName("uploadSuccessMsg"));
+            } else {
+                result.put("success", false);
+                result.put("message", ResourceBundleUtils.getName("uploadFailMsg"));
+            }
+            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+        } catch (Exception ex) {
+            log.error("ERROR getSaveImg: ", ex);
+            return null;
+        }
+    }//</editor-fold>
+
+    public static final String PATH_UPLOAD = "upload";
+    public static final String PATH_MATERIAL = "material";
+
+    //<editor-fold defaultstate="collapsed" desc="saveFile">
+    private String saveFile() {
+        InputStream stream = null;
+        String rtn = null;
+        try {
+            String fileName = WebUtil.removeAscii(fileFileName);
+            fileName = fileName.replaceAll("\\s+","_");
+            String uploadDir = ServletActionContext.getServletContext().getRealPath("/");
+            uploadDir += File.separator + PATH_UPLOAD + File.separator + PATH_MATERIAL + File.separator;
+
+            stream = new FileInputStream(this.file);
+            String fullPath = uploadDir + "tmp_" + fileName;
+            fullPath = fullPath.replace("\\", File.separator);
+            // write the file to the file specified
+            log.info("-------fullPath: " + fullPath);
+            try (OutputStream bos = new FileOutputStream(fullPath)) {
+                int bytesRead;
+                byte[] buffer = new byte[8192];
+                while ((bytesRead = stream.read(buffer, 0, 8192)) != -1) {
+                    bos.write(buffer, 0, bytesRead);
+                }
+                bos.flush();
+            }
+            ImageUtil.resize(fullPath, uploadDir + fileName);
+            rtn = fileName;
+        } catch (FileNotFoundException ex) {
+            log.error("ERROR FileNotFoundException: ", ex);
+        } catch (Exception ex) {
+            log.error("ERROR Exception: ", ex);
+        } finally {
+            try {
+                if (stream != null) {
+                    stream.close();
+                }
+            } catch (IOException ex) {
+                log.error("ERROR IOException: ", ex);
+            }
+        }
+        return rtn;
     }//</editor-fold>
 }

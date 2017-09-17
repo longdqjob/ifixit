@@ -29,6 +29,8 @@ public class Material extends BaseObject implements Serializable {
     private String specification;
     private Integer quantity;
     private Float cost;
+    private String imgUrl;
+    private String imgPath;
     private Material parent;
     private ItemType itemType;
 
@@ -112,6 +114,24 @@ public class Material extends BaseObject implements Serializable {
 
     public void setSpecification(String specification) {
         this.specification = specification;
+    }
+
+    @Column(name = "img_url")
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
+    @Column(name = "img_path")
+    public String getImgPath() {
+        return imgPath;
+    }
+
+    public void setImgPath(String imgPath) {
+        this.imgPath = imgPath;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)

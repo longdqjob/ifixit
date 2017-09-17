@@ -27,6 +27,8 @@ public class Machine extends BaseObject implements Serializable {
     private String description;
     private String specification;
     private String note;
+    private String imgUrl;
+    private String imgPath;
     private Machine parent;
     private Integer itemTypeId;
     private Company company;
@@ -94,6 +96,24 @@ public class Machine extends BaseObject implements Serializable {
 
     public void setCompleteCode(String completeCode) {
         this.completeCode = completeCode;
+    }
+
+    @Column(name = "img_url")
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
+    @Column(name = "img_path")
+    public String getImgPath() {
+        return imgPath;
+    }
+
+    public void setImgPath(String imgPath) {
+        this.imgPath = imgPath;
     }
 
     @Transient

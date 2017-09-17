@@ -727,4 +727,22 @@ public class WorkOrderAction extends BaseAction implements Preparable {
         workOrder.setStockTotalCost(totalCost);
         workOrder = workOrderDao.save(workOrder);
     }//</editor-fold>
+
+    private void calcQtyMaterial(WorkOrder workOrder) {
+        if (WorkOrder.STATUS_COMPLETE == workOrder.getStatus()) {
+            Map mapStock = stockItemDao.getList(workOrder.getId(), null, null);
+            ArrayList<StockItem> listStock = new ArrayList<StockItem>();
+            if (mapStock.get("list") != null) {
+                listStock = (ArrayList<StockItem>) mapStock.get("list");
+            }
+            Material material;
+            for (StockItem stockItem : listStock) {
+                material = stockItem.getMaterial();
+                if (stockItem.getQuantity() != null && stockItem.getQuantity() > 0) {
+                    material.setQuantity(material.getQuantity() - stockItem.getQuantity());
+                }
+                material = materialDao.save(material);
+            }
+        }
+    }
 }

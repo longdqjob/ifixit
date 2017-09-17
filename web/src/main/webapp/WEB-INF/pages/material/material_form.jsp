@@ -89,7 +89,7 @@
         labelAlign: 'left',
         anchor: '100%',
         allowBlank: false,
-        margin: '10 10 10 10',
+        margin: '20 10 10 10',
         width: 250,
         maxLength: 50,
         readOnly: true,
@@ -159,12 +159,77 @@
     });
 
 
+    var materialImage = {
+        xtype: 'filefield',
+        id: "materialImage",
+        name: 'file',
+        fieldLabel: '<fmt:message key="material.img"/>',
+        allowBlank: true,
+        margin: '10 10 10 10',
+        anchor: '99%',
+        buttonText: '<fmt:message key="browse"/>',
+        listeners: {
+            change: function (fld, value) {
+                var newValue = value.replace(/C:\\fakepath\\/g, '');
+                fld.setRawValue(newValue);
+                uploadImg();
+            }
+        }
+    };
+
+    var materialImgUrl = Ext.create('Ext.form.field.Text', {
+        xtype: 'textfield',
+        hidden: true,
+    });
+
+    var materialImgPath = Ext.create('Ext.form.field.Text', {
+        xtype: 'textfield',
+        hidden: true,
+    });
+
+    var materialImgPreview = new Ext.Component({
+        margin: '10 10 10 10',
+        autoEl: {
+            tag: 'img', src: '../images/no-preview-available.png', id: 'materialImgPreview'
+        }
+    });
+
+    var imgForm = Ext.create('Ext.form.Panel', {
+        xtype: 'form',
+        layout: 'anchor',
+        bodyStyle: 'background-color: transparent;',
+        items: [materialImgUrl, materialImgPath, materialImage]
+    });
+
     //--------------------------------------------------------------------------
     var tabSpec = Ext.create('Ext.tab.Panel', {
         tabBarPosition: 'top',
         autoHeight: true,
         activeTab: 0,
         items: [{
+                title: '<fmt:message key="material.info"/>',
+                tabIndex: 13,
+                items: [{
+                        xtype: 'container',
+                        anchor: '100%',
+                        columnWidth: 1,
+                        layout: 'column',
+                        height: '100%',
+                        items: [{
+                                xtype: 'container',
+                                columnWidth: 0.5,
+                                layout: 'anchor',
+                                items: [imgForm, materialCost, materialQty, materialUnit]
+                            }, {
+                                xtype: 'container',
+                                columnWidth: 0.5,
+                                layout: 'anchor',
+                                items: [materialImgPreview]
+                            },
+                        ]
+                    }
+                ],
+            }, {
                 title: '<fmt:message key="material.specification"/>',
                 tabIndex: 13,
                 items: [{
@@ -246,12 +311,12 @@
                         xtype: 'container',
                         columnWidth: 0.5,
                         layout: 'anchor',
-                        items: [materialId, materialFather, materialCode, materialName, materialCost]
+                        items: [materialId, materialFather, materialCode, materialName, ]
                     }, {
                         xtype: 'container',
                         columnWidth: 0.5,
                         layout: 'anchor',
-                        items: [materialFatherCode, materialCompleteCode, materialUnit, materialQty]
+                        items: [materialFatherCode, materialCompleteCode]
                     },
                     {
                         xtype: 'container',
@@ -269,6 +334,7 @@
         closeAction: 'hide',
         autoEl: 'form',
         width: '60%',
+        autoScroll: true,
         constrainHeader: true,
         layout: 'anchor',
         modal: true,

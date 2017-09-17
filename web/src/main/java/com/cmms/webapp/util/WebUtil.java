@@ -15,12 +15,15 @@
  */
 package com.cmms.webapp.util;
 
+import java.io.File;
 import java.lang.reflect.Method;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -92,5 +95,25 @@ public class WebUtil {
             }
         }
         return result;
+    }
+
+    public static boolean deleteFile(String path) {
+        if (!StringUtils.isBlank(path)) {
+            try {
+                File originalFile = new File(path);
+                return originalFile.delete();
+            } catch (Exception ex) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static String removeAscii(String input) {
+        if (StringUtils.isBlank(input)) {
+            return input;
+        }
+        input = Normalizer.normalize(input, Normalizer.Form.NFD);
+        return input.replaceAll("[^\\x00-\\x7F]", "");
     }
 }

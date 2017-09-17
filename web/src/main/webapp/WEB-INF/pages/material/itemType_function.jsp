@@ -4,6 +4,12 @@
     var selectedItem = null;
 
     function updateLayOut() {
+        if (itemTypeWindow.isVisible()) {
+            itemTypeWindow.updateLayout();
+        }
+        if (materialWindow.isVisible()) {
+            materialWindow.updateLayout();
+        }
         Ext.getCmp("searchform").updateLayout();
         Ext.getCmp('gridId').setWidth(Ext.getCmp("searchform").getWidth());
         Ext.getCmp('gridId').setHeight(Ext.getCmp("viewport").getHeight() - Ext.getCmp("searchform").getHeight() - 110);

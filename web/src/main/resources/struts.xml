@@ -182,6 +182,7 @@
         <!-- workOrder -->
         <action name="workOrder" class="workOrderAction" method="index">
             <interceptor-ref name="adminCheck"/>
+            <interceptor-ref name="adminOnly"/>
             <result name="success">/WEB-INF/pages/engineer/index.jsp</result>
         </action>
         
@@ -370,6 +371,11 @@
         <action name="delete" class="materialAction">
             <result type="stream">
                 <param name="inputName">delete</param>
+            </result>
+        </action>
+        <action name="saveImg" class="materialAction">
+            <result type="stream">
+                <param name="inputName">saveImg</param>
             </result>
         </action>
     </package>

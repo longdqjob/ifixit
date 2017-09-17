@@ -7,17 +7,35 @@
         materialWindow.setTitle('<fmt:message key="material.add"/>');
         materialWindow.setIconCls("add-cls");
         enableCode();
+        resetImgPreView();
         materialWindow.show();
         materialCode.focus();
+    }
+    
+    function resetImgPreView(){
+        materialImgUrl.reset();
+        try {
+            materialImgPreview.el.dom.src = "../images/no-preview-available.png";
+        } catch (c) {
+            console.error(c);
+        }
+    }
+    function setImgPreView(url){
+        materialImgUrl.setValue(url);
+        try {
+            materialImgPreview.el.dom.src = url;
+        } catch (c) {
+            console.error(c);
+        }
     }
 
     function editMaterial(data) {
         materialResetSpec();
         var itemTypeObj = null;
-        
+
         materialForm.reset();
         materialId.setValue(data.get("id"));
-        
+
         if (data.get("itemType")) {
             itemTypeObj = Ext.decode(data.get("itemType"));
             console.log(itemTypeObj);
@@ -32,6 +50,14 @@
         materialCost.setValue(data.get("cost"));
         materialUnit.setValue(data.get("unit"));
         materialQty.setValue(data.get("quantity"));
+
+        if (data.get("imgUrl") && data.get("imgUrl") != "") {
+            setImgPreView(data.get("imgUrl"));
+        } else {
+            resetImgPreView();
+        }
+
+
         disableCode();
         materialFillSpecValue(data.get("specification"));
         materialWindow.setTitle('<fmt:message key="material.edit"/>');
@@ -106,6 +132,29 @@
         return rtn;
     }
 
+    function uploadImg() {
+        maskTarget(materialWindow);
+        imgForm.getForm().submit({
+            url: '../material/saveImg',
+            waitMsg: '<fmt:message key="uploadingMsg"/>',
+            handleResponse: function (response) {
+                var res = JSON.parse(response.responseXML.body.textContent);
+                console.log(res);
+                return res;
+            },
+            success: function (fp, o) {
+                unMaskTarget();
+                alertSuccess('Success: ' + o.result && o.result.message || '<fmt:message key="uploadSuccessMsg"/>');
+                setImgPreView(o.result.url);
+                materialImgPath.setValue(o.result.path);
+            },
+            failure: function (form, o) {
+                unMaskTarget();
+                alertError('Error: ' + o.result && o.result.message || '<fmt:message key="uploadFailMsg"/>');
+            }
+        });
+    }
+
     function saveFormMaterial() {
         var valid = materialForm.query("field{isValid()==false}");
         if (!valid || valid.length > 0) {
@@ -125,6 +174,8 @@
                 cost: materialCost.getValue(),
                 unit: materialUnit.getValue(),
                 quantity: materialQty.getValue(),
+                imgUrl: materialImgUrl.getValue(),
+                imgPath: materialImgPath.getValue(),
                 specification: Ext.encode(materialCreateSpec())
             },
             success: function (response) {
@@ -152,7 +203,7 @@
         });
     }
 
-    function saveChangeMaterial(id,quantity, unit, cost, callbackSuccess,callbackFail) {
+    function saveChangeMaterial(id, quantity, unit, cost, callbackSuccess, callbackFail) {
         maskTarget(Ext.getCmp("gridId"));
         Ext.Ajax.request({
             url: "../material/saveChange",
