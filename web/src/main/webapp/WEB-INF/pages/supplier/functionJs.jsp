@@ -52,6 +52,7 @@
                 }
             },
             failure: function (response, opts) {
+                redirectIfNotAuthen(response);
                 showMask.hide();
                 alertSystemError();
             }
@@ -95,6 +96,7 @@
                 }
             },
             failure: function (response, opts) {
+                redirectIfNotAuthen(response);
                 alertSystemError();
                 unmask();
             },
@@ -108,6 +110,10 @@
             contact: searchContact.getValue(),
             phone: searchPhone.getValue(),
         };
-        mygrid.getStore().loadPage(1);
+        mygrid.getStore().loadPage(1, {
+            callback: function (records, operation, success) {
+                storeRedirectIfNotAuthen(operation);
+            }
+        });
     }
 </script>

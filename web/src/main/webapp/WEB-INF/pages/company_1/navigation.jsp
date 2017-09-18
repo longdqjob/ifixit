@@ -143,6 +143,10 @@
         mygrid.getStore().getProxy().extraParams = {
             id: id,
         };
-        mygrid.getStore().loadPage(1);
+        mygrid.getStore().loadPage(1, {
+            callback: function (records, operation, success) {
+                storeRedirectIfNotAuthen(operation);
+            }
+        });
     }
 </script>

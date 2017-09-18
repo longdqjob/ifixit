@@ -5,7 +5,11 @@
             code: searchMaterialCode.getValue(),
             name: searchMaterialName.getValue(),
         };
-        gridMaterial.getStore().loadPage(1);
+        gridMaterial.getStore().loadPage(1, {
+            callback: function (records, operation, success) {
+                storeRedirectIfNotAuthen(operation);
+            }
+        });
     }
 
     var searchMaterialCode = Ext.create('Ext.form.field.Text', {

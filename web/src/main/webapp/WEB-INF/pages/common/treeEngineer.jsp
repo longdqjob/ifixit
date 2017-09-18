@@ -1,13 +1,14 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <script>
     var grpEngineerId = ${grpEngineerId};
+    var grpEngineerNameSs = '${grpEngineerName}';
     var storeTreeEngineer = Ext.create('Ext.data.TreeStore', {
         proxy: {
             type: 'ajax',
             url: '../grpEngineer/getTree'
         },
         root: {
-            text: '<fmt:message key="grpEngineer"/>',
+            name: grpEngineerNameSs,
             id: grpEngineerId,
             expanded: true
         },
@@ -76,7 +77,8 @@
                 maskTarget(Ext.getCmp('grpEngineerTreeWindow'));
                 Ext.getCmp('treeGrpEngineer').getStore().getRootNode().removeAll();
                 Ext.getCmp('treeGrpEngineer').getStore().load();
-                Ext.getCmp('treeGrpEngineer').getStore().on('load', function (store, records, options) {
+                Ext.getCmp('treeGrpEngineer').getStore().on('load', function (store, records, operation, options) {
+                    treeRedirectIfNotAuthen(options);
                     unMaskTarget();
                 });
             }

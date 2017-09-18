@@ -2,6 +2,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
        default-lazy-init="true">
+    
+    <bean id="customLoginUrlAuthenticationEntryPoint" class="com.cmms.webapp.security.CustomLoginUrlAuthenticationEntryPoint">
+        <constructor-arg name="loginFormUrl" value="/login"/>
+    </bean>
 
     <bean id="adminInterceptor" class="com.cmms.webapp.interceptor.UserRoleAuthorizationInterceptor">
         <property name="authorizedRoles" value="ROLE_ADMIN"/>
@@ -15,6 +19,8 @@
         <property name="mailEngine" ref="mailEngine"/>
         <property name="mailMessage" ref="mailMessage"/>
         <property name="templateName" value="accountCreated.vm"/>
+        <property name="companyDao" ref="companyDao"/>
+        <property name="groupEngineerDao" ref="groupEngineerDao"/>
     </bean>
 
     <bean id="userAction" class="com.cmms.webapp.action.UserAction" scope="prototype">
@@ -23,12 +29,16 @@
         <property name="mailEngine" ref="mailEngine"/>
         <property name="mailMessage" ref="mailMessage"/>
         <property name="templateName" value="accountCreated.vm"/>
+        <property name="companyDao" ref="companyDao"/>
+        <property name="groupEngineerDao" ref="groupEngineerDao"/>
     </bean>
 
     <bean id="passwordHintAction" class="com.cmms.webapp.action.PasswordHintAction" scope="prototype">
         <property name="userManager" ref="userManager"/>
         <property name="mailEngine" ref="mailEngine"/>
         <property name="mailMessage" ref="mailMessage"/>
+        <property name="companyDao" ref="companyDao"/>
+        <property name="groupEngineerDao" ref="groupEngineerDao"/>
     </bean>
     
     <bean id="loginSuccessHandler" class="com.cmms.webapp.security.LoginSuccessHandler">
@@ -42,12 +52,16 @@
     <bean id="itemAction" class="com.cmms.webapp.action.ItemAction" scope="prototype">
         <property name="itemTypeDao" ref="itemTypeDao"/>
         <property name="machineDao" ref="machineDao"/>
+        <property name="companyDao" ref="companyDao"/>
+        <property name="groupEngineerDao" ref="groupEngineerDao"/>
     </bean>
     
     <bean id="companyAction" class="com.cmms.webapp.action.CompanyAction" scope="prototype">
         <property name="companyDao" ref="companyDao"/>
+        <property name="groupEngineerDao" ref="groupEngineerDao"/>
     </bean>
     <bean id="grpEngineerAction" class="com.cmms.webapp.action.GrpEngineerAction" scope="prototype">
+        <property name="companyDao" ref="companyDao"/>
         <property name="groupEngineerDao" ref="groupEngineerDao"/>
     </bean>
     
@@ -55,23 +69,31 @@
         <property name="itemTypeDao" ref="itemTypeDao"/>
         <property name="machineDao" ref="machineDao"/>
         <property name="companyDao" ref="companyDao"/>
+        <property name="groupEngineerDao" ref="groupEngineerDao"/>
         <property name="machineTypeDao" ref="machineTypeDao"/>
     </bean>
     
     <bean id="supplierAction" class="com.cmms.webapp.action.SupplierAction" scope="prototype">
         <property name="supplierDao" ref="supplierDao"/>
+        <property name="companyDao" ref="companyDao"/>
+        <property name="groupEngineerDao" ref="groupEngineerDao"/>
     </bean>
     
     <bean id="materialAction" class="com.cmms.webapp.action.MaterialAction" scope="prototype">
         <property name="itemTypeDao" ref="itemTypeDao"/>
         <property name="materialDao" ref="materialDao"/>
+        <property name="companyDao" ref="companyDao"/>
+        <property name="groupEngineerDao" ref="groupEngineerDao"/>
     </bean>
     <bean id="machineTypeAction" class="com.cmms.webapp.action.MachineTypeAction" scope="prototype">
         <property name="machineTypeDao" ref="machineTypeDao"/>
+        <property name="companyDao" ref="companyDao"/>
+        <property name="groupEngineerDao" ref="groupEngineerDao"/>
     </bean>
     
     <bean id="workTypeAction" class="com.cmms.webapp.action.WorkTypeAction" scope="prototype">
         <property name="companyDao" ref="companyDao"/>
+        <property name="groupEngineerDao" ref="groupEngineerDao"/>
         <property name="workTypeDao" ref="workTypeDao"/>
     </bean>
     <bean id="workOrderAction" class="com.cmms.webapp.action.WorkOrderAction" scope="prototype">

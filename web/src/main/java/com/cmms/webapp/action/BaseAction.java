@@ -5,11 +5,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.struts2.ServletActionContext;
 import com.cmms.Constants;
+import com.cmms.dao.CompanyDao;
+import com.cmms.dao.GroupEngineerDao;
+import com.cmms.model.Company;
+import com.cmms.model.GroupEngineer;
 import com.cmms.model.User;
 import com.cmms.service.MailEngine;
 import com.cmms.service.RoleManager;
 import com.cmms.service.UserManager;
 import com.cmms.webapp.security.LoginSuccessHandler;
+import com.cmms.webapp.util.ResourceBundleUtils;
 import java.text.SimpleDateFormat;
 import org.springframework.mail.SimpleMailMessage;
 
@@ -20,6 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Implementation of <strong>ActionSupport</strong> that contains convenience
@@ -246,23 +253,64 @@ public class BaseAction extends ActionSupport {
         this.limit = limit;
     }
 
+    GroupEngineerDao groupEngineerDao;
+    CompanyDao companyDao;
+
+    public CompanyDao getCompanyDao() {
+        return companyDao;
+    }
+
+    public void setCompanyDao(CompanyDao companyDao) {
+        this.companyDao = companyDao;
+    }
+
+    public GroupEngineerDao getGroupEngineerDao() {
+        return groupEngineerDao;
+    }
+
+    public void setGroupEngineerDao(GroupEngineerDao groupEngineerDao) {
+        this.groupEngineerDao = groupEngineerDao;
+    }
+
     public Integer getSytemId() {
-        if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID) != null) {
+        if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID) != null
+                && getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_NAME) != null) {
             return (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID);
         } else {
-            Integer rtn = 1;
+            Integer rtn = LoginSuccessHandler.updateSessionSystem(getRequest());
             getRequest().getSession().setAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID, rtn);
-            return rtn;
+            String systemName = ResourceBundleUtils.getName("company");
+            if (rtn > 0) {
+                if (companyDao == null) {
+                    ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getRequest().getServletContext());
+                    companyDao = ctx.getBean("companyDao", CompanyDao.class);
+                }
+                Company company = companyDao.get(rtn);
+                systemName = company.getName();
+            }
+            getRequest().getSession().setAttribute(LoginSuccessHandler.SESSION_SYSTEM_NAME, systemName);
+            return (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID);
         }
     }
 
     public Integer getGrpEngineerId() {
-        if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP) != null) {
+        if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP) != null
+                && getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP_NAME) != null) {
             return (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP);
         } else {
-            Integer rtn = 1;
+            Integer rtn = LoginSuccessHandler.updateSessionEng(getRequest());
             getRequest().getSession().setAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP, rtn);
-            return rtn;
+            String engName = ResourceBundleUtils.getName("grpEngineer");
+            if (rtn > 0) {
+                if (groupEngineerDao == null) {
+                    ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getRequest().getServletContext());
+                    groupEngineerDao = ctx.getBean("groupEngineerDao", GroupEngineerDao.class);
+                }
+                GroupEngineer groupEngineer = groupEngineerDao.get(rtn);
+                engName = groupEngineer.getName();
+            }
+            getRequest().getSession().setAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP_NAME, engName);
+            return (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP);
         }
     }
 
@@ -283,4 +331,7 @@ public class BaseAction extends ActionSupport {
         return null;
     }
 
+    public static final String PATH_UPLOAD = "upload";
+    public static final String PATH_MATERIAL = "material";
+    public static final String PATH_MECHANIC = "mechanic";
 }

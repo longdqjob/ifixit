@@ -159,6 +159,13 @@
             onStoreLoad: Ext.emptyFn,
             enableTextSelection: true,
             emptyText: '<div class="grid-data-empty"><div data-icon="/" class="empty-grid-icon"></div><div class="empty-grid-byline" style="text-align: center;"><fmt:message key="noRecord"/></div></div>',
+            getRowClass: function (record, rowIndex, rowParams, store) {
+                if (record.get('status') == '0'
+                        || record.get('status') == '4') {
+                    return 'overdue';
+                }
+                return "";
+            },
         },
         plugins: {
             ptype: 'cellediting',
@@ -215,8 +222,9 @@
         listeners: {
             afterrender: function (usergrid, eOpts) {
                 //console.log(usergrid);
-            },
-            validateedit: function (editor, context, eOpts) {
+            },'rowdblclick': function (grid, record) {
+                editWorkOrder(record);
+            },validateedit: function (editor, context, eOpts) {
                 var record = context.record;
                 if (record.get("status") == context.value) {
                     return true;

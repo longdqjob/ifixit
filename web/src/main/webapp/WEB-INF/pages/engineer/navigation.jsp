@@ -1,13 +1,14 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <script>
     var grpEngineerIdSs = ${grpEngineerId};
+    var grpEngineerNameSs = '${grpEngineerName}';
     var storeEngineer = Ext.create('Ext.data.TreeStore', {
         proxy: {
             type: 'ajax',
             url: '../grpEngineer/getTree'
         },
         root: {
-            text: '<fmt:message key="grpEngineer"/>',
+            name: grpEngineerNameSs,
             id: grpEngineerIdSs,
             expanded: true
         },
@@ -30,7 +31,7 @@
         header: false,
         collapsible: true,
         useArrows: false,
-        rootVisible: false,
+        rootVisible: true,
         lines: true,
         multiSelect: true,
         border: true,

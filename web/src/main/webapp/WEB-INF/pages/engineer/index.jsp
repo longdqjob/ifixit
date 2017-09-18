@@ -5,6 +5,24 @@
     <meta name="menu" content="workOrder"/>
 </head>
 
+<style>
+    .overdue .x-grid-cell{
+        background-color: #FA1D19 !important;
+        color:black ;
+    }
+    .major .x-grid-cell{
+        background-color: #FF7F00 !important;
+        color:black;
+    }
+    .minor .x-grid-cell{
+        background-color: yellow !important;
+        color:black;
+    }
+    .infor .x-grid-cell{
+        background-color: #7790F7 !important;
+        color:black;
+    }
+</style>
 <script>
     var numSpecification = 10;
 </script>

@@ -163,4 +163,23 @@
             });
         }
     }
+
+
+    var urlLogin = "http://localhost:8080/login";
+    function redirectIfNotAuthen(response) {
+        if (response.status == 401) {
+            window.location.replace(urlLogin);
+        }
+    }
+
+    function storeRedirectIfNotAuthen(operation) {
+        if (operation.error && operation.error.status && operation.error.status == 401) {
+            window.location.replace(urlLogin);
+        }
+    }
+    function treeRedirectIfNotAuthen(options) {
+        if (options.error && options.error.status && options.error.status == 401) {
+            window.location.replace(urlLogin);
+        }
+    }
 </script>

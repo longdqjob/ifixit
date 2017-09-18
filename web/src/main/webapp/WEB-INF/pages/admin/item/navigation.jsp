@@ -138,23 +138,10 @@
         mygrid.getStore().getProxy().extraParams = {
             id: id,
         };
-        mygrid.getStore().loadPage(1);
-        
-//        Ext.Ajax.request({
-//            url: '../itemType/loadData',
-//            method: "POST",
-//            params: {
-//                id: id,
-//                start: 0,
-//                limit: 10
-//            },
-//            success: function (response) {
-//                var res = JSON.parse(response.responseText);
-//                console.log(res);
-//            },
-//            failure: function (response, opts) {
-//                alert("System Error!");
-//            },
-//        });
+        mygrid.getStore().loadPage(1, {
+            callback: function (records, operation, success) {
+                storeRedirectIfNotAuthen(operation);
+            }
+        });
     }
 </script>

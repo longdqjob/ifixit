@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
  * Convenience class for setting and retrieving cookies.
  */
 public final class RequestUtil {
+
     private static final Log log = LogFactory.getLog(RequestUtil.class);
 
     /**
@@ -28,7 +29,7 @@ public final class RequestUtil {
      * @param path the path to set it on
      */
     public static void setCookie(HttpServletResponse response, String name,
-                                 String value, String path) {
+            String value, String path) {
         if (log.isDebugEnabled()) {
             log.debug("Setting cookie '" + name + "' on path '" + path + "'");
         }
@@ -75,7 +76,7 @@ public final class RequestUtil {
      * @param path the path on which the cookie was set (i.e. /appfuse)
      */
     public static void deleteCookie(HttpServletResponse response,
-                                    Cookie cookie, String path) {
+            Cookie cookie, String path) {
         if (cookie != null) {
             // Delete the cookie by setting its maximum age to zero
             cookie.setMaxAge(0);
@@ -87,13 +88,15 @@ public final class RequestUtil {
     /**
      * Convenience method to get the application's URL based on request
      * variables.
-     * 
+     *
      * @param request the current request
      * @return URL to application
      */
     public static String getAppURL(HttpServletRequest request) {
-        if (request == null) return "";
-        
+        if (request == null) {
+            return "";
+        }
+
         StringBuffer url = new StringBuffer();
         int port = request.getServerPort();
         if (port < 0) {
@@ -109,5 +112,9 @@ public final class RequestUtil {
         }
         url.append(request.getContextPath());
         return url.toString();
+    }
+
+    public static boolean isAjaxRequest(HttpServletRequest request) {
+        return "XMLHttpRequest".equalsIgnoreCase(request.getHeader("X-Requested-With"));
     }
 }

@@ -1,5 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <script>
+    var systemNameSs = '${systemName}';
     var store = Ext.create('Ext.data.TreeStore', {
         fields: [
             {name: 'id', type: 'int'},
@@ -17,7 +18,7 @@
             url: '../company/getTreeCompany'
         },
         root: {
-            text: '<fmt:message key="company"/>',
+            namedisplay: systemNameSs,
             id: '-11',
             expanded: true
         },
@@ -74,7 +75,7 @@
         header: false,
         collapsible: true,
         useArrows: false,
-        rootVisible: false,
+        rootVisible: true,
         lines: true,
         multiSelect: true,
         border: true,

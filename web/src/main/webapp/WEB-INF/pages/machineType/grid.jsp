@@ -178,6 +178,8 @@
         listeners: {
             afterrender: function (usergrid, eOpts) {
                 //console.log(usergrid);
+            },'rowdblclick': function (grid, record) {
+                edit(record);
             }
         }
     });

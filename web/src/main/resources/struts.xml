@@ -315,6 +315,11 @@
                 <param name="inputName">loadData</param>
             </result>
         </action>
+        <action name="saveImg" class="machineAction">
+            <result type="stream">
+                <param name="inputName">saveImg</param>
+            </result>
+        </action>
         <action name="save" class="machineAction">
             <result type="stream">
                 <param name="inputName">save</param>

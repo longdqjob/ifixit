@@ -327,7 +327,7 @@ public class MaterialAction extends BaseAction implements Preparable {
                 uploadDir += File.separator + PATH_UPLOAD + File.separator + PATH_MATERIAL + File.separator;
                 result.put("success", true);
                 result.put("url", "../" + PATH_UPLOAD + "/" + PATH_MATERIAL + "/" + rtn);
-                result.put("path", uploadDir + fileFileName);
+                result.put("path", uploadDir + rtn);
                 result.put("message", ResourceBundleUtils.getName("uploadSuccessMsg"));
             } else {
                 result.put("success", false);
@@ -340,18 +340,27 @@ public class MaterialAction extends BaseAction implements Preparable {
         }
     }//</editor-fold>
 
-    public static final String PATH_UPLOAD = "upload";
-    public static final String PATH_MATERIAL = "material";
-
     //<editor-fold defaultstate="collapsed" desc="saveFile">
     private String saveFile() {
         InputStream stream = null;
         String rtn = null;
         try {
             String fileName = WebUtil.removeAscii(fileFileName);
-            fileName = fileName.replaceAll("\\s+","_");
+            fileName = fileName.replaceAll("\\s+", "_");
             String uploadDir = ServletActionContext.getServletContext().getRealPath("/");
             uploadDir += File.separator + PATH_UPLOAD + File.separator + PATH_MATERIAL + File.separator;
+
+            File theDir = new File(uploadDir);
+            // if the directory does not exist, create it
+            if (!theDir.exists()) {
+                log.info("mkdirs: " + uploadDir);
+                try {
+                    theDir.mkdirs();
+                } catch (Exception ex) {
+                    //handle it
+                    log.info("mkdirs Exception: ", ex);
+                }
+            }
 
             stream = new FileInputStream(this.file);
             String fullPath = uploadDir + "tmp_" + fileName;

@@ -5,7 +5,11 @@
             code: searchMechanicCode.getValue(),
             name: searchMechanicName.getValue(),
         };
-        gridMechanicType.getStore().loadPage(1);
+        gridMechanicType.getStore().loadPage(1, {
+            callback: function (records, operation, success) {
+                storeRedirectIfNotAuthen(operation);
+            }
+        });
     }
 
     var searchMechanicCode = Ext.create('Ext.form.field.Text', {

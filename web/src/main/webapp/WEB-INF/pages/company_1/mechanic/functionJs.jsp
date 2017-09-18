@@ -53,6 +53,7 @@
                 }
             },
             failure: function (response, opts) {
+                redirectIfNotAuthen(response);
                 alertSystemError();
                 unmask();
             },
@@ -176,7 +177,11 @@
         gridHis.getStore().getProxy().extraParams = {
             id: id,
         };
-        gridHis.getStore().loadPage(1);
+        gridHis.getStore().loadPage(1, {
+            callback: function (records, operation, success) {
+                storeRedirectIfNotAuthen(operation);
+            }
+        });
     }
 
 
@@ -229,6 +234,7 @@
                 }
             },
             failure: function (response, opts) {
+                redirectIfNotAuthen(response);
                 alertSystemError();
                 unMaskTarget();
             },

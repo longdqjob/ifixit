@@ -3,7 +3,6 @@ package com.cmms.webapp.interceptor;
 import com.cmms.dao.CompanyDao;
 import com.cmms.dao.GroupEngineerDao;
 import com.cmms.webapp.security.LoginSuccessHandler;
-import static com.cmms.webapp.security.LoginSuccessHandler.SESSION_USER_ID;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;
 import org.apache.struts2.ServletActionContext;
@@ -49,25 +48,8 @@ public class UserRoleAuthorizationInterceptor implements Interceptor {
     public String intercept(ActionInvocation invocation) throws Exception {
         HttpServletRequest request = ServletActionContext.getRequest();
 
-        //System
-        if (request.getSession().getAttribute(LoginSuccessHandler.SESSION_LIST_SYSTEM_ID) == null) {
-            Integer systemId = 1;
-            
-            ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
-            CompanyDao companyDao = ctx.getBean("companyDao", CompanyDao.class);
-            List<Integer> list = companyDao.getListChildren(systemId);
-            log.info("------------------getListChildren: " + StringUtils.join(list, ","));
-            request.getSession().setAttribute(LoginSuccessHandler.SESSION_LIST_SYSTEM_ID, list);
-        }
-        //Grp ENGINNER
-        if (request.getSession().getAttribute(LoginSuccessHandler.SESSION_LIST_GRP_ENGINNER) == null) {
-            Integer engineerGrpID = 1;
-            ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
-            GroupEngineerDao groupEngineerDao = ctx.getBean("groupEngineerDao", GroupEngineerDao.class);
-            List<Integer> list = groupEngineerDao.getListChildren(engineerGrpID);
-            log.info("------------------get groupEngineerDao: " + StringUtils.join(list, ","));
-            request.getSession().setAttribute(LoginSuccessHandler.SESSION_LIST_GRP_ENGINNER, list);
-        }
+        LoginSuccessHandler.updateSession(request);
+        
         if (this.authorizedRoles != null) {
             for (String authorizedRole : this.authorizedRoles) {
                 if (request.isUserInRole(authorizedRole)) {

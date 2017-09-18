@@ -6,81 +6,6 @@
         hidden: true,
     });
 
-    var companyParentStore = Ext.create('Ext.data.Store', {
-        fields: ['id', 'code', 'name'],
-        listeners: {
-            load: {
-                fn: function (store, records, options) {
-                    console.log(records);
-                },
-                scope: this
-            },
-        }
-    });
-
-    var companyParent = Ext.create('Ext.form.ComboBox', {
-        fieldLabel: '<fmt:message key="companyParent"/>',
-        store: companyParentStore,
-        emptyText: '--Please Select--',
-        queryMode: 'local',
-        displayField: 'name',
-        valueField: 'id',
-        margin: '10 10 10 10',
-        anchor: '100%',
-        editable: true,
-        allowBlank: false,
-        width: 450,
-        autoSelect: true,
-        typeAhead: true,
-        listConfig: {
-            itemTpl: '{code} - {name}'
-        },
-//        listeners: {
-//            'keyup': function () {
-//                this.store.filter('name', this.getRawValue(), true, false);
-//            },
-//            'beforequery': function (queryEvent) {
-//                queryEvent.combo.onLoad();
-//                // prevent doQuery from firing and clearing out my filter.
-//                return false;
-//            }
-//        }
-    });
-
-
-//    var companyParentStore = Ext.create('Ext.data.Store', {
-//        pageSize: 50,
-//        fields: ['id', 'code', 'name'],
-//        remoteSort: true,
-//        proxy: {
-//            type: 'ajax',
-//            url: '../company/getListCompany',
-//            reader: {
-//                rootProperty: 'list',
-//                type: 'json',
-//                totalProperty: 'totalCount'
-//            }
-//        },
-//    });
-//
-//    var companyParent = Ext.create('Ext.form.ComboBox', {
-//        fieldLabel: '<fmt:message key="companyParent"/>',
-//        store: companyParentStore,
-//        emptyText: '--Please Select--',
-//        queryMode: 'remote',
-//        displayField: 'name',
-//        valueField: 'id',
-//        pageSize: 50,
-//        margin: '10 10 10 10',
-//        anchor: '100%',
-//        editable: true,
-//        allowBlank: false,
-//        width: 450,
-//        listConfig: {
-//            itemTpl: '{code} - {name}'
-//        },
-//    });
-
     var companyName = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         grow: true,
@@ -89,7 +14,7 @@
         id: "companyName",
         labelAlign: 'left',
         anchor: '100%',
-        allowBlank: false,
+        allowBlank: true,
         margin: '10 10 10 10',
         width: 450,
         maxLength: 50,
@@ -158,7 +83,7 @@
         id: "companyParentName",
         labelAlign: 'left',
         anchor: '100%',
-        allowBlank: false,
+        allowBlank: true,
         margin: '10 10 10 10',
         width: 350,
         readOnly: true,
@@ -171,7 +96,7 @@
         id: "parentCodeId",
         labelAlign: 'left',
         anchor: '100%',
-        allowBlank: false,
+        allowBlank: true,
         margin: '10 10 10 10',
         width: 450,
         readOnly: true,

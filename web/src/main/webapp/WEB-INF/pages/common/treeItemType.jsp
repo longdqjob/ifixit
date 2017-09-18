@@ -67,7 +67,9 @@
                 maskTarget(Ext.getCmp('cmItemTypeTreeWindow'));
                 Ext.getCmp('cmTreeItemType').getStore().getRootNode().removeAll();
                 Ext.getCmp('cmTreeItemType').getStore().load();
-                Ext.getCmp('cmTreeItemType').getStore().on('load', function (store, records, options) {
+                
+                Ext.getCmp('cmTreeItemType').getStore().on('load', function (store, records, operation, options) {
+                    treeRedirectIfNotAuthen(options);
                     unMaskTarget();
                 });
             }

@@ -246,6 +246,21 @@
         anchor: '100%',
         allowBlank: false,
         margin: '13 10 10 10',
+        listeners: {
+            change: function (checkbox, newVal, oldVal) {
+                console.log(newVal);
+                if(newVal){
+                    workOrderInterval.allowBlank = false;
+                    workOrderInterval.show();
+                    Ext.getCmp("lbMon").show();
+                }else{
+                    workOrderInterval.reset();
+                    workOrderInterval.allowBlank = true;
+                    Ext.getCmp("lbMon").hide();
+                    workOrderInterval.hide();
+                }
+            }
+        }
     });
 
     var workOrderIntervalCtn = Ext.create('Ext.form.FieldContainer', {
@@ -275,6 +290,7 @@
                         items: [{
                                 xtype: 'label',
                                 labelAlign: 'left',
+                                id: "lbMon",
                                 text: '<fmt:message key="work.unit"/>',
                                 style: 'font-weight:inherit;',
                                 margin: '15 0 0 0'

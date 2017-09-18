@@ -53,7 +53,11 @@
             code: searchCode.getValue(),
             name: searchName.getValue(),
         };
-        mygrid.getStore().loadPage(1);
+        mygrid.getStore().loadPage(1, {
+            callback: function (records, operation, success) {
+                storeRedirectIfNotAuthen(operation);
+            }
+        });
     }
 
     function addItemType(data) {
@@ -116,6 +120,7 @@
                 store.reload();
             },
             failure: function (response, opts) {
+                redirectIfNotAuthen(response);
                 unMaskTarget();
                 alertSystemError();
             }
@@ -157,6 +162,7 @@
                 }
             },
             failure: function (response, opts) {
+                redirectIfNotAuthen(response);
                 alertSystemError();
                 unMaskTarget();
             },

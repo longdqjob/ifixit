@@ -118,6 +118,7 @@ public class WorkOrderAction extends BaseAction implements Preparable {
     }//</editor-fold>
 
     public String index() {
+        getGrpEngineerId();
         return SUCCESS;
     }
 
@@ -379,7 +380,11 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             workOrder.setStartTime(sdf.parse(startTime));
             workOrder.setEndTime(sdf.parse(endTime));
             workOrder.setStatus(Integer.parseInt(status));
-            workOrder.setInterval(Integer.parseInt(interval));
+            if (!StringUtils.isBlank(interval)) {
+                workOrder.setInterval(Integer.parseInt(interval));
+            }else{
+                workOrder.setInterval(0);
+            }
             workOrder.setIsRepeat(Integer.parseInt(repeat));
             workOrder.setTask(task);
             workOrder.setNote(note);

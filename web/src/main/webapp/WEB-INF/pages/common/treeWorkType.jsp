@@ -100,7 +100,8 @@
                 maskTarget(Ext.getCmp('workTypeTreeWindow'));
                 Ext.getCmp('treeWorkType').getStore().getRootNode().removeAll();
                 Ext.getCmp('treeWorkType').getStore().load();
-                Ext.getCmp('treeWorkType').getStore().on('load', function (store, records, options) {
+                Ext.getCmp('treeWorkType').getStore().on('load', function (store, records, operation, options) {
+                    treeRedirectIfNotAuthen(options);
                     unMaskTarget();
                 });
             },

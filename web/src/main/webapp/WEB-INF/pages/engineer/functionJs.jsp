@@ -24,7 +24,11 @@
             code: searchCode.getValue(),
             name: searchName.getValue(),
         };
-        mygrid.getStore().loadPage(1);
+        mygrid.getStore().loadPage(1, {
+            callback: function (records, operation, success) {
+                storeRedirectIfNotAuthen(operation);
+            }
+        });
     }
 
     function addEngineer(data) {
@@ -81,6 +85,7 @@
                 }
             },
             failure: function (response, opts) {
+                redirectIfNotAuthen(response);
                 showMask.hide();
                 alertSystemError();
             }
@@ -122,6 +127,7 @@
                 }
             },
             failure: function (response, opts) {
+                redirectIfNotAuthen(response);
                 alertSystemError();
                 unmask();
             },

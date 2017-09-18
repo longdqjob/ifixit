@@ -1,6 +1,24 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <script>
+    function resetImgPreView() {
+        mechanicImgUrl.reset();
+        mechanicImgPath.reset();
+        try {
+            mechanicImgPreview.el.dom.src = "../images/no-preview-available.png";
+        } catch (c) {
+            console.error(c);
+        }
+    }
+    function setImgPreView(url) {
+        mechanicImgUrl.setValue(url);
+        try {
+            mechanicImgPreview.el.dom.src = url;
+        } catch (c) {
+            console.error(c);
+        }
+    }
+
     function changeCode(oldValue, newValue) {
         if (mechanicTypeCode.getValue() != "") {
             //  Ext.getCmp("mechanicFullCode").setText('<fmt:message key="machine.fullCode"/>: ' + mechanicTypeCode.getValue() + "." + newValue);
@@ -9,7 +27,6 @@
             // Ext.getCmp("mechanicFullCode").setText('<fmt:message key="machine.fullCode"/>: ' + newValue);
             mechanicCompleteCode.setValue(newValue);
         }
-
     }
 
     function enableCode() {
@@ -21,6 +38,7 @@
     //--------------------------------Mechanic----------------------------------
     function addMechanic(data) {
         resetLabelSpec();
+        resetImgPreView();
         mechanicForm.reset();
         mechanicWindow.setTitle('<fmt:message key="machine.add"/>');
         mechanicWindow.setIconCls('add-cls');
@@ -31,6 +49,7 @@
     }
 
     function editMechanic(data) {
+        console.log(data);
         resetLabelSpec();
         mechanicForm.reset();
         mechanicId.setValue(data.get("id"));
@@ -44,15 +63,21 @@
         fatherName.setValue(data.get("parentName"));
         systemId.setValue(data.get("companyId"));
         systemName.setValue(data.get("companyName"));
-        
+
         fillSpecificValue(data.get("specification"));
         machineNote.setValue(data.get("note"));
-        console.log(data.get("since"));
         if (typeof data.get("since") !== "undefined") {
             Ext.getCmp("sinceField").setValue(Ext.Date.parse(data.get("since").split(".")[0], 'Y-m-d H:i:s'));
         }
 
-
+        if (data.get("imgUrl") && data.get("imgUrl") != "") {
+            setImgPreView(data.get("imgUrl"));
+        } else {
+            resetImgPreView();
+        }
+        if (data.get("imgPath") && data.get("imgPath") != "") {
+            mechanicImgPath.setValue(data.get("imgPath"));
+        }
         mechanicWindow.setTitle('<fmt:message key="machine.edit"/>');
         mechanicWindow.setIconCls('edit-cls');
         disableCode();
@@ -60,6 +85,7 @@
         gridHis.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
         mechanicName.focus();
     }
+
 
     function getMechanicType(id) {
         mask();
@@ -84,6 +110,7 @@
                 }
             },
             failure: function (response, opts) {
+                redirectIfNotAuthen(response);
                 alertSystemError();
                 unmask();
             },
@@ -208,9 +235,35 @@
         gridHis.getStore().getProxy().extraParams = {
             id: id,
         };
-        gridHis.getStore().loadPage(1);
+        gridHis.getStore().loadPage(1, {
+            callback: function (records, operation, success) {
+                storeRedirectIfNotAuthen(operation);
+            }
+        });
     }
 
+    function uploadImg() {
+        maskTarget(mechanicWindow);
+        imgForm.getForm().submit({
+            url: '../machine/saveImg',
+            waitMsg: '<fmt:message key="uploadingMsg"/>',
+            handleResponse: function (response) {
+                var res = JSON.parse(response.responseXML.body.textContent);
+                console.log(res);
+                return res;
+            },
+            success: function (fp, o) {
+                unMaskTarget();
+                alertSuccess('Success: ' + o.result && o.result.message || '<fmt:message key="uploadSuccessMsg"/>');
+                setImgPreView(o.result.url);
+                mechanicImgPath.setValue(o.result.path);
+            },
+            failure: function (form, o) {
+                unMaskTarget();
+                alertError('Error: ' + o.result && o.result.message || '<fmt:message key="uploadFailMsg"/>');
+            }
+        });
+    }
 
     function saveMechanic() {
         var valid = mechanicForm.query("field{isValid()==false}");
@@ -265,6 +318,8 @@
                 machineTypeId: mechanicTypeId.getValue(),
                 note: machineNote.getValue(),
                 since: Ext.getCmp("sinceField").getRawValue(),
+                imgUrl: mechanicImgUrl.getValue(),
+                imgPath: mechanicImgPath.getValue(),
                 completeCode: mechanicCompleteCode.getValue()
             },
             success: function (response) {
@@ -288,6 +343,7 @@
                 }
             },
             failure: function (response, opts) {
+                redirectIfNotAuthen(response);
                 alertSystemError();
                 unMaskTarget();
             },
@@ -315,6 +371,7 @@
                 }
             },
             failure: function (response, opts) {
+                redirectIfNotAuthen(response);
                 unMaskTarget();
                 alertSystemError();
             }

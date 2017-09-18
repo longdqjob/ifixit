@@ -5,7 +5,7 @@
     function addWorkOrder(data) {
         workOrderForm.reset();
         manHrsTotalCost.reset();
-        manHrsTotalMh.reset();        
+        manHrsTotalMh.reset();
         workOrderWindow.setTitle('<fmt:message key="work.add"/>');
         workOrderWindow.show();
         loadInfo(null);
@@ -27,13 +27,13 @@
         grpEngineerName.setValue(data.get('grpEngineerName'));
         workOrderStatus.setValue(data.get('status'));
         workOrderInterval.setValue(data.get('interval'));
-        workOrderRepeat.setValue((data.get('isRepeat') == "1"));                
+        workOrderRepeat.setValue((data.get('isRepeat') == "1"));
         Ext.getCmp("startTime").setValue(new Date(data.get('startTime')));
         Ext.getCmp("endTime").setValue(new Date(data.get('endTime')));
-        workOrderTask.setValue(data.get('task')); 
-        workOrderReason.setValue(data.get('reason')); 
-        workOrderNote.setValue(data.get('note')); 
-        materialTotalCost.setValue(data.get('stockTotalCost')); 
+        workOrderTask.setValue(data.get('task'));
+        workOrderReason.setValue(data.get('reason'));
+        workOrderNote.setValue(data.get('note'));
+        materialTotalCost.setValue(data.get('stockTotalCost'));
         workOrderWindow.show();
         loadInfo(data.get('id'));
     }
@@ -64,6 +64,7 @@
                     loadListManHrs();
                 },
                 failure: function (response, opts) {
+                    redirectIfNotAuthen(response);
                     alertSystemError();
                     unMaskTarget();
                 },
@@ -111,7 +112,7 @@
                 reason: workOrderReason.getValue(),
                 note: workOrderNote.getValue(),
                 manHrs: Ext.encode(getListManHrs()),
-                stock: Ext.encode(getListStock())                
+                stock: Ext.encode(getListStock())
             },
             success: function (response) {
                 unMaskTarget();
@@ -134,12 +135,13 @@
                 }
             },
             failure: function (response, opts) {
+                redirectIfNotAuthen(response);
                 alertSystemError();
                 unMaskTarget();
             },
         });
     }
-    
+
     function saveChangeWO(id, status, callbackSuccess, callbackFail) {
         maskTarget(Ext.getCmp("gridId"));
         Ext.Ajax.request({
@@ -169,6 +171,7 @@
                 }
             },
             failure: function (response, opts) {
+                redirectIfNotAuthen(response);
                 alertSystemError();
                 unMaskTarget();
                 if (isFunction(callbackFail)) {
@@ -179,6 +182,33 @@
     }
 
     function deleteWorkOrder(params) {
+        maskTarget(Ext.getCmp("gridId"));
+        Ext.Ajax.request({
+            url: '../workOrder/delete?' + params,
+            method: "POST",
+            timeout: 10000,
+            success: function (result, request) {
+                unMaskTarget();
+                jsonData = Ext.decode(result.responseText);
+                if (jsonData.success == true) {
+                    alertSuccess(jsonData.message);
+                    alertSuccess(res.message);
+                    loadWorkOrder();
+                    mygrid.getView().getEl().scrollTo('Top', scrollPosition.top, true);
+                } else {
+                    if (jsonData.message) {
+                        alertError(jsonData.message);
+                    } else {
+                        alertSystemError();
+                    }
+                }
+            },
+            failure: function (response, opts) {
+                redirectIfNotAuthen(response);
+                unMaskTarget();
+                alertSystemError();
+            }
+        });
     }
 
     function loadListManHrs() {
@@ -189,7 +219,7 @@
         storeManHrsPaging.proxy.data = data;
         storeManHrsPaging.load();
     }
-    
+
     function chooseWorkType(record) {
         wWorkTypeName.setValue(record.get('name'));
         wWorkTypeId.setValue(record.get('id'));

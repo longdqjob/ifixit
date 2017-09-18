@@ -82,7 +82,8 @@
                 maskTarget(Ext.getCmp('mechanicTreeWindow'));
                 Ext.getCmp('treeMechanic').getStore().getRootNode().removeAll();
                 Ext.getCmp('treeMechanic').getStore().load();
-                Ext.getCmp('treeMechanic').getStore().on('load', function (store, records, options) {
+                Ext.getCmp('treeMechanic').getStore().on('load', function (store, records, operation, options) {
+                    treeRedirectIfNotAuthen(options);
                     unMaskTarget();
                 });
             }

@@ -5,12 +5,17 @@
              xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
               http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
+    
+    
     <http pattern="/images/**" security="none"/>
     <http pattern="/styles/**" security="none"/>
     <http pattern="/scripts/**" security="none"/>
     <http pattern="/assets/**" security="none"/>
 
-    <http auto-config="true">
+    <http auto-config="true" entry-point-ref="customLoginUrlAuthenticationEntryPoint">
+<!--        <intercept-url pattern="/**" access="isAuthenticated()" />
+        <custom-filter ref="ajaxTimeoutRedirectFilter" after="EXCEPTION_TRANSLATION_FILTER"/>-->
+        
         <intercept-url pattern="/admin/**" access="ROLE_ADMIN"/>
         <intercept-url pattern="/passwordHint*" access="ROLE_ANONYMOUS,ROLE_ADMIN,ROLE_USER"/>
         <intercept-url pattern="/signup*" access="ROLE_ANONYMOUS,ROLE_ADMIN,ROLE_USER"/>

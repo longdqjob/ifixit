@@ -36,6 +36,7 @@ public class CompanyAction extends BaseAction implements Preparable {
     }
 
     public String index() {
+        getSytemId();
         return SUCCESS;
     }
 
@@ -148,8 +149,18 @@ public class CompanyAction extends BaseAction implements Preparable {
             if (!StringUtils.isBlank(idReq)) {
                 id = Integer.parseInt(idReq);
                 company = companyDao.get(id);
-                if (code.equals(company.getCode())) {
+                if (completeCode.equals(company.getCompleteCode())) {
                     checkUnique = false;
+                }else{
+                    //@todo: neu cho con thi ko cho sua code
+//                    List<Integer> list = new ArrayList<>(1);
+//                    list.add(id);
+//                    //Thay doi code -> Kiem tra su dung
+//                    if (companyDao.checkUseParent(list)) {
+//                        result.put("success", false);
+//                        result.put("message", ResourceBundleUtils.getName("deleteUsing"));
+//                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+//                    }
                 }
             } else {
                 company = new Company();

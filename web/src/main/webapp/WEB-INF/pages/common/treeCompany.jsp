@@ -1,13 +1,14 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <script>
     var systemId = ${systemId};
+    var systemNameSs = '${systemName}';
     var storeCompany = Ext.create('Ext.data.TreeStore', {
         proxy: {
             type: 'ajax',
             url: '../company/getTreeCompany'
         },
         root: {
-            text: '<fmt:message key="company"/>',
+            text: systemNameSs,
             id: systemId,
             expanded: true
         },
@@ -89,7 +90,8 @@
                 maskTarget(Ext.getCmp('companyTreeWindow'));
                 Ext.getCmp('treeCompany').getStore().getRootNode().removeAll();
                 Ext.getCmp('treeCompany').getStore().load();
-                Ext.getCmp('treeCompany').getStore().on('load', function (store, records, options) {
+                Ext.getCmp('treeCompany').getStore().on('load', function (store, records, operation, options) {
+                    treeRedirectIfNotAuthen(options);
                     unMaskTarget();
                 });
             }

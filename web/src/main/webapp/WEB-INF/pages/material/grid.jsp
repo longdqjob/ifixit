@@ -210,8 +210,9 @@
         listeners: {
             afterrender: function (usergrid, eOpts) {
                 //console.log(usergrid);
-            },
-            validateedit: function (editor, context, eOpts) {
+            },'rowdblclick': function (grid, record) {
+                editMaterial(record);
+            },validateedit: function (editor, context, eOpts) {
                 if (!editor.editors.items[0].field.wasValid) {
                     context.cancel = true;
                     return false;

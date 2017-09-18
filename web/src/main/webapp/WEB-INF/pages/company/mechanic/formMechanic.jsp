@@ -158,7 +158,7 @@
 
     var father = Ext.create('Ext.form.FieldContainer', {
         xtype: 'fieldcontainer',
-       // columnWidth: 1,
+        // columnWidth: 1,
         layout: 'column',
         items: [fatherId, fatherName, {
                 xtype: 'button',
@@ -244,6 +244,48 @@
     });
 
     //--------------------------------------------------------------------------
+    var mechanicImage = {
+        xtype: 'filefield',
+        id: "mechanicImage",
+        name: 'file',
+        fieldLabel: '<fmt:message key="machine.image"/>',
+        allowBlank: true,
+        margin: '10 10 10 10',
+        anchor: '99%',
+        buttonText: '<fmt:message key="browse"/>',
+        listeners: {
+            change: function (fld, value) {
+                var newValue = value.replace(/C:\\fakepath\\/g, '');
+                fld.setRawValue(newValue);
+                uploadImg();
+            }
+        }
+    };
+
+    var mechanicImgUrl = Ext.create('Ext.form.field.Text', {
+        xtype: 'textfield',
+        hidden: true,
+    });
+
+    var mechanicImgPath = Ext.create('Ext.form.field.Text', {
+        xtype: 'textfield',
+        hidden: true,
+    });
+
+    var mechanicImgPreview = new Ext.Component({
+        margin: '10 10 10 10',
+        autoEl: {
+            tag: 'img', src: '../images/no-preview-available.png', id: 'materialImgPreview'
+        }
+    });
+
+    var imgForm = Ext.create('Ext.form.Panel', {
+        xtype: 'form',
+        layout: 'anchor',
+        bodyStyle: 'background-color: transparent;',
+        items: [mechanicImgUrl, mechanicImgPath, mechanicImage]
+    });
+
     var indentifyForm = Ext.create('Ext.form.Panel', {
         xtype: 'form',
         layout: 'anchor',
@@ -257,16 +299,19 @@
                 margin: '20 0 0 0',
                 items: [{
                         xtype: 'container',
-                        columnWidth: 0.6,
+                        columnWidth: 0.5,
                         layout: 'anchor',
-                        items: [father,systemContainer, sinceField]
-                    }
+                        items: [imgForm, father, systemContainer, sinceField]
+                    }, {
+                        xtype: 'container',
+                        columnWidth: 0.5,
+                        layout: 'anchor',
+                        items: [mechanicImgPreview]
+                    },
                 ]
             }
         ],
     });
-
-
 
     //--------------------------------------------------------------------------
     var tabSpec = Ext.create('Ext.tab.Panel', {
@@ -484,7 +529,7 @@
                         xtype: 'container',
                         columnWidth: 0.5,
                         layout: 'anchor',
-                        items: [mechanicId, mechanicType,mechanicCode ]
+                        items: [mechanicId, mechanicType, mechanicCode]
                     }, {
                         xtype: 'container',
                         columnWidth: 0.5,

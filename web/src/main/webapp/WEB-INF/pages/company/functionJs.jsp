@@ -20,7 +20,11 @@
             code: searchCode.getValue(),
             name: searchName.getValue(),
         };
-        mygrid.getStore().loadPage(1);
+        mygrid.getStore().loadPage(1, {
+            callback: function (records, operation, success) {
+                storeRedirectIfNotAuthen(operation);
+            }
+        });
     }
 
     function resetForm(callback) {
@@ -37,6 +41,7 @@
                 }
             },
             failure: function (response, opts) {
+                redirectIfNotAuthen(response);
                 alertSystemError();
                 unmask();
             },
@@ -119,6 +124,7 @@
                 store.reload();
             },
             failure: function (response, opts) {
+                redirectIfNotAuthen(response);
                 showMask.hide();
                 alertSystemError();
             }
@@ -130,12 +136,12 @@
             return false;
         }
 
-        if (companyParentId.getValue() == null || companyParentId.getValue() === "") {
-            companyParentName.reset();
-            companyParentName.setActiveError("This field is required!");
-            companyTreeWindow.show();
-            return false;
-        }
+//        if (companyParentId.getValue() == null || companyParentId.getValue() === "") {
+//            companyParentName.reset();
+//            companyParentName.setActiveError("This field is required!");
+//            companyTreeWindow.show();
+//            return false;
+//        }
 
         mask();
         Ext.Ajax.request({
@@ -175,6 +181,7 @@
 
             },
             failure: function (response, opts) {
+                redirectIfNotAuthen(response);
                 alertSystemError();
                 unmask();
             },

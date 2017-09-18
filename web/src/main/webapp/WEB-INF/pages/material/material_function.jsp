@@ -56,6 +56,10 @@
         } else {
             resetImgPreView();
         }
+        
+        if (data.get("imgPath") && data.get("imgPath") != "") {
+            materialImgPath.setValue(data.get("imgPath"));
+        }
 
 
         disableCode();
@@ -107,6 +111,7 @@
                 store.reload();
             },
             failure: function (response, opts) {
+                redirectIfNotAuthen(response);
                 unMaskTarget();
                 alertSystemError();
             }
@@ -197,6 +202,7 @@
                 }
             },
             failure: function (response, opts) {
+                redirectIfNotAuthen(response);
                 alertSystemError();
                 unMaskTarget();
             },
@@ -234,6 +240,7 @@
                 }
             },
             failure: function (response, opts) {
+                redirectIfNotAuthen(response);
                 alertSystemError();
                 unMaskTarget();
                 if (isFunction(callbackFail)) {

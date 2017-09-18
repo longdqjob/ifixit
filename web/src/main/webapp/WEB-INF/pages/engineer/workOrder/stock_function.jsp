@@ -150,6 +150,7 @@
                     }
                 },
                 failure: function (response, opts) {
+                    redirectIfNotAuthen(response);
                     unMaskTarget();
                     alertSystemError();
                 }
@@ -199,9 +200,9 @@
                 }
             },
             failure: function (response, opts) {
+                redirectIfNotAuthen(response);
                 alertSystemError();
                 unMaskTarget();
-                console.log("---------response---------");
                 if (isFunction(callbackFail)) {
                     console.log("---------callbackFail---------");
                     callbackFail();
