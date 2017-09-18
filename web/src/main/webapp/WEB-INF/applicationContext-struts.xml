@@ -4,7 +4,7 @@
        default-lazy-init="true">
     
     <bean id="customLoginUrlAuthenticationEntryPoint" class="com.cmms.webapp.security.CustomLoginUrlAuthenticationEntryPoint">
-        <constructor-arg name="loginFormUrl" value="/login"/>
+        <constructor-arg  value="/login"/>
     </bean>
 
     <bean id="adminInterceptor" class="com.cmms.webapp.interceptor.UserRoleAuthorizationInterceptor">

@@ -38,7 +38,10 @@ public class Company extends BaseObject implements Serializable {
     @Transient
     @Column(name = "parent_name")
     public String getParentName() {
-        return parentName;
+        if (this.company == null) {
+            return "";
+        }
+        return this.company.getName();
     }
 
     public void setParentName(String parentName) {
@@ -112,7 +115,7 @@ public class Company extends BaseObject implements Serializable {
     public Company getCompany() {
         return company;
     }
-    
+
     @Transient
     public String getParentCode() {
         if (this.company == null) {
@@ -129,8 +132,6 @@ public class Company extends BaseObject implements Serializable {
     public void setCompleteCode(String completeCode) {
         this.completeCode = completeCode;
     }
-    
-    
 
     @Transient
     public Integer getParentId() {

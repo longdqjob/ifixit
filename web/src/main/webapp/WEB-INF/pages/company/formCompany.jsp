@@ -63,7 +63,7 @@
         id: "companyDescription",
         labelAlign: 'left',
         anchor: '100%',
-        allowBlank: false,
+        allowBlank: true,
         margin: '10 10 10 10',
         width: 450,
         maxLength: 50,
@@ -137,7 +137,7 @@
                         height: '100%',
                         items: [
                             companyId, companyParent, companyParentCode, companyCode,
-                            companyFullCode, companyName,companyDescription]
+                            companyFullCode, companyName]
                     }]
             },
         ]

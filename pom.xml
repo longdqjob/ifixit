@@ -104,7 +104,7 @@
         </jdbc.url>
         <jdbc.username>root</jdbc.username>
         <!--<jdbc.password>Longdq@2902</jdbc.password>-->
-        <jdbc.password>nms@123</jdbc.password>
+        <jdbc.password></jdbc.password>
         <jdbc.validationQuery><![CDATA[SELECT 1 + 1]]></jdbc.validationQuery>
 
     </properties>

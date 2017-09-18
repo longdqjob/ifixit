@@ -80,7 +80,10 @@
         multiSelect: true,
         border: true,
         store: store,
-        minHeight: 500,
+        minHeight: 400,
+        viewConfig: {
+            toggleOnDblClick: false
+        },
         columns: [{
                 xtype: 'treecolumn', //this is so we know which column will show the tree
                 width: 345,
@@ -98,22 +101,13 @@
                 this.getView().getEl().setStyle('height', 'auto');
                 loadMachine("-10");
             },
-            itemclick: function (view, node) {
-                //console.log(node);
-//                if (node.isLeaf()) {
-//                    // some functionality to open the leaf(document) in a tabpanel
-//                    alert(node.get("text"));
-//                } else if (node.isExpanded()) {
-//                    node.collapse();
-//                } else {
-//                    node.expand();
-//                }
+            itemclick: function (view, record) {
+                //tree.expandPath(record.getPath());
             },
             itemdblclick: function (tree, record, item, index, e, eOpts) {
-                //console.log(record);
-                //console.log(record.get("id"));
                 loadMachine(record.get("id"));
                 console.log("dbClick Load data " + record.get("id") + " - " + record.get("name"));
+
             },
             itemcontextmenu: function (tree, record, item, index, e, eOpts) {
                 selectedSystem = record;
@@ -145,8 +139,8 @@
                                 var msg = '<fmt:message key="msgDelete.confirm.item"/>';
                                 Ext.MessageBox.confirm('Confirm', msg, function (btn) {
                                     if (btn == 'yes') {
-                                        var param = '&ids=' + record.get('id');
-                                        deleteCompany(param);
+                                        //var param = record.get('id');
+                                        deleteCompany(record.get('id'));
                                     }
                                 });
                             }}]

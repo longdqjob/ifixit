@@ -64,10 +64,11 @@
                 itemId: 'treeCompany',
                 id: 'treeCompany',
                 layout: 'fit',
-                //height: 300,
+                height: 400,
+                scrollable:true,
                 name: 'treeCompany',
                 store: storeCompany,
-                rootVisible: true,
+                rootVisible: false,
                 useArrows: false,
                 lines: true,
                 columns: [{

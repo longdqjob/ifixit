@@ -8,7 +8,7 @@
         Ext.getCmp('gridId').setWidth(Ext.getCmp("searchform").getWidth());
         Ext.getCmp('gridId').setHeight(Ext.getCmp("viewport").getHeight() - Ext.getCmp("searchform").getHeight() - 110);
         Ext.getCmp("gridId").updateLayout();
-        tree.setHeight(Ext.getCmp("viewport").getHeight() - 180);
+        tree.setHeight(Ext.getCmp("gridId").getHeight() - 30);
     }
 
     function loadMachine(system) {
@@ -64,7 +64,7 @@
         }
         companyWindow.setTitle('<fmt:message key="addCompany"/>');
         companyWindow.setIconCls("add-cls");
-        enableCode();
+        companyCode.setReadOnly(false);
         companyWindow.show();
         companyCode.focus();
     }
@@ -84,19 +84,19 @@
         companyFullCode.setValue(data.get("completeCode"));
         companyDescription.setValue(data.get("description"));
 
-        disableCode();
+        companyCode.setReadOnly(true);
 
         companyWindow.setTitle('<fmt:message key="editCompany"/>');
         companyWindow.setIconCls("edit-cls");
         companyWindow.show();
-        companyCode.focus();
+        companyName.focus();
     }
-    function enableCode() {
-        companyCode.setReadOnly(false);
-    }
-    function disableCode() {
-        companyCode.setReadOnly(true);
-    }
+//    function enableCode() {
+//        companyCode.setReadOnly(false);
+//    }
+//    function disableCode() {
+//        companyCode.setReadOnly(true);
+//    }
 
     function deleteCompany(arrayList) {
         var showMask = new Ext.LoadMask({
@@ -104,8 +104,11 @@
             target: Ext.getCmp('gridId')
         });
         showMask.show();
+        //find record will be delete, then find the parent
+        record = store.findNode("id", arrayList, true, true, true);
+        parentId = record.get("parentId");
         Ext.Ajax.request({
-            url: '../company/deleteCompany?' + arrayList,
+            url: '../company/deleteCompany?&ids=' + arrayList,
             method: "POST",
             timeout: 10000,
             success: function (result, request) {
@@ -121,7 +124,16 @@
                     }
                 }
                 //TODO reload store
-                store.reload();
+//                store.reload();
+                console.log(parentId);
+                var path = store.findNode("id", parentId, true, true, true).getPath();
+                console.log(path);
+                store.load({
+                    callback: function (r, options, success) {
+                        tree.expandPath(path);
+                    }
+                });
+
             },
             failure: function (response, opts) {
                 redirectIfNotAuthen(response);
@@ -170,13 +182,14 @@
                         alertSystemError();
                     }
                 }
-                alert (companyId.getValue())
-                var path = store.findNode("id", companyId.getValue(), true, true, true).getPath();
+
+//                var path = store.findNode("id", companyId.getValue(), true, true, true).getPath();
+                var path = store.findNode("id", companyParentId.getValue(), true, true, true).getPath();
+                console.log(path);
                 store.load({
                     callback: function (r, options, success) {
                         tree.expandPath(path);
                     }
-
                 });
 
             },
@@ -187,6 +200,7 @@
             },
         });
     }
+
 
     function chooseCompany(record) {
         Ext.getCmp('companyParentName').setValue(record.get('name'));
