@@ -95,6 +95,7 @@
         readOnly: true,
     });
 
+   
     var materialName = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         grow: true,
@@ -107,15 +108,29 @@
         width: 350,
         maxLength: 255,
     });
+    
+     var materialLocation = Ext.create('Ext.form.field.Text', {
+        xtype: 'textfield',
+        grow: true,
+        tabIndex: 4,
+        fieldLabel: '<fmt:message key="material.location"/>',
+        labelAlign: 'left',
+        anchor: '100%',
+        margin: '20 10 10 10',
+        width: 250,
+        maxLength: 200,
+        readOnly: false,
+    });
+
 
     var unitStore = Ext.create('Ext.data.Store', {
         fields: ['abbr', 'name'],
         data: [
-            {"abbr": "un", "name": "<fmt:message key="material.unit.un"/>"},
-            {"abbr": "kg", "name": "<fmt:message key="material.unit.kg"/>"},
-            {"abbr": "m", "name": "<fmt:message key="material.unit.m"/>"},
-            {"abbr": "m2", "name": "<fmt:message key="material.unit.m2"/>"},
-            {"abbr": "m3", "name": "<fmt:message key="material.unit.m3"/>"},
+            {"abbr": "UN", "name": "<fmt:message key="material.unit.un"/>"},
+            {"abbr": "KG", "name": "<fmt:message key="material.unit.kg"/>"},
+            {"abbr": "M", "name": "<fmt:message key="material.unit.m"/>"},
+            {"abbr": "M2", "name": "<fmt:message key="material.unit.m2"/>"},
+            {"abbr": "M3", "name": "<fmt:message key="material.unit.m3"/>"},
         ]
     });
 
@@ -325,7 +340,7 @@
                         xtype: 'container',
                         columnWidth: 0.5,
                         layout: 'anchor',
-                        items: [materialFatherCode, materialCompleteCode]
+                        items: [materialFatherCode, materialCompleteCode,materialLocation]
                     },
                     {
                         xtype: 'container',

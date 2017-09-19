@@ -55,6 +55,7 @@
         materialCost.setValue(data.get("cost"));
         materialUnit.setValue(data.get("unit"));
         materialQty.setValue(data.get("quantity"));
+        materialLocation.setValue(data.get("location"));
 
         if (data.get("imgUrl") && data.get("imgUrl") != "") {
             setImgPreView(data.get("imgUrl"));
@@ -186,7 +187,8 @@
                 quantity: materialQty.getValue(),
                 imgUrl: materialImgUrl.getValue(),
                 imgPath: materialImgPath.getValue(),
-                specification: Ext.encode(materialCreateSpec())
+                specification: Ext.encode(materialCreateSpec()),
+                location: materialLocation.getValue()
             },
             success: function (response) {
                 unMaskTarget();

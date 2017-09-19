@@ -109,11 +109,11 @@
                 ],
             },
             ////////////////ITEM   
-            {text: 'ID', dataIndex: 'id', flex: 1, hidden: true},
-            {text: '<fmt:message key="material.code"/>', dataIndex: 'code', flex: 1, },
+            {text: 'ID', dataIndex: 'id', flex: 1, hidden: true,flex: 0.2},
+            {text: '<fmt:message key="material.code"/>', dataIndex: 'code', flex: 0.5, },
             {text: '<fmt:message key="material.completeCode"/>', dataIndex: 'completeCode', flex: 1, },
             {text: '<fmt:message key="material.name"/>', dataIndex: 'name', flex: 1, },
-            {text: '<fmt:message key="material.qty"/>', dataIndex: 'quantity', flex: 1,
+            {text: '<fmt:message key="material.qty"/>', dataIndex: 'quantity', flex: 0.5,
                 editor: {
                     completeOnEnter: true,
                     field: {
@@ -125,7 +125,7 @@
                     },
                 }
             },
-            {text: '<fmt:message key="material.unit"/>', dataIndex: 'unit', flex: 1,
+            {text: '<fmt:message key="material.unit"/>', dataIndex: 'unit', flex: 0.4,
                 editor: {
                     xtype: 'combobox',
                     queryMode: 'local',
@@ -134,7 +134,7 @@
                     store: unitStore,
                 },
             },
-            {text: '<fmt:message key="material.unitCost"/>', dataIndex: 'cost', flex: 1,
+            {text: '<fmt:message key="material.unitCost"/>', dataIndex: 'cost', flex: 0.5,
                 editor: {
                     completeOnEnter: true,
                     field: {
@@ -146,6 +146,7 @@
                     },
                 }
             },
+            {text: '<fmt:message key="material.location"/>', dataIndex: 'location', flex: 1, },
         ],
         viewConfig: {
             autoFit: true,
@@ -210,9 +211,9 @@
         listeners: {
             afterrender: function (usergrid, eOpts) {
                 //console.log(usergrid);
-            },'rowdblclick': function (grid, record) {
+            }, 'rowdblclick': function (grid, record) {
                 editMaterial(record);
-            },validateedit: function (editor, context, eOpts) {
+            }, validateedit: function (editor, context, eOpts) {
                 if (!editor.editors.items[0].field.wasValid) {
                     context.cancel = true;
                     return false;

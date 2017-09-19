@@ -92,7 +92,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         response.setStatus(HttpServletResponse.SC_OK);
         //since we have created our custom success handler, its up to us to where
         //we will redirect the user after successfully login
-        response.sendRedirect("home");
+        response.sendRedirect("admin/workOrder");
     }
 
     public static void updateSession(HttpServletRequest request) {

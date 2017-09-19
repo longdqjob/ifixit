@@ -150,6 +150,7 @@ public class MaterialAction extends BaseAction implements Preparable {
             String quantity = getRequest().getParameter("quantity");
             String imgUrl = getRequest().getParameter("imgUrl");
             String imgPath = getRequest().getParameter("imgPath");
+            String location = getRequest().getParameter("location");
 
             if (StringUtils.isBlank(code)) {
                 result.put("success", false);
@@ -201,6 +202,7 @@ public class MaterialAction extends BaseAction implements Preparable {
             material.setQuantity(Integer.parseInt(quantity));
             material.setImgPath(imgPath);
             material.setImgUrl(imgUrl);
+            material.setLocation(location);
             material = materialDao.save(material);
             if (material != null) {
                 if (!StringUtils.isBlank(lastPath) && !lastPath.equals(material.getImgPath())) {
