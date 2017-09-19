@@ -62,6 +62,7 @@
         width: 350,
         maxLength: 50,
         labelWidth: 100,
+        minValue: 0,
         allowDecimals: true,
         allowNegative: false,
         decimalSeparator: ".",

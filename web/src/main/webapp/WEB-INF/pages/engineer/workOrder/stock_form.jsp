@@ -63,10 +63,10 @@
         allowBlank: false,
         margin: '10 10 10 10',
         width: 350,
-        maxLength: 50,
         labelWidth: 50,
         allowDecimals: false,
         allowNegative: false,
+        minValue: 0,
         listeners: {
             'change': function (textfield, newValue, oldValue) {
                 calcQty();
