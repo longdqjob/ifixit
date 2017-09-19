@@ -33,6 +33,7 @@ public class Material extends BaseObject implements Serializable {
     private String imgPath;
     private Material parent;
     private ItemType itemType;
+    private String location;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -132,6 +133,15 @@ public class Material extends BaseObject implements Serializable {
 
     public void setImgPath(String imgPath) {
         this.imgPath = imgPath;
+    }
+
+    @Column(name = "location")
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
