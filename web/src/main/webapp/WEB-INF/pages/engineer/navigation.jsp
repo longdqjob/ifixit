@@ -62,6 +62,9 @@
         store: storeEngineer,
         hideHeaders: true,
         minHeight: 400,
+         viewConfig: {
+            toggleOnDblClick: false
+        },
         columns: [{
                 xtype: 'treecolumn', //this is so we know which column will show the tree
                 width: 345,

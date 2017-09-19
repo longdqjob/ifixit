@@ -2,13 +2,14 @@
 
 <script>
     var selectedSystem = null;
-    var engParentNode= 0;
+    var engParentNode = 0;
 
     function updateLayOut() {
         Ext.getCmp("searchform").updateLayout();
         Ext.getCmp('gridId').setWidth(Ext.getCmp("searchform").getWidth());
         Ext.getCmp('gridId').setHeight(Ext.getCmp("viewport").getHeight() - Ext.getCmp("searchform").getHeight() - 110);
         Ext.getCmp("gridId").updateLayout();
+        tree.setHeight(Ext.getCmp("gridId").getHeight()-5);
     }
 
     function loadWorkOrder(engineerId) {
@@ -144,7 +145,7 @@
             },
         });
     }
-    
+
     function reloadTreeEng() {
         var path = storeEngineer.findNode("id", engParentNode, true, true, true).getPath();
         storeEngineer.load({
