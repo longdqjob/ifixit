@@ -226,11 +226,10 @@ public class MachineDaoHibernate extends GenericDaoHibernate<Machine, Long> impl
                 return false;
             }
             Query query = getSession().createSQLQuery("SELECT * FROM work_order WHERE machine_id in (:lstId)")
-                    .addEntity(Machine.class)
                     .setParameterList("lstId", lstId);
             return (query.list().size() > 0);
         } catch (Exception ex) {
-            log.error("ERROR checkUseParent: " + StringUtils.join(lstId, ","), ex);
+            log.error("ERROR checkUseWO: " + StringUtils.join(lstId, ","), ex);
             return null;
         }
     }

@@ -133,4 +133,24 @@ public class MachineTypeDaoHibernate extends GenericDaoHibernate<MachineType, In
         }
         return rtn;
     }
+    
+    /**
+     *
+     * @param lstId
+     * @return true neu duoc su dung tren WO
+     */
+    @Override
+    public Boolean checkUseMechanic(List<Integer> lstId) {
+        try {
+            if (lstId == null || lstId.isEmpty()) {
+                return false;
+            }
+            Query query = getSession().createSQLQuery("SELECT * FROM machine WHERE machine_type_id in (:lstId)")
+                    .setParameterList("lstId", lstId);
+            return (query.list().size() > 0);
+        } catch (Exception ex) {
+            log.error("ERROR checkUseMechanic: " + StringUtils.join(lstId, ","), ex);
+            return null;
+        }
+    }
 }

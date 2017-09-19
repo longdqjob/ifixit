@@ -49,8 +49,8 @@
             }]
     });
 
-    var mhManHrs = Ext.create('Ext.form.field.Text', {
-        xtype: 'textfield',
+    var mhManHrs = Ext.create('Ext.form.field.Number', {
+        xtype: 'numberfield',
         grow: true,
         tabIndex: 5,
         fieldLabel: '<fmt:message key="mh.manHrs"/>',
@@ -62,6 +62,10 @@
         width: 350,
         maxLength: 50,
         labelWidth: 100,
+        allowDecimals: true,
+        allowNegative: false,
+        decimalSeparator: ".",
+        decimalPrecision: 3,
         listeners: {
             'change': function (textfield, newValue, oldValue) {
                 changeHrs(oldValue, newValue);
@@ -76,7 +80,7 @@
         fieldLabel: '<fmt:message key="mh.cost"/>',
         labelAlign: 'left',
         anchor: '100%',
-        allowBlank: false,
+        allowBlank: true,
         margin: '10 10 10 10',
         width: 250,
         readOnly: true,
@@ -94,7 +98,7 @@
         fieldLabel: '<fmt:message key="mh.totalCost"/>',
         labelAlign: 'left',
         anchor: '100%',
-        allowBlank: false,
+        allowBlank: true,
         margin: '10 10 10 10',
         width: 250,
         readOnly: true,

@@ -16,7 +16,7 @@
         allowBlank: false,
         margin: '10 10 10 10',
         width: 350,
-        maxLength: 50,
+        maxLength: 255,
     });
 
     var engneerDes = Ext.create('Ext.form.field.Text', {
@@ -29,7 +29,7 @@
         allowBlank: false,
         margin: '10 10 10 10',
         width: 350,
-        maxLength: 50,
+        maxLength: 255,
     });
 
     var engneerCode = Ext.create('Ext.form.field.Text', {
@@ -41,7 +41,12 @@
         allowBlank: false,
         margin: '10 10 10 10',
         width: 350,
-        maxLength: 50,
+        maxLength: 20,
+        listeners: {
+            'change': function (textfield, newValue, oldValue) {
+                generateFullCode();
+            }
+        }
     });
     var engneerFullCode = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
@@ -52,12 +57,12 @@
         allowBlank: false,
         margin: '10 10 10 10',
         width: 350,
-        maxLength: 50,
+        maxLength: 20,
         readOnly: true,
     });
 
-    var engneerCost = Ext.create('Ext.form.field.Text', {
-        xtype: 'textfield',
+    var engneerCost = Ext.create('Ext.form.field.Number', {
+        xtype: 'numberfield',
         grow: true,
         fieldLabel: '<fmt:message key="grpEngineer.cost"/>',
         labelAlign: 'left',
@@ -66,11 +71,10 @@
         margin: '10 10 10 10',
         width: 350,
         maxLength: 50,
-        listeners: {
-            'change': function (textfield, newValue, oldValue) {
-                generateFullCode();
-            }
-        }
+        allowDecimals: true,
+        allowNegative: false,
+        decimalSeparator: ".",
+        decimalPrecision: 3,
     });
 
     var engneerParentId = Ext.create('Ext.form.field.Text', {
@@ -82,6 +86,11 @@
     var engneerParentCode = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         hidden: true,
+        listeners: {
+            'change': function (textfield, newValue, oldValue) {
+                generateFullCode();
+            }
+        }
     });
 
     var engneerParentName = Ext.create('Ext.form.field.Text', {
@@ -90,7 +99,7 @@
         fieldLabel: '<fmt:message key="grpEngineer.parent"/>',
         labelAlign: 'left',
         anchor: '100%',
-        allowBlank: false,
+        allowBlank: true,
         margin: '10 10 10 10',
         width: 250,
         readOnly: true,
@@ -102,6 +111,7 @@
         layout: 'column',
         items: [engneerParentId, engneerParentCode, engneerParentName, {
                 xtype: 'button',
+                id: "btnEngneerParent",
                 text: '<fmt:message key="choose"/>',
                 margin: '10 0 6 10',
                 width: 80,

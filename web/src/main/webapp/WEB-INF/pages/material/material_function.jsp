@@ -4,6 +4,11 @@
     function addMaterial(data) {
         materialResetSpec();
         materialForm.reset();
+        if (data != null) {
+            materialFatherId.setValue(data.get("id"));
+            materialFatherName.setValue(data.get("name"));
+            materialFatherCode.setValue(data.get("completeCode"));
+        }
         materialWindow.setTitle('<fmt:message key="material.add"/>');
         materialWindow.setIconCls("add-cls");
         enableCode();
@@ -11,8 +16,8 @@
         materialWindow.show();
         materialCode.focus();
     }
-    
-    function resetImgPreView(){
+
+    function resetImgPreView() {
         materialImgUrl.reset();
         try {
             materialImgPreview.el.dom.src = "../images/no-preview-available.png";
@@ -20,7 +25,7 @@
             console.error(c);
         }
     }
-    function setImgPreView(url){
+    function setImgPreView(url) {
         materialImgUrl.setValue(url);
         try {
             materialImgPreview.el.dom.src = url;
@@ -56,7 +61,7 @@
         } else {
             resetImgPreView();
         }
-        
+
         if (data.get("imgPath") && data.get("imgPath") != "") {
             materialImgPath.setValue(data.get("imgPath"));
         }

@@ -182,4 +182,14 @@
             window.location.replace(urlLogin);
         }
     }
+
+    function eleWithRequired(ele, show) {
+        if (show) {
+            ele.allowBlank = false;
+            ele.show();
+        } else {
+            ele.allowBlank = true;
+            ele.hide();
+        }
+    }
 </script>

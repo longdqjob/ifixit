@@ -1,8 +1,4 @@
-<%-- 
-    Document   : layout
-    Created on : Aug 26, 2017, 5:57:28 PM
-    Author     : thuyetlv
---%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <script>
     Ext.onReady(function () {
@@ -22,8 +18,9 @@
                     xtype: 'panel',
                     region: 'west',
                     id: "westSide",
+                    iconCls: 'navpn',
                     stateId: 'navigation-panel',
-                   // title: 'System',
+                    title: '<fmt:message key="company"/>',
                     split: true,
                     width: 350,
                     minWidth: 350,
@@ -34,9 +31,8 @@
                     layout: 'accordion',
                     items: [{
                             contentEl: 'west',
-                            title: 'System',
+                            id: "westPn",
                             html: ' <div id="tree"></div>',
-                            iconCls: 'navpn',
                             margin: '0 0 0 -5',
                         },
 //                        {
@@ -51,11 +47,9 @@
                     ],
                     listeners: {
                         collapse: function () {
-                            console.log("-----collapse:--");
                             updateLayOut();
                         },
                         expand: function () {
-                            console.log("-----expand:--");
                             updateLayOut();
                         }
                     }
@@ -87,6 +81,8 @@
                 },
             },
         });
+        Ext.getCmp("westPn").getHeader().hide();
+//        Ext.getCmp("westPn").getHeader().destroy();
         tree.render('tree');
         search.render('searchDiv');
         gridPanel.render('gridDiv');

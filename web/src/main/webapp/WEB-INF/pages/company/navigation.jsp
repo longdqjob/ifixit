@@ -73,7 +73,7 @@
         id: 'sidelefttree',
         resizable: false,
         header: false,
-        collapsible: true,
+        collapsible: false,
         useArrows: false,
         rootVisible: true,
         lines: true,

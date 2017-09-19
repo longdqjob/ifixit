@@ -4,16 +4,22 @@
     var selectedSystem = null;
 
     function updateLayOut() {
+        try {
+            tree.updateLayout();
+            Ext.getCmp("westPn").updateLayout();
+        } catch (c) {
+            console.error(c);
+        }
         Ext.getCmp("searchform").updateLayout();
         Ext.getCmp('gridId').setWidth(Ext.getCmp("searchform").getWidth());
-        Ext.getCmp('gridId').setHeight(Ext.getCmp("viewport").getHeight() - Ext.getCmp("searchform").getHeight() - 110);
+        Ext.getCmp('gridId').setHeight(Ext.getCmp("viewport").getHeight() - Ext.getCmp("searchform").getHeight() - 120);
         Ext.getCmp("gridId").updateLayout();
-        tree.setHeight(Ext.getCmp("gridId").getHeight() - 30);
+        tree.setHeight(Ext.getCmp("gridId").getHeight() + 5);
     }
 
     function loadMachine(system) {
         if (!system) {
-            system = (selectedSystem != null) ? selectedSystem.get("id") : -10;
+            system = (selectedSystem != null) ? selectedSystem.get("id") : 0;
         }
         mygrid.getStore().getProxy().extraParams = {
             system: system,

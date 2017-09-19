@@ -16,8 +16,9 @@
             items: [{
                     region: 'west',
                     id: "westSide",
+                    iconCls: 'navpn',
                     stateId: 'navigation-panel',
-                    title: 'West',
+                    title: '<fmt:message key="grpEngineer"/>',
                     split: true,
                     width: 400,
                     minWidth: 175,
@@ -28,17 +29,15 @@
                     layout: 'accordion',
                     items: [{
                             contentEl: 'west',
-                            title: '<fmt:message key="grpEngineer"/>',
+                            id: "westPn",
+//                            title: '<fmt:message key="grpEngineer"/>',
                             html: ' <div id="tree"></div>',
-                            iconCls: 'navpn' // see the HEAD section for style used
                         }],
                     listeners: {
                         collapse: function () {
-                            console.log("-----collapse:--");
                             updateLayOut();
                         },
                         expand: function () {
-                            console.log("-----expand:--");
                             updateLayOut();
                         }
                     }
@@ -71,6 +70,7 @@
             },
         });
         tree.render('tree');
+        Ext.getCmp("westPn").getHeader().hide();
         search.render('searchDiv');
         gridPanel.render('gridDiv');
     });

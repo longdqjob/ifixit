@@ -39,6 +39,7 @@
     function addMechanic(data) {
         resetLabelSpec();
         resetImgPreView();
+        loadHistoryWo(null);
         mechanicForm.reset();
         mechanicWindow.setTitle('<fmt:message key="machine.add"/>');
         mechanicWindow.setIconCls('add-cls');
@@ -52,6 +53,9 @@
         console.log(data);
         resetLabelSpec();
         mechanicForm.reset();
+
+        loadHistoryWo(data.get("id"));
+
         mechanicId.setValue(data.get("id"));
         mechanicTypeId.setValue(data.get("machineTypeId"));
         mechanicTypeName.setValue(data.get("machineTypeName"));
@@ -78,12 +82,28 @@
         if (data.get("imgPath") && data.get("imgPath") != "") {
             mechanicImgPath.setValue(data.get("imgPath"));
         }
+
         mechanicWindow.setTitle('<fmt:message key="machine.edit"/>');
         mechanicWindow.setIconCls('edit-cls');
         disableCode();
         mechanicWindow.show();
         gridHis.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
         mechanicName.focus();
+    }
+
+    function loadHistoryWo(mechanicId) {
+        if (mechanicId) {
+            gridHis.getStore().getProxy().extraParams = {
+                mechanicId: mechanicId,
+            };
+            gridHis.getStore().loadPage(1, {
+                callback: function (records, operation, success) {
+                    storeRedirectIfNotAuthen(operation);
+                }
+            });
+        } else {
+            gridHis.getStore().removeAll();
+        }
     }
 
 

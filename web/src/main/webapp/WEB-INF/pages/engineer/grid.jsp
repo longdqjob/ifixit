@@ -116,11 +116,7 @@
                         case 1 :
                             return '<fmt:message key="work.status.open"/>';
                         case 2 :
-                            return '<fmt:message key="work.status.approval"/>';
-                        case 3 :
-                            return '<fmt:message key="work.status.inProgress"/>';
-                        case 4 :
-                            return '<fmt:message key="work.status.pendding"/>';
+                            return '<fmt:message key="work.status.over"/>';
                     }
                 },
                 editor: {

@@ -53,8 +53,8 @@
             }]
     });
 
-    var stockQty = Ext.create('Ext.form.field.Text', {
-        xtype: 'textfield',
+    var stockQty = Ext.create('Ext.form.field.Number', {
+        xtype: 'numberfield',
         grow: true,
         tabIndex: 5,
         fieldLabel: '<fmt:message key="work.material.qty"/>',
@@ -65,6 +65,8 @@
         width: 350,
         maxLength: 50,
         labelWidth: 50,
+        allowDecimals: false,
+        allowNegative: false,
         listeners: {
             'change': function (textfield, newValue, oldValue) {
                 calcQty();
@@ -83,7 +85,7 @@
         fieldLabel: '<fmt:message key="work.material.unit"/>',
         labelAlign: 'left',
         anchor: '100%',
-        allowBlank: false,
+        allowBlank: true,
         margin: '10 10 10 10',
         width: 250,
         readOnly: true,
@@ -96,7 +98,7 @@
         fieldLabel: '<fmt:message key="material.unitCost"/>',
         labelAlign: 'left',
         anchor: '100%',
-        allowBlank: false,
+        allowBlank: true,
         margin: '10 10 10 10',
         width: 250,
         readOnly: true,
@@ -110,7 +112,7 @@
         fieldLabel: '<fmt:message key="material.totalCode"/>',
         labelAlign: 'left',
         anchor: '100%',
-        allowBlank: false,
+        allowBlank: true,
         margin: '10 10 10 10',
         width: 250,
         readOnly: true,

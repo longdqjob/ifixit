@@ -122,6 +122,41 @@ public class WorkOrderAction extends BaseAction implements Preparable {
         return SUCCESS;
     }
 
+    //<editor-fold defaultstate="collapsed" desc="getLoadWOHis">
+    public InputStream getLoadWOHis() {
+        try {
+            JSONObject result = new JSONObject();
+            String mechanicReq = getRequest().getParameter("mechanicId");
+            List<Integer> listEng = groupEngineerDao.getListChildren(getGrpEngineerId());
+            Map pagingMap = workOrderDao.getList(listEng, null, Long.parseLong(mechanicReq), null, null, start, limit);
+
+            ArrayList<WorkOrder> list = new ArrayList<WorkOrder>();
+            if (pagingMap.get("list") != null) {
+                list = (ArrayList<WorkOrder>) pagingMap.get("list");
+            }
+
+            Integer count = 0;
+            if (pagingMap.get("count") != null) {
+                count = (Integer) pagingMap.get("count");
+            }
+
+            JSONArray jSONArray = new JSONArray();
+            JSONObject tmp;
+            for (WorkOrder workOrder : list) {
+                tmp = new JSONObject();
+                tmp = WebUtil.toJSONObject(workOrder, "workType,machine,groupEngineer");
+                jSONArray.put(tmp);
+            }
+
+            result.put("list", jSONArray);
+            result.put("totalCount", count);
+            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+        } catch (Exception ex) {
+            log.error("ERROR getLoadData: ", ex);
+            return null;
+        }
+    }//</editor-fold>
+
     //<editor-fold defaultstate="collapsed" desc="getLoadData">
     public InputStream getLoadData() {
         try {
@@ -157,7 +192,7 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                 listEng = groupEngineerDao.getListChildren(engineerId);
             }
 
-            Map pagingMap = workOrderDao.getList(listEng, listWorkType, code, name, start, limit);
+            Map pagingMap = workOrderDao.getList(listEng, listWorkType, null, code, name, start, limit);
 
             ArrayList<WorkOrder> list = new ArrayList<WorkOrder>();
             if (pagingMap.get("list") != null) {
@@ -382,7 +417,7 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             workOrder.setStatus(Integer.parseInt(status));
             if (!StringUtils.isBlank(interval)) {
                 workOrder.setInterval(Integer.parseInt(interval));
-            }else{
+            } else {
                 workOrder.setInterval(0);
             }
             workOrder.setIsRepeat(Integer.parseInt(repeat));

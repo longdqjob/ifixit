@@ -109,30 +109,42 @@ public class ItemTypeDaoHibernate extends GenericDaoHibernate<ItemType, Integer>
     public List<Integer> getListChildren(Integer id) {
         try {
             List<Integer> rtn = null;
-            id = (id == null) ? 0 : id;
-            String hql = "SELECT id,GetItemTypeTree(id,:level) FamilyTree FROM item_type WHERE id=:parent_id";
-
-            List<Object[]> areaList = getSession()
-                    .createSQLQuery(hql)
-                    .setParameter("level", TREE_LEVEL)
-                    .setParameter("parent_id", id)
-                    .list();
-            rtn = new LinkedList<>();
-            rtn.add(id);
-            if (areaList != null && !areaList.isEmpty()) {
-                String familyTree = "";
-                for (Object[] obj : areaList) {
-                    familyTree = String.valueOf(obj[1]);
-                }
-                if (familyTree.length() > 0) {
-                    String[] tmp = familyTree.split(",");
-                    for (String child : tmp) {
-                        rtn.add(Integer.valueOf(child));
-                    }
-                }
+            if (id == null) {
+                return new ArrayList<Integer>(0);
             }
 
-            return rtn;
+            if (id <= 0) {
+                List<ItemType> list = getAll();
+                rtn = new LinkedList<>();
+                for (ItemType itemType : list) {
+                    rtn.add(itemType.getId());
+                }
+                return rtn;
+            } else {
+                String hql = "SELECT id,GetItemTypeTree(id,:level) FamilyTree FROM item_type WHERE id=:parent_id";
+
+                List<Object[]> areaList = getSession()
+                        .createSQLQuery(hql)
+                        .setParameter("level", TREE_LEVEL)
+                        .setParameter("parent_id", id)
+                        .list();
+                rtn = new LinkedList<>();
+                rtn.add(id);
+                if (areaList != null && !areaList.isEmpty()) {
+                    String familyTree = "";
+                    for (Object[] obj : areaList) {
+                        familyTree = String.valueOf(obj[1]);
+                    }
+                    if (familyTree.length() > 0) {
+                        String[] tmp = familyTree.split(",");
+                        for (String child : tmp) {
+                            rtn.add(Integer.valueOf(child));
+                        }
+                    }
+                }
+
+                return rtn;
+            }
         } catch (Exception ex) {
             log.error("ERROR getListChildren: ", ex);
             return null;

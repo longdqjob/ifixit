@@ -2,6 +2,7 @@
 
 <script>
     var selectedSystem = null;
+    var engParentNode= 0;
 
     function updateLayOut() {
         Ext.getCmp("searchform").updateLayout();
@@ -33,11 +34,14 @@
 
     function addEngineer(data) {
         engneerForm.reset();
+        engneerCode.setReadOnly(false);
         if (data != null) {
-            workTypeParentId.setValue(data.get("id"));
-            workTypeParentName.setValue(data.get("name"));
+            console.log(data);
+            engneerParentId.setValue(data.get("id"));
+            engneerParentName.setValue(data.get("name"));
             engneerParentCode.setValue(data.get("completeCode"));
         }
+
         engneerWindow.setTitle('<fmt:message key="grpEngineer.add"/>');
         engneerWindow.show();
     }
@@ -53,29 +57,34 @@
         engneerCode.setValue(data.get("code"));
         engneerFullCode.setValue(data.get("completeCode"));
         engneerCost.setValue(data.get("cost"));
-        engneerWindow.setTitle('<fmt:message key="grpEngineer.add"/>');
+        //Set reaonly for edit
+        engneerCode.setReadOnly(true);
+        Ext.getCmp("btnEngneerParent").hide();
+
+        engneerWindow.setTitle('<fmt:message key="grpEngineer.edit"/>');
         engneerWindow.show();
     }
 
     function generateFullCode() {
-        engneerFullCode.setValue(engneerParentCode.getValue() + "." + engneerCode.getValue());
+        if (engneerParentCode.getValue() != "") {
+            engneerFullCode.setValue(engneerParentCode.getValue() + "." + engneerCode.getValue());
+        } else {
+            engneerFullCode.setValue(engneerCode.getValue());
+        }
     }
 
     function deleteEngineer(arrayList) {
-        var showMask = new Ext.LoadMask({
-            msg: '<fmt:message key="loading"/>',
-            target: Ext.getCmp('gridId')
-        });
-        showMask.show();
+        maskTarget(tree);
         Ext.Ajax.request({
             url: '../grpEngineer/delete?' + arrayList,
             method: "POST",
             timeout: 10000,
             success: function (result, request) {
-                showMask.hide();
+                unMaskTarget();
                 jsonData = Ext.decode(result.responseText);
                 if (jsonData.success == true) {
                     alertSuccess(jsonData.message);
+                    reloadTreeEng();
                 } else {
                     if (jsonData.message) {
                         alertError(jsonData.message);
@@ -86,7 +95,7 @@
             },
             failure: function (response, opts) {
                 redirectIfNotAuthen(response);
-                showMask.hide();
+                unMaskTarget();
                 alertSystemError();
             }
         });
@@ -117,7 +126,9 @@
                     alertError(res.message);
                     engneerCode.setActiveError(res.message);
                 } else if ("true" == res.success || true === res.success) {
+                    alertSuccess(res.message);
                     engneerWindow.hide();
+                    reloadTreeEng();
                 } else {
                     if (res.message) {
                         alertError(res.message);
@@ -131,6 +142,15 @@
                 alertSystemError();
                 unmask();
             },
+        });
+    }
+    
+    function reloadTreeEng() {
+        var path = storeEngineer.findNode("id", engParentNode, true, true, true).getPath();
+        storeEngineer.load({
+            callback: function (r, options, success) {
+                tree.expandPath(path);
+            }
         });
     }
 </script>

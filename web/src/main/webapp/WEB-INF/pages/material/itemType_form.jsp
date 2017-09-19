@@ -14,7 +14,7 @@
         allowBlank: false,
         margin: '10 10 10 10',
         width: 450,
-        maxLength: 50,
+        maxLength: 255,
     });
 
     var itemTypeCode = Ext.create('Ext.form.field.Text', {
@@ -26,7 +26,7 @@
         allowBlank: false,
         margin: '10 10 10 10',
         width: 450,
-        maxLength: 50,
+        maxLength: 20,
         listeners: {
             change: function (code, newval, oldval, options) {
                 genItemTypeCode();
@@ -40,9 +40,9 @@
         labelAlign: 'left',
         anchor: '100%',
         allowBlank: false,
-        margin: '10 10 10 10',
+        margin: '20 10 10 10',
         width: 450,
-        maxLength: 50,
+        maxLength: 20,
         readOnly: true,
     });
 

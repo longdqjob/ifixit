@@ -48,7 +48,7 @@
     var materialFatherCode = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         grow: true,
-        tabIndex: 4,
+        tabIndex: -1,
         fieldLabel: '<fmt:message key="material.parentCode"/>',
         labelAlign: 'left',
         anchor: '100%',
@@ -67,14 +67,14 @@
     var materialCode = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         grow: true,
-        tabIndex: 4,
+        tabIndex: 1,
         fieldLabel: '<fmt:message key="material.code"/>',
         labelAlign: 'left',
         anchor: '100%',
         allowBlank: false,
         margin: '10 10 10 10',
         width: 250,
-        maxLength: 50,
+        maxLength: 20,
         listeners: {
             'change': function (textfield, newValue, oldValue) {
                 genMaterialCode(oldValue, newValue);
@@ -91,21 +91,21 @@
         allowBlank: false,
         margin: '20 10 10 10',
         width: 250,
-        maxLength: 50,
+        maxLength: 20,
         readOnly: true,
     });
 
     var materialName = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         grow: true,
-        tabIndex: 5,
+        tabIndex: 2,
         fieldLabel: '<fmt:message key="material.name"/>',
         labelAlign: 'left',
         anchor: '100%',
         allowBlank: false,
         margin: '20 10 10 10',
         width: 350,
-        maxLength: 50,
+        maxLength: 255,
     });
 
     var unitStore = Ext.create('Ext.data.Store', {
@@ -123,6 +123,7 @@
     var materialUnit = Ext.create('Ext.form.ComboBox', {
         fieldLabel: '<fmt:message key="material.unit"/>',
         labelWidth: 100,
+        tabIndex: 6,
         store: unitStore,
         queryMode: 'local',
         displayField: 'name',
@@ -133,20 +134,24 @@
         editable: false,
     });
 
-    var materialCost = Ext.create('Ext.form.field.Text', {
-        xtype: 'textfield',
+    var materialCost = Ext.create('Ext.form.field.Number', {
+        xtype: 'numberfield',
         grow: true,
-        tabIndex: 5,
+        tabIndex: 4,
         fieldLabel: '<fmt:message key="material.unitCost"/>',
         labelAlign: 'left',
         anchor: '100%',
         allowBlank: false,
         margin: '20 10 10 10',
         width: 350,
-        maxLength: 50,
+        allowDecimals: true,
+        allowNegative: false,
+        decimalSeparator: ".",
+        decimalPrecision: 3,
+        minValue: 0,
     });
-    var materialQty = Ext.create('Ext.form.field.Text', {
-        xtype: 'textfield',
+    var materialQty = Ext.create('Ext.form.field.Number', {
+        xtype: 'numberfield',
         grow: true,
         tabIndex: 5,
         fieldLabel: '<fmt:message key="material.qty"/>',
@@ -155,13 +160,16 @@
         allowBlank: false,
         margin: '20 10 10 10',
         width: 350,
-        maxLength: 50,
+        allowDecimals: false,
+        allowNegative: false,
+        minValue: 0,
     });
 
 
     var materialImage = {
         xtype: 'filefield',
         id: "materialImage",
+        tabIndex: 3,
         name: 'file',
         fieldLabel: '<fmt:message key="material.img"/>',
         allowBlank: true,
@@ -209,6 +217,7 @@
         items: [{
                 title: '<fmt:message key="material.info"/>',
                 tabIndex: 13,
+                id: "tabInfo",
                 items: [{
                         xtype: 'container',
                         anchor: '100%',
@@ -231,7 +240,7 @@
                 ],
             }, {
                 title: '<fmt:message key="material.specification"/>',
-                tabIndex: 13,
+                tabIndex: 7,
                 items: [{
                         xtype: 'container',
                         anchor: '100%',
@@ -355,6 +364,9 @@
                 }
             }],
         listeners: {
+            show: function (window) {
+                tabSpec.setActiveTab(Ext.getCmp("tabInfo"));
+            },
             afterRender: function (thisForm, options) {
                 this.keyNav = Ext.create('Ext.util.KeyNav', this.el, {
                     enter: function () {

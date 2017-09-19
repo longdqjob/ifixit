@@ -15,6 +15,7 @@ import com.cmms.service.RoleManager;
 import com.cmms.service.UserManager;
 import com.cmms.webapp.security.LoginSuccessHandler;
 import com.cmms.webapp.util.ResourceBundleUtils;
+import com.google.gson.Gson;
 import java.text.SimpleDateFormat;
 import org.springframework.mail.SimpleMailMessage;
 
@@ -272,6 +273,34 @@ public class BaseAction extends ActionSupport {
         this.groupEngineerDao = groupEngineerDao;
     }
 
+    public void updateSessionSystem() {
+        Integer rtn = (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID);
+        if (rtn == null) {
+            rtn = LoginSuccessHandler.updateSessionSystem(getRequest());
+            getRequest().getSession().setAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID, rtn);
+        }
+        String systemName = ResourceBundleUtils.getName("company");
+        String obj = "";
+        if (rtn != null && rtn > 0) {
+            if (companyDao == null) {
+                ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getRequest().getServletContext());
+                companyDao = ctx.getBean("companyDao", CompanyDao.class);
+            }
+            Company company = companyDao.get(rtn);
+            systemName = company.getName();
+
+            //SESSION_SYSTEM_OBJ
+            try {
+                Gson gson = new Gson();
+                obj = gson.toJson(companyDao.getTree(company));
+            } catch (Exception ex) {
+                log.error("ERROR getSytemId: ", ex);
+            }
+        }
+        getRequest().getSession().setAttribute(LoginSuccessHandler.SESSION_SYSTEM_NAME, systemName);
+        getRequest().getSession().setAttribute(LoginSuccessHandler.SESSION_SYSTEM_OBJ, obj);
+    }
+
     public Integer getSytemId() {
         if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID) != null
                 && getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_NAME) != null) {
@@ -279,18 +308,39 @@ public class BaseAction extends ActionSupport {
         } else {
             Integer rtn = LoginSuccessHandler.updateSessionSystem(getRequest());
             getRequest().getSession().setAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID, rtn);
-            String systemName = ResourceBundleUtils.getName("company");
-            if (rtn > 0) {
-                if (companyDao == null) {
-                    ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getRequest().getServletContext());
-                    companyDao = ctx.getBean("companyDao", CompanyDao.class);
-                }
-                Company company = companyDao.get(rtn);
-                systemName = company.getName();
-            }
-            getRequest().getSession().setAttribute(LoginSuccessHandler.SESSION_SYSTEM_NAME, systemName);
+            updateSessionSystem();
             return (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID);
         }
+    }
+
+    public void updateSessionEng() {
+        Integer rtn = (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP);
+        if (rtn == null) {
+            rtn = LoginSuccessHandler.updateSessionEng(getRequest());
+            getRequest().getSession().setAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP, rtn);
+        }
+        String engName = ResourceBundleUtils.getName("grpEngineer");
+        String obj = "";
+        if (rtn > 0) {
+            if (groupEngineerDao == null) {
+                ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getRequest().getServletContext());
+                groupEngineerDao = ctx.getBean("groupEngineerDao", GroupEngineerDao.class);
+            }
+            GroupEngineer groupEngineer = groupEngineerDao.get(rtn);
+            engName = groupEngineer.getName();
+
+            //SESSION_SYSTEM_OBJ
+            try {
+                Gson gson = new Gson();
+                obj = gson.toJson(groupEngineerDao.getTree(groupEngineer));
+            } catch (Exception ex) {
+                log.error("ERROR getGrpEngineerId: ", ex);
+            }
+        }
+        getRequest().getSession().setAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP_NAME, engName);
+        getRequest().getSession().setAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP_OBJ, obj);
+        log.info("----------------SESSION_ENGINNER_GRP_OBJ--------------");
+        log.info(getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP_OBJ));
     }
 
     public Integer getGrpEngineerId() {
@@ -300,16 +350,7 @@ public class BaseAction extends ActionSupport {
         } else {
             Integer rtn = LoginSuccessHandler.updateSessionEng(getRequest());
             getRequest().getSession().setAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP, rtn);
-            String engName = ResourceBundleUtils.getName("grpEngineer");
-            if (rtn > 0) {
-                if (groupEngineerDao == null) {
-                    ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getRequest().getServletContext());
-                    groupEngineerDao = ctx.getBean("groupEngineerDao", GroupEngineerDao.class);
-                }
-                GroupEngineer groupEngineer = groupEngineerDao.get(rtn);
-                engName = groupEngineer.getName();
-            }
-            getRequest().getSession().setAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP_NAME, engName);
+            updateSessionEng();
             return (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP);
         }
     }

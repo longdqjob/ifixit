@@ -2,6 +2,7 @@ package com.cmms.webapp.action;
 
 import com.cmms.dao.CompanyDao;
 import com.cmms.model.Company;
+import com.cmms.model.GroupEngineer;
 import com.cmms.webapp.security.LoginSuccessHandler;
 import com.cmms.webapp.util.ResourceBundleUtils;
 import com.cmms.webapp.util.WebUtil;
@@ -11,6 +12,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
@@ -52,19 +54,9 @@ public class CompanyAction extends BaseAction implements Preparable {
             if (!StringUtils.isBlank(idReq)) {
                 id = Integer.parseInt(idReq);
             }
-            Integer sessionSystem = (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID);
-            id = ((sessionSystem != null) && (id == null || id < sessionSystem)) ? sessionSystem : id;
-//            if (id == null || id < -1) {
-//                id = null;
-//                if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID) != null) {
-//                    id = (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID);
-//                }
-//            }
-
-//            String result = "";
-//            JSONObject treeview = new JSONObject();
-//            treeview.put("list", itemTypeDao.getTreeView(id));
-//            result = treeview.toString();
+            if (id == null || id <= 0) {
+                id = getSytemId();
+            }
             return new ByteArrayInputStream(companyDao.getTreeView(id).toString().getBytes("UTF8"));
         } catch (Exception e) {
             log.error("ERROR getTreeCompany: ", e);
@@ -151,7 +143,7 @@ public class CompanyAction extends BaseAction implements Preparable {
                 company = companyDao.get(id);
                 if (completeCode.equals(company.getCompleteCode())) {
                     checkUnique = false;
-                }else{
+                } else {
                     //@todo: neu cho con thi ko cho sua code
 //                    List<Integer> list = new ArrayList<>(1);
 //                    list.add(id);
@@ -164,6 +156,24 @@ public class CompanyAction extends BaseAction implements Preparable {
                 }
             } else {
                 company = new Company();
+                if (StringUtils.isBlank(parent)) {
+                    if (getGrpEngineerId() > 0) {
+                        result.put("success", false);
+                        result.put("message", ResourceBundleUtils.getName("parentRequired"));
+                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                    }
+                } else {
+                    //Khong truyen parent thi mac dinh parent la systemID cua user
+                    Integer parentId = Integer.parseInt(parent);
+                    if (parentId <= 0) {
+                        parentId = getSytemId();
+                    }
+                    if (parentId > 0) {
+                        Company parentObj = companyDao.get(parentId);
+                        company.setCompany(parentObj);
+                        completeCode = parentObj.getCompleteCode() + "." + code;
+                    }
+                }
             }
 
             //Check unique
@@ -190,6 +200,10 @@ public class CompanyAction extends BaseAction implements Preparable {
             company.setCompleteCode(completeCode);
             company = companyDao.save(company);
             if (company != null) {
+                if (Objects.equals(company.getId(), getSytemId())) {
+                    //update Session
+                    updateSessionSystem();
+                }
                 result.put("success", true);
                 result.put("message", ResourceBundleUtils.getName("saveSuccess"));
             } else {

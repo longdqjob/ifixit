@@ -19,4 +19,7 @@ public interface MachineTypeDao extends GenericDao<MachineType, Integer> {
     
     @Transactional
     Boolean checkUnique(Integer id,String code);
+    
+    @Transactional
+    Boolean checkUseMechanic(List<Integer> lstId);
 }

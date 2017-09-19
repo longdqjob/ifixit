@@ -30,7 +30,7 @@
         header: false,
         collapsible: true,
         useArrows: false,
-        rootVisible: false,
+        rootVisible: true,
         lines: true,
         multiSelect: true,
         border: true,
@@ -66,42 +66,63 @@
                 console.log("dbClick Load data " + record.get("id") + " - " + record.get("name"));
             },
             itemcontextmenu: function (tree, record, item, index, e, eOpts) {
-                // Optimize : create menu once
-                var menu_grid = new Ext.menu.Menu({items: [{
-                            text: '<fmt:message key="loadData"/>',
-                            iconCls: "refresh",
-                            handler: function () {
-                                selectedItem = record;
-                                console.log(selectedItem);
-                                loadMaterial(selectedItem.get("id"));
-                            }}, {
-                            text: '<fmt:message key="button.add"/>',
-                            iconCls: "add-cls",
-                            handler: function () {
-                                addItemType(record);
-                            }}, {
-                            text: '<fmt:message key="button.add"/>',
-                            iconCls: "edit-cls",
-                            handler: function () {
-                                addMaterial(record);
-                            }}, {
-                            text: '<fmt:message key="button.edit"/>',
-                            iconCls: "edit-cls",
-                            handler: function () {
-                                editItemType(record);
-                            }}, {
-                            text: '<fmt:message key="button.delete"/>',
-                            iconCls: "delete-cls",
-                            handler: function () {
-                                var msg = '<fmt:message key="msgDelete.confirm.item"/>';
-                                Ext.MessageBox.confirm('Confirm', msg, function (btn) {
-                                    if (btn == 'yes') {
-                                        var param = '&ids=' + record.get('id');
-                                        deleteItemType(param);
-                                    }
-                                });
-                            }}]
-                });
+                var menu_grid = null;
+                if (record.get("id") > 0) {
+                    itemTypeParentNode = record.parentNode.get("id");
+                    menu_grid = new Ext.menu.Menu({items: [{
+                                text: '<fmt:message key="loadData"/>',
+                                iconCls: "refresh",
+                                handler: function () {
+                                    selectedItem = record;
+                                    console.log(selectedItem);
+                                    loadMaterial(selectedItem.get("id"));
+                                }}, {
+                                text: '<fmt:message key="button.add"/>',
+                                iconCls: "add-cls",
+                                handler: function () {
+                                    addItemType(record);
+                                }}, {
+                                text: '<fmt:message key="button.add"/>' + " " + '<fmt:message key="material"/>',
+                                iconCls: "add-cls",
+                                handler: function () {
+                                    addMaterial(record);
+                                }}, {
+                                text: '<fmt:message key="button.edit"/>',
+                                iconCls: "edit-cls",
+                                handler: function () {
+                                    editItemType(record);
+                                }}, {
+                                text: '<fmt:message key="button.delete"/>',
+                                iconCls: "delete-cls",
+                                handler: function () {
+                                    var msg = '<fmt:message key="msgDelete.confirm.item"/>';
+                                    Ext.MessageBox.confirm('Confirm', msg, function (btn) {
+                                        if (btn == 'yes') {
+                                            var param = '&ids=' + record.get('id');
+                                            deleteItemType(param);
+                                        }
+                                    });
+                                }}]
+                    });
+                } else {
+                    itemTypeParentNode = 0;
+                    menu_grid = new Ext.menu.Menu({items: [{
+                                text: '<fmt:message key="loadData"/>',
+                                iconCls: "refresh",
+                                handler: function () {
+                                    selectedItem = record;
+                                    console.log(selectedItem);
+                                    loadMaterial(selectedItem.get("id"));
+                                }
+                            }, {
+                                text: '<fmt:message key="button.add"/>',
+                                iconCls: "add-cls",
+                                handler: function () {
+                                    addItemType(record);
+                                }
+                            }]
+                    });
+                }
                 // HERE IS THE MAIN CHANGE
                 var position = [e.getX() - 10, e.getY() - 10];
                 e.stopEvent();

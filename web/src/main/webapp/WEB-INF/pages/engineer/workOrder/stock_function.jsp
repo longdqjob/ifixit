@@ -119,6 +119,7 @@
         } else {
             storeStock.add(getStockFromFrm());
         }
+        gridStock.getView().refresh();
         sumStockCost();
         stockWindow.hide();
     }
@@ -137,6 +138,7 @@
                         alertSuccess(jsonData.message);
                         try {
                             storeStock.removeAt(rowIndex);
+                            gridStock.getView().refresh();
                             sumStockCost();
                         } catch (c) {
                             console.log(c);
@@ -158,6 +160,7 @@
         } else {
             try {
                 storeStock.removeAt(rowIndex);
+                gridStock.getView().refresh();
                 sumStockCost();
                 alertSuccess('<fmt:message key="deleteSuccess"/>');
             } catch (c) {

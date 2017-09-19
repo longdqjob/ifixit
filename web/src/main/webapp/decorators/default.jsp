@@ -30,6 +30,10 @@
                 margin: 0 0 0 0;
             } 
 
+            :hover {
+                text-decoration: none !important;
+            }
+
         </style>
     </head>
 

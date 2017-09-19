@@ -2,7 +2,6 @@ package com.cmms.dao.hibernate;
 
 import com.cmms.dao.GroupEngineerDao;
 import static com.cmms.dao.hibernate.ItemTypeDaoHibernate.TREE_LEVEL;
-import com.cmms.model.Company;
 import com.cmms.model.GroupEngineer;
 import java.math.BigInteger;
 import java.sql.SQLException;
@@ -51,6 +50,7 @@ public class GroupEngineerDaoHibernate extends GenericDaoHibernate<GroupEngineer
         }
     }
 
+    @Override
     public JSONObject getTree(GroupEngineer root) throws JSONException, SQLException {
         JSONObject obj = new JSONObject();
         GroupEngineer grpEnineer = root;
@@ -201,6 +201,30 @@ public class GroupEngineerDaoHibernate extends GenericDaoHibernate<GroupEngineer
             return (((BigInteger) list.get(0)).intValue() > 0);
         } catch (Exception ex) {
             log.error("ERROR checkUseParent: ", ex);
+            return null;
+        }
+    }
+    
+    /**
+     *
+     * @param lstId
+     * @return true neu duoc su dung
+     */
+    @Override
+    public Boolean checkUseByWo(List<Integer> lstId) {
+        try {
+            if (lstId == null || lstId.isEmpty()) {
+                return false;
+            }
+            String hql = "SELECT COUNT(id) FROM work_order WHERE group_engineer_id in (:lstId)";
+            Query query = getSession()
+                    .createSQLQuery(hql)
+                    .setParameterList("lstId", lstId);
+
+            List list = query.list();
+            return (((BigInteger) list.get(0)).intValue() > 0);
+        } catch (Exception ex) {
+            log.error("ERROR checkUseByWo: ", ex);
             return null;
         }
     }

@@ -3,11 +3,13 @@ package com.cmms.dao.hibernate;
 import com.cmms.dao.WorkTypeDao;
 import static com.cmms.dao.hibernate.ItemTypeDaoHibernate.TREE_LEVEL;
 import com.cmms.model.Company;
+import com.cmms.model.Machine;
 import com.cmms.model.WorkType;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -56,7 +58,7 @@ public class WorkTypeDaoHibernate extends GenericDaoHibernate<WorkType, Integer>
         obj.put("name", currentGroup.getName());
         obj.put("code", currentGroup.getCode());
         obj.put("completeCode", currentGroup.getCompleteCode());
-        obj.put("displayname",  currentGroup.getCode()+"-"+currentGroup.getName());
+        obj.put("displayname", currentGroup.getCode() + "-" + currentGroup.getName());
         obj.put("parentId", currentGroup.getParentId());
         obj.put("parentCode", currentGroup.getParentCode());
         obj.put("leaf", false);
@@ -167,4 +169,23 @@ public class WorkTypeDaoHibernate extends GenericDaoHibernate<WorkType, Integer>
         return rtn;
     }
 
+    /**
+     *
+     * @param lstId
+     * @return true neu duoc su dung tren WO
+     */
+    @Override
+    public Boolean checkUseWO(List<Integer> lstId) {
+        try {
+            if (lstId == null || lstId.isEmpty()) {
+                return false;
+            }
+            Query query = getSession().createSQLQuery("SELECT * FROM work_order WHERE work_type_id in (:lstId)")
+                    .setParameterList("lstId", lstId);
+            return (query.list().size() > 0);
+        } catch (Exception ex) {
+            log.error("ERROR checkUseWO: " + StringUtils.join(lstId, ","), ex);
+            return null;
+        }
+    }
 }

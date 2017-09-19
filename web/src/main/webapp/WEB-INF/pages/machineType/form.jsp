@@ -17,7 +17,7 @@
         allowBlank: false,
         margin: '10 10 10 10',
         width: 350,
-        maxLength: 50,
+        maxLength: 20,
         tabIndex: 1,
     });
 
@@ -32,7 +32,7 @@
         allowBlank: false,
         margin: '10 10 10 10',
         width: 350,
-        maxLength: 50,
+        maxLength: 255,
         tabIndex: 2,
     });
 
@@ -47,7 +47,6 @@
         allowBlank: false,
         margin: '10 10 10 10',
         width: 350,
-        maxLength: 50,
         tabIndex: 4,
     });
 

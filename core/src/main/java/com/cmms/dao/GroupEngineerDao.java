@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.List;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -15,6 +16,9 @@ public interface GroupEngineerDao extends GenericDao<GroupEngineer, Integer> {
 
     @Transactional
     List<GroupEngineer> getListItem(Integer id);
+
+    @Transactional
+    public JSONObject getTree(GroupEngineer root) throws JSONException, SQLException;
 
     @Transactional
     JSONArray getTreeView(Integer id) throws JSONException, SQLException;
@@ -30,6 +34,9 @@ public interface GroupEngineerDao extends GenericDao<GroupEngineer, Integer> {
 
     @Transactional
     Boolean checkUseParent(List<Integer> lstId);
+
+    @Transactional
+    Boolean checkUseByWo(List<Integer> lstId);
 
     @Transactional
     Boolean checkUseByManHrs(List<Integer> lstId);

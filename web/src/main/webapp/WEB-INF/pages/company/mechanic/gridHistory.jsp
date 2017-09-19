@@ -1,25 +1,20 @@
-<%-- 
-    Document   : layout
-    Created on : Aug 26, 2017, 5:57:28 PM
-    Author     : thuyetlv
---%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <script>
 //-----------------------------------------Grid---------------------------------------------------------------
     var storeHis = Ext.create('Ext.data.Store', {
         storeId: 'storeHis',
-        fields: ['id', 'status', 'wo', 'code', 'description', 'start', 'end', 'cost', 'note','since'],
         pageSize: 20,
-//        proxy: {
-//            type: 'ajax',
-//            url: '../machine/loadData',
-//            reader: {
-//                rootProperty: 'list',
-//                type: 'json',
-//                totalProperty: 'totalCount'
-//            }
-//        },
+        autoLoad: false,
+        proxy: {
+            type: 'ajax',
+            url: '../workOrder/loadWOHis',
+            reader: {
+                rootProperty: 'list',
+                type: 'json',
+                totalProperty: 'totalCount'
+            }
+        },
     });
     var gridHis = Ext.create('Ext.grid.Panel', {
         id: 'gridHis',
@@ -45,22 +40,33 @@
                 renderer: function (value) {
                     switch (value) {
                         case 0 :
-                            return '<fmt:message key="machine.maintainHistory.status.open"/>';
+                            return '<fmt:message key="work.status.complete"/>';
                         case 1 :
-                            return '<fmt:message key="machine.maintainHistory.status.inprogess"/>';
+                            return '<fmt:message key="work.status.open"/>';
                         case 2 :
-                            return '<fmt:message key="machine.maintainHistory.status.pendding"/>';
-                        case 3 :
-                            return '<fmt:message key="machine.maintainHistory.status.close"/>';
+                            return '<fmt:message key="work.status.over"/>';
                     }
                 }
-            },
-            {text: '<fmt:message key="machine.maintainHistory.wo"/>', dataIndex: 'wo', flex: 1, },
+            },            
+            {text: '<fmt:message key="machine.maintainHistory.wo"/>', dataIndex: 'name', flex: 1, },
             {text: '<fmt:message key="machine.maintainHistory.code"/>', dataIndex: 'code', flex: 1, },
-            {text: '<fmt:message key="machine.maintainHistory.description"/>', dataIndex: 'description', flex: 1, },
-            {text: '<fmt:message key="machine.maintainHistory.start"/>', dataIndex: 'start', flex: 1, },
-            {text: '<fmt:message key="machine.maintainHistory.end"/>', dataIndex: 'end', flex: 1, },
-            {text: '<fmt:message key="machine.maintainHistory.cost"/>', dataIndex: 'cost', flex: 1, },
+            {text: '<fmt:message key="machine.maintainHistory.start"/>', type: 'date', dataIndex: 'startTime', flex: 1,
+                renderer: function (value) {
+                    if (value) {
+                        value = value.replace(".0", "");
+                        return Ext.Date.format(Ext.Date.parse(value, 'Y-m-d H:i:s'), 'm/d/Y');
+                    }
+                    return "";
+                }},
+            {text: '<fmt:message key="machine.maintainHistory.end"/>', type: 'date', dataIndex: 'endTime', flex: 1,
+                renderer: function (value) {
+                    if (value) {
+                        value = value.replace(".0", "");
+                        return Ext.Date.format(Ext.Date.parse(value, 'Y-m-d H:i:s'), 'm/d/Y');
+                    }
+                    return "";
+                }},
+            {text: '<fmt:message key="machine.maintainHistory.cost"/>', dataIndex: 'mhTotalCost', flex: 1, },
             {text: '<fmt:message key="machine.maintainHistory.note"/>', dataIndex: 'note', flex: 1, },
         ],
         viewConfig: {

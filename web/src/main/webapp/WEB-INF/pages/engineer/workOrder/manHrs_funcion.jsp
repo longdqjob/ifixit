@@ -112,6 +112,7 @@
         }
         try {
             storeManHrs.sync();
+            gridManHrs.getView().refresh();
         } catch (c) {
             console.log(c);
         }
@@ -133,6 +134,7 @@
                         alertSuccess(jsonData.message);
                         try {
                             storeManHrs.removeAt(rowIndex);
+                            gridManHrs.getView().refresh();
                         } catch (c) {
                             console.log(c);
                         }
@@ -153,6 +155,7 @@
         } else {
             try {
                 storeManHrs.removeAt(rowIndex);
+                gridManHrs.getView().refresh();
                 alertSuccess('<fmt:message key="deleteSuccess"/>');
             } catch (c) {
                 console.log(c);
@@ -162,8 +165,8 @@
         }
         sumMhs();
     }
-    
-    
+
+
     function saveChangeMh(id, mh, callbackSuccess, callbackFail) {
         maskTarget(Ext.getCmp("gridManHrs"));
         Ext.Ajax.request({

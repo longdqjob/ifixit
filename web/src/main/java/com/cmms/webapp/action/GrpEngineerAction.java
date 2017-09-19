@@ -2,13 +2,13 @@ package com.cmms.webapp.action;
 
 import com.cmms.dao.GroupEngineerDao;
 import com.cmms.model.GroupEngineer;
-import com.cmms.webapp.security.LoginSuccessHandler;
 import com.cmms.webapp.util.ResourceBundleUtils;
 import com.opensymphony.xwork2.Preparable;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -48,7 +48,7 @@ public class GrpEngineerAction extends BaseAction implements Preparable {
             if (!StringUtils.isBlank(idReq)) {
                 id = Integer.parseInt(idReq);
             }
-            if (id == null || id < -1) {
+            if (id == null || id <= 0) {
                 id = getGrpEngineerId();
             }
             return new ByteArrayInputStream(groupEngineerDao.getTreeView(id).toString().getBytes("UTF8"));
@@ -76,13 +76,6 @@ public class GrpEngineerAction extends BaseAction implements Preparable {
                 result.put("message", ResourceBundleUtils.getName("message.codeRequired"));
                 return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
             }
-            if (StringUtils.isBlank(parent)) {
-                if (getGrpEngineerId() > 0) {
-                    result.put("success", false);
-                    result.put("message", ResourceBundleUtils.getName("parentRequired"));
-                    return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
-                }
-            }
 
             Boolean checkUnique = true;
             GroupEngineer cGroupEngineer;
@@ -94,6 +87,24 @@ public class GrpEngineerAction extends BaseAction implements Preparable {
                 }
             } else {
                 cGroupEngineer = new GroupEngineer();
+                if (StringUtils.isBlank(parent)) {
+                    if (getGrpEngineerId() > 0) {
+                        result.put("success", false);
+                        result.put("message", ResourceBundleUtils.getName("parentRequired"));
+                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                    }
+                } else {
+                    //Khong truyen parent thi mac dinh parent la engineerId cua user
+                    Integer parentId = Integer.parseInt(parent);
+                    if (parentId <= 0) {
+                        parentId = getGrpEngineerId();
+                    }
+                    if (parentId > 0) {
+                        GroupEngineer parentObj = groupEngineerDao.get(parentId);
+                        cGroupEngineer.setParent(parentObj);
+                        completeCode = parentObj.getCompleteCode() + "." + code;
+                    }
+                }
             }
 
             //Check unique
@@ -109,10 +120,7 @@ public class GrpEngineerAction extends BaseAction implements Preparable {
                     return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
                 }
             }
-            if (!StringUtils.isBlank(parent)) {
-                GroupEngineer parentObj = groupEngineerDao.get(Integer.parseInt(parent));
-                cGroupEngineer.setParent(parentObj);
-            }
+
             cGroupEngineer.setCode(code);
             cGroupEngineer.setCompleteCode(completeCode);
             cGroupEngineer.setName(name);
@@ -120,6 +128,10 @@ public class GrpEngineerAction extends BaseAction implements Preparable {
             cGroupEngineer.setCost(Float.parseFloat(cost));
             cGroupEngineer = groupEngineerDao.save(cGroupEngineer);
             if (cGroupEngineer != null) {
+                if (Objects.equals(cGroupEngineer.getId(), getGrpEngineerId())) {
+                    //update Session
+                    updateSessionEng();
+                }
                 result.put("success", true);
                 result.put("message", ResourceBundleUtils.getName("saveSuccess"));
             } else {
@@ -155,6 +167,11 @@ public class GrpEngineerAction extends BaseAction implements Preparable {
                         result.put("message", ResourceBundleUtils.getName("deleteUsing"));
                         return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
                     }
+                    if (groupEngineerDao.checkUseByWo(list)) {
+                        result.put("success", false);
+                        result.put("message", ResourceBundleUtils.getName("deleteUsing"));
+                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                    }
                     if (groupEngineerDao.checkUseByManHrs(list)) {
                         result.put("success", false);
                         result.put("message", ResourceBundleUtils.getName("deleteUsing"));
@@ -166,6 +183,11 @@ public class GrpEngineerAction extends BaseAction implements Preparable {
                         list.add(Integer.parseInt(idTmp));
                     }
                     if (groupEngineerDao.checkUseParent(list)) {
+                        result.put("success", false);
+                        result.put("message", ResourceBundleUtils.getName("deleteUsing"));
+                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                    }
+                    if (groupEngineerDao.checkUseByWo(list)) {
                         result.put("success", false);
                         result.put("message", ResourceBundleUtils.getName("deleteUsing"));
                         return new ByteArrayInputStream(result.toString().getBytes("UTF8"));

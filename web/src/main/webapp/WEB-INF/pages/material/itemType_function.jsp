@@ -2,7 +2,7 @@
 
 <script>
     var selectedItem = null;
-
+    var itemTypeParentNode = 0;
     function updateLayOut() {
         if (itemTypeWindow.isVisible()) {
             itemTypeWindow.updateLayout();
@@ -99,7 +99,7 @@
     }
 
     function deleteItemType(arrayList) {
-        maskTarget(Ext.getCmp('tree'));
+        maskTarget(Ext.getCmp('treeItemType'));
         Ext.Ajax.request({
             url: '../itemType/delete?' + arrayList,
             method: "POST",
@@ -109,6 +109,7 @@
                 jsonData = Ext.decode(result.responseText);
                 if (jsonData.success == true) {
                     alertSuccess(jsonData.message);
+                    reloadTreeItemType();
                 } else {
                     if (jsonData.message) {
                         alertError(jsonData.message);
@@ -116,8 +117,6 @@
                         alertSystemError();
                     }
                 }
-                //TODO reload store
-                store.reload();
             },
             failure: function (response, opts) {
                 redirectIfNotAuthen(response);
@@ -153,6 +152,7 @@
                 } else if ("true" == res.success || true === res.success) {
                     alertSuccess(res.message);
                     itemTypeWindow.hide();
+                    reloadTreeItemType();
                 } else {
                     if (res.message || res.message == "true") {
                         alertError(res.message);
@@ -224,7 +224,15 @@
                 rtn["" + tmp] = Ext.getCmp("it_spec_" + tmp).getValue();
             }
         }
-        console.log(rtn);
         return rtn;
+    }
+
+    function reloadTreeItemType() {
+        var path = treeItemTypeStore.findNode("id", itemTypeParentNode, true, true, true).getPath();
+        treeItemTypeStore.load({
+            callback: function (r, options, success) {
+                tree.expandPath(path);
+            }
+        });
     }
 </script>

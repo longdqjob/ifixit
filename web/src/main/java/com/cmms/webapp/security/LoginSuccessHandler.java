@@ -7,6 +7,8 @@ package com.cmms.webapp.security;
 
 import com.cmms.dao.CompanyDao;
 import com.cmms.dao.GroupEngineerDao;
+import com.cmms.model.Company;
+import com.cmms.model.GroupEngineer;
 import com.cmms.service.UserManager;
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -60,8 +62,10 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     public static final String SESSION_USER_ID = "USER_HANDLE";
     public static final String SESSION_LIST_SYSTEM_ID = "lstSystemId";
     public static final String SESSION_SYSTEM_ID = "systemId";
+    public static final String SESSION_SYSTEM_OBJ = "userSystemObj";
     public static final String SESSION_SYSTEM_NAME = "systemName";
     public static final String SESSION_ENGINNER_GRP = "grpEngineerId";
+    public static final String SESSION_ENGINNER_GRP_OBJ = "userGrpEngineerObj";
     public static final String SESSION_ENGINNER_GRP_NAME = "grpEngineerName";
     public static final String SESSION_LIST_GRP_ENGINNER = "lstEngineerGrp";
 
@@ -92,40 +96,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     }
 
     public static void updateSession(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        if (session.getAttribute(SESSION_SYSTEM_ID) == null || session.getAttribute(SESSION_ENGINNER_GRP) == null) {
-            User authUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            String userName = authUser.getUsername();
-            Long userId = authUser.getId();
-
-            session.setAttribute(SESSION_USER_NAME, userName);
-            session.setAttribute(SESSION_USER_ID, userId);
-
-            ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getServletContext());
-            //System
-            if (session.getAttribute(SESSION_SYSTEM_ID) == null) {
-                Integer systemId = 3;
-                if (userId < 0) {
-                    systemId = 0;
-                }
-                session.setAttribute(SESSION_SYSTEM_ID, systemId);
-                CompanyDao companyDao = ctx.getBean("companyDao", CompanyDao.class);
-                List<Integer> list = companyDao.getListChildren(systemId);
-                request.getSession().setAttribute(LoginSuccessHandler.SESSION_LIST_SYSTEM_ID, list);
-            }
-
-            //ENGINNER_GRP
-            if (session.getAttribute(SESSION_SYSTEM_ID) == null) {
-                Integer engineerGrpID = 2;
-                if (userId < 0) {
-                    engineerGrpID = 0;
-                }
-                session.setAttribute(SESSION_ENGINNER_GRP, engineerGrpID);
-                GroupEngineerDao groupEngineerDao = ctx.getBean("groupEngineerDao", GroupEngineerDao.class);
-                List<Integer> listEng = groupEngineerDao.getListChildren(engineerGrpID);
-                request.getSession().setAttribute(LoginSuccessHandler.SESSION_LIST_GRP_ENGINNER, listEng);
-            }
-        }
+        updateSessionSystem(request);
+        updateSessionEng(request);
     }
 
     public static Integer updateSessionSystem(HttpServletRequest request) {
@@ -148,6 +120,18 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
             CompanyDao companyDao = ctx.getBean("companyDao", CompanyDao.class);
             List<Integer> list = companyDao.getListChildren(systemId);
             request.getSession().setAttribute(LoginSuccessHandler.SESSION_LIST_SYSTEM_ID, list);
+
+            //SESSION_SYSTEM_OBJ
+            if (systemId > 0) {
+                try {
+                    Company company = companyDao.get(systemId);
+                    request.getSession().setAttribute(LoginSuccessHandler.SESSION_SYSTEM_OBJ, companyDao.getTree(company).toString());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            } else {
+                request.getSession().setAttribute(LoginSuccessHandler.SESSION_SYSTEM_OBJ, "");
+            }
             return systemId;
         }
         return (Integer) session.getAttribute(SESSION_SYSTEM_ID);
@@ -173,7 +157,18 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
             GroupEngineerDao groupEngineerDao = ctx.getBean("groupEngineerDao", GroupEngineerDao.class);
             List<Integer> listEng = groupEngineerDao.getListChildren(engineerGrpID);
             request.getSession().setAttribute(LoginSuccessHandler.SESSION_LIST_GRP_ENGINNER, listEng);
-            return engineerGrpID;
+            
+            //SESSION_SYSTEM_OBJ
+            if (engineerGrpID > 0) {
+                try {
+                    GroupEngineer groupEngineer = groupEngineerDao.get(engineerGrpID);
+                    request.getSession().setAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP_OBJ, groupEngineerDao.getTree(groupEngineer).toString());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            } else {
+                request.getSession().setAttribute(LoginSuccessHandler.SESSION_SYSTEM_OBJ, "");
+            }
         }
         return (Integer) session.getAttribute(SESSION_ENGINNER_GRP);
     }

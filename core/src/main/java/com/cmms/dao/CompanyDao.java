@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -17,6 +18,9 @@ public interface CompanyDao extends GenericDao<Company, Integer> {
     @Transactional
     List<Company> getListItem(Integer id);
 
+    @Transactional
+    public JSONObject getTree(Company root) throws JSONException, SQLException;
+    
     @Transactional
     JSONArray getTreeView(Integer id) throws JSONException, SQLException;
 

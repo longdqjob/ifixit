@@ -387,6 +387,12 @@
     
     <!-- workOrderAction -->
     <package name="workOrder" extends="default" namespace="/workOrder">
+        <action name="loadWOHis" class="workOrderAction">
+            <interceptor-ref name="adminOnly"/>
+            <result type="stream">
+                <param name="inputName">loadWOHis</param>
+            </result>
+        </action>
         <action name="loadData" class="workOrderAction">
             <interceptor-ref name="adminOnly"/>
             <result type="stream">

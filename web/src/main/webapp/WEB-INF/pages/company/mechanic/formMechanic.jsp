@@ -16,7 +16,7 @@
     var mechanicTypeName = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         grow: true,
-        tabIndex: -1,
+        tabIndex: 1,
         fieldLabel: '<fmt:message key="machine.type"/>',
         name: 'parentName',
         id: "mechanicTypeName",
@@ -62,7 +62,7 @@
         allowBlank: false,
         margin: '10 10 10 10',
         width: 250,
-        maxLength: 50,
+        maxLength: 20,
         readOnly: true,
     });
 
@@ -79,7 +79,7 @@
         allowBlank: false,
         margin: '10 10 10 10',
         width: 250,
-        maxLength: 50,
+        maxLength: 20,
         listeners: {
             'change': function (textfield, newValue, oldValue) {
                 changeCode(oldValue, newValue);
@@ -97,7 +97,7 @@
         allowBlank: false,
         margin: '10 10 10 10',
         width: 250,
-        maxLength: 50,
+        maxLength: 20,
         readOnly: true,
     });
 
@@ -126,7 +126,7 @@
         allowBlank: false,
         margin: '20 10 10 10',
         width: 350,
-        maxLength: 50,
+        maxLength: 255,
     });
 
     var fatherId = Ext.create('Ext.form.field.Text', {
@@ -138,7 +138,7 @@
     var fatherName = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         grow: true,
-        tabIndex: -1,
+        tabIndex: 10,
         fieldLabel: '<fmt:message key="machine.father"/>',
         id: "fatherName",
         labelAlign: 'left',
@@ -163,7 +163,7 @@
         items: [fatherId, fatherName, {
                 xtype: 'button',
                 text: 'Choose',
-                tabIndex: 8,
+                tabIndex: 12,
                 margin: '10 0 6 10',
                 width: 80,
                 handler: function () {
@@ -181,7 +181,7 @@
     var systemName = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         grow: true,
-        tabIndex: -1,
+        tabIndex: 14,
         fieldLabel: '<fmt:message key="machine.system"/>',
         id: "systemName",
         labelAlign: 'left',
@@ -208,7 +208,7 @@
                 text: 'Choose',
                 margin: '10 0 6 10',
                 width: 80,
-                tabIndex: 10,
+                tabIndex: 16,
                 handler: function () {
                     companyTreeWindow.show();
                 }
@@ -217,7 +217,7 @@
 
     var sinceField = {
         xtype: 'datefield',
-        tabIndex: 11,
+        tabIndex: 18,
         fieldLabel: '<fmt:message key="machine.since"/>',
         id: "sinceField",
         labelAlign: 'left',
@@ -248,6 +248,7 @@
         xtype: 'filefield',
         id: "mechanicImage",
         name: 'file',
+        tabIndex: 8,
         fieldLabel: '<fmt:message key="machine.image"/>',
         allowBlank: true,
         margin: '10 10 10 10',
@@ -578,6 +579,9 @@
                 }
             }],
         listeners: {
+            show: function (window) {
+                Ext.getCmp("tabMechanic").setActiveTab(Ext.getCmp("indentify"));
+            },
             afterRender: function (thisForm, options) {
                 this.keyNav = Ext.create('Ext.util.KeyNav', this.el, {
                     enter: function () {

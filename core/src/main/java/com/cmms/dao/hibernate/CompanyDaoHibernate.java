@@ -58,7 +58,6 @@ public class CompanyDaoHibernate extends GenericDaoHibernate<Company, Integer> i
 
     public JSONObject getTree(Company root) throws JSONException, SQLException {
         JSONObject obj = new JSONObject();
-        JSONArray children = new JSONArray();
         Company currentGroup = root;
         obj.put("name", currentGroup.getName());
         obj.put("namedisplay", currentGroup.getCode() + "." + currentGroup.getName());
@@ -72,10 +71,7 @@ public class CompanyDaoHibernate extends GenericDaoHibernate<Company, Integer> i
         obj.put("state", currentGroup.getState());
         obj.put("leaf", false);
         obj.put("expand", true);
-        //obj.put("iconCls", "folder");
-//        obj.put("iconCls", "task-folder");
         obj.put("id", currentGroup.getId());
-//        obj.put("children", children);
         return obj;
     }
 

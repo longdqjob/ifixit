@@ -24,7 +24,10 @@ public interface WorkTypeDao extends GenericDao<WorkType, Integer> {
 
     @Transactional
     Integer delete(List<Integer> list);
-    
+
     @Transactional
-    Boolean checkUnique(Integer id,String code);
+    Boolean checkUnique(Integer id, String code);
+
+    @Transactional
+    Boolean checkUseWO(List<Integer> lstId);
 }
