@@ -13,6 +13,7 @@
 <jsp:include page="../common/treeMechanic.jsp" />
 <jsp:include page="../common/treeCompany.jsp" />
 <jsp:include page="functionJs.jsp" />
+<jsp:include page="mechanic/gridJob.jsp" />
 <jsp:include page="mechanic/gridHistory.jsp" />
 <jsp:include page="mechanic/functionJs.jsp" />
 <jsp:include page="mechanic/formMechanic.jsp" />

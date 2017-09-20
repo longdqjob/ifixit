@@ -153,7 +153,7 @@
         if (sfieldIdex) {
             sfieldIdex = "," + sfieldIdex + ",";
             form.getForm().getFields().each(function (field) {
-                if (sfieldIdex.indexOf("," + field.getId() + ",") >= 0) {
+                if (!sfieldIdex.indexOf("," + field.getId() + ",") >= 0) {
                     field.setReadOnly(bReadOnly);
                 }
             });

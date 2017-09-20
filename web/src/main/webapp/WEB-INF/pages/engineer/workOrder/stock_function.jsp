@@ -1,6 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <script>
+    var qtyOfMat = 0;
     function getListStock() {
         var data = [];
         storeStock.each(function (rec) {
@@ -27,19 +28,33 @@
         stockMateName.setValue(record.get("name"));
         stockUnit.setValue(record.get("unit"));
         stockUnitCost.setValue(record.get("cost"));
-        stockMatQty.setValue(record.get("quantity"));
+        qtyOfMat = record.get("quantity");
         materialCode = record.get("completeCode");
         materialDesc = record.get("description");
-        calcQty();
+    }
+
+    //Return true neu vuot qua
+    function checkOverQty() {
+        var ttQty = 0;
+        storeStock.each(function (rec) {
+            if (stockMateId.getValue() == rec.get("materialId")) {
+                ttQty += parseInt(rec.get('quantity'));
+            }
+        });
+        ttQty += parseInt(stockQty.getValue());
+        return (qtyOfMat < ttQty);
     }
 
     function calcQty() {
         if (stockQty.getValue() != "" && stockUnitCost.getValue() != "") {
             stockTotalCost.setValue(stockQty.getValue() * stockUnitCost.getValue());
+        } else {
+            stockTotalCost.reset();
         }
     }
 
     function showStockForm(data) {
+        qtyOfMat = 0;
         materialCode = "";
         materialDesc = "";
         stockForm.reset();
@@ -53,6 +68,7 @@
             stockQty.setValue(data.get("quantity"));
             stockUnit.setValue(data.get("materialUnit"));
             stockUnitCost.setValue(data.get("materialCost"));
+            qtyOfMat = data.get("materialQty");
             calcQty();
         } else {
             stockWindow.setTitle('<fmt:message key="material.add"/>');
@@ -90,11 +106,16 @@
         if (!valid || valid.length > 0) {
             return false;
         }
-        if (parseInt(stockQty.getValue()) > parseInt(stockMatQty.getValue())) {
-            alertError('<fmt:message key="errors.wo.quantity.greater"/>' + stockMatQty.getValue());
-            stockQty.setActiveError(res.message);
-            return false;
-        }
+//        if (parseInt(stockQty.getValue()) > parseInt(stockMatQty.getValue())) {
+//            alertError('<fmt:message key="errors.wo.quantity.greater"/>' + stockMatQty.getValue());
+//            stockQty.setActiveError(res.message);
+//            return false;
+//        }
+//        if (checkOverQty()) {
+//            alertError('<fmt:message key="overQty"/>');
+//            stockQty.setActiveError('<fmt:message key="overQty"/>');
+//            return false;
+//        }
         if (stockItemId.getValue() != "" && stockItemId.getValue() != "0") {
             var index = storeStock.findExact("id", parseInt(stockItemId.getValue()));
             if (index > -1) {

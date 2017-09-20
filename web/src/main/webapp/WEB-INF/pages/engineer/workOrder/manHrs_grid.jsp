@@ -59,11 +59,11 @@
             //////////////ACTION
             {
                 xtype: 'actioncolumn',
+                id: "gridActionMh",
                 text: 'Action',
                 align: 'center',
                 width: 100,
-                items: [
-                    {
+                items: [{
                         icon: '../images/delete.png',
                         tooltip: '<fmt:message key="deleteItem"/>',
                         handler: function (grid, rowIndex, colIndex) {
@@ -101,8 +101,8 @@
                 }
             }),
             ////////////////ITEM
-            {text: '<fmt:message key="work.manHour.enginnerGrp"/>', dataIndex: 'engineerGrp', flex: 1, },
-            {text: '<fmt:message key="work.manHour.manHrs"/>', dataIndex: 'mh', flex: 1,
+            {text: '<fmt:message key="work.manHour.enginnerGrp"/>', dataIndex: 'engineerGrp', flex: 2, },
+            {text: '<fmt:message key="work.manHour.manHrs"/>', xtype: 'numbercolumn', align: "right", dataIndex: 'mh', flex: 0.5,
                 editor: {
                     completeOnEnter: true,
                     field: {
@@ -113,8 +113,8 @@
                     }
                 }
             },
-            {text: '<fmt:message key="work.manHour.cost"/>', dataIndex: 'engineerCost', flex: 1, },
-            {text: '<fmt:message key="work.manHour.totalCost"/>', dataIndex: 'totalCost', flex: 1, },
+            {text: '<fmt:message key="work.manHour.cost"/>', xtype: 'numbercolumn', align: "right", dataIndex: 'engineerCost', flex: 0.5, },
+            {text: '<fmt:message key="work.manHour.totalCost"/>', xtype: 'numbercolumn', align: "right", dataIndex: 'totalCost', flex: 0.8, },
         ],
         viewConfig: {
             autoFit: true,
@@ -139,6 +139,7 @@
                 dock: 'top',
                 items: [{
                         xtype: 'button',
+                        id: "btnGridAddMh",
                         text: '<fmt:message key="add"/>',
                         listeners: {
                             click: function (el) {

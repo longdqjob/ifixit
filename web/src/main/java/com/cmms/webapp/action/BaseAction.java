@@ -332,7 +332,7 @@ public class BaseAction extends ActionSupport {
             //SESSION_SYSTEM_OBJ
             try {
                 Gson gson = new Gson();
-                obj = gson.toJson(groupEngineerDao.getTree(groupEngineer));
+                obj = gson.toJson(groupEngineerDao.getTree(groupEngineer, null));
             } catch (Exception ex) {
                 log.error("ERROR getGrpEngineerId: ", ex);
             }

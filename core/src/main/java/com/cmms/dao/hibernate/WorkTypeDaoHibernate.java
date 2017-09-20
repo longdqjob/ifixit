@@ -34,12 +34,12 @@ public class WorkTypeDaoHibernate extends GenericDaoHibernate<WorkType, Integer>
             List<WorkType> rtn = new LinkedList<>();
             String hql = "";
             if (id == null || id <= 0) {
-                hql = "SELECT * FROM work_type WHERE parent_id IS NULL";
+                hql = "SELECT * FROM work_type WHERE parent_id IS NULL ORDER BY name ASC";
                 rtn = getSession().createSQLQuery(hql)
                         .addEntity(WorkType.class)
                         .list();
             } else {
-                hql = "SELECT * FROM work_type WHERE parent_id=:parent_id";
+                hql = "SELECT * FROM work_type WHERE parent_id=:parent_id ORDER BY name ASC";
                 rtn = getSession().createSQLQuery(hql)
                         .addEntity(WorkType.class)
                         .setParameter("parent_id", id)

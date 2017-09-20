@@ -18,7 +18,8 @@ import javax.persistence.ManyToOne;
 @Entity
 @Table(name = "work_order")
 public class WorkOrder extends BaseObject implements Serializable {
-    public static final Integer STATUS_COMPLETE = 2;
+    public static final Integer STATUS_COMPLETE = 0;
+    public static final Integer STATUS_OVERDUE = 2;
 
     private static final long serialVersionUID = -1L;
     private Long id;

@@ -507,8 +507,13 @@
                 tabIndex: 55,
                 items: [gridHisPanel]
             }, {
-                title: '<fmt:message key="machine.note"/>',
+                title: '<fmt:message key="machine.job"/>',
+                id: "machineJob",
                 tabIndex: 56,
+                items: [gridJobPanel]
+            }, {
+                title: '<fmt:message key="machine.note"/>',
+                tabIndex: 57,
                 id: "machineNotes",
                 items: [machineNote]
             }]

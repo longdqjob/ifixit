@@ -3,6 +3,7 @@
 <script>
     //--------------------------------Mechanic----------------------------------
     function addWorkOrder(data) {
+        resetReadOnlyWo();
         workOrderForm.reset();
         manHrsTotalCost.reset();
         manHrsTotalMh.reset();
@@ -12,6 +13,7 @@
     }
 
     function editWorkOrder(data) {
+        resetReadOnlyWo();
         workOrderForm.reset();
         manHrsTotalCost.setValue(data.get('mhTotalCost'));
         manHrsTotalMh.setValue(data.get('mhTotal'));
@@ -36,6 +38,33 @@
         materialTotalCost.setValue(data.get('stockTotalCost'));
         workOrderWindow.show();
         loadInfo(data.get('id'));
+
+        //Trang thai complete thi ko co phep lam gi
+        if (data.get('status') == "0") {
+            setReadOnlyWo();
+        }
+    }
+
+    function resetReadOnlyWo() {
+        Ext.getCmp("gridActionStock").show();
+        Ext.getCmp("gridActionMh").show();
+        Ext.getCmp("btnGridAddMh").show();
+        Ext.getCmp("btnGridAddStock").show();
+        Ext.getCmp("btnChooseMechnic").show();
+        Ext.getCmp("btnChooseWorkType").show();
+        Ext.getCmp("btnChooseGrpEngineer").show();
+        setReadOnlyForAll(workOrderForm, false, "workOrderId,mechanicId,mechanicName,workTypeName,grpEngineerName");
+    }
+    
+    function setReadOnlyWo() {
+        Ext.getCmp("gridActionStock").hide();
+        Ext.getCmp("gridActionMh").hide();
+        Ext.getCmp("btnGridAddMh").hide();
+        Ext.getCmp("btnGridAddStock").hide();
+        Ext.getCmp("btnChooseMechnic").hide();
+        Ext.getCmp("btnChooseWorkType").hide();
+        Ext.getCmp("btnChooseGrpEngineer").hide();
+        setReadOnlyForAll(workOrderForm, true, "workOrderId,mechanicId,mechanicName,workTypeName,grpEngineerName");
     }
 
     function chooseMechanic(record) {
@@ -120,6 +149,9 @@
                 if ("codeExisted" == res.success) {
                     alertError(res.message);
                     workOrderCode.setActiveError(res.message);
+                } else if ("overQty" == res.success) {
+                    alertError(res.message);
+                    Ext.getCmp("tabWorkOrder").setActiveTab(Ext.getCmp("material"));
                 } else if ("true" == res.success || true === res.success) {
                     workOrderWindow.hide();
                     var scrollPosition = mygrid.getEl().down('.x-grid-view').getScroll();

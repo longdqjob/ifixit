@@ -2,6 +2,7 @@ package com.cmms.dao;
 
 import com.cmms.model.Material;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.codehaus.jettison.json.JSONArray;
@@ -30,4 +31,7 @@ public interface MaterialDao extends GenericDao<Material, Long> {
 
     @Transactional
     Boolean checkUse(List<Long> lstId);
+    
+    @Transactional
+    HashMap<Long,Integer> getQty(List<Long> lstId);
 }

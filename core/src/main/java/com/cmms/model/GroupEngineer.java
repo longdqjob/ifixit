@@ -133,4 +133,35 @@ public class GroupEngineer extends BaseObject implements Serializable {
         return 0;
     }
 
+    private int countComplete;
+    private int countOpen;
+    private int countOverDue;
+
+    @Transient
+    public int getCountComplete() {
+        return countComplete;
+    }
+
+    public void setCountComplete(int countComplete) {
+        this.countComplete = countComplete;
+    }
+
+    @Transient
+    public int getCountOpen() {
+        return countOpen;
+    }
+
+    public void setCountOpen(int countOpen) {
+        this.countOpen = countOpen;
+    }
+
+    @Transient
+    public int getCountOverDue() {
+        return countOverDue;
+    }
+
+    public void setCountOverDue(int countOverDue) {
+        this.countOverDue = countOverDue;
+    }
+
 }

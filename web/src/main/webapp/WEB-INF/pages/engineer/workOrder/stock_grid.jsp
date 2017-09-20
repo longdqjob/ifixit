@@ -9,7 +9,9 @@
 //-----------------------------------------Grid---------------------------------------------------------------
     var storeStock = Ext.create('Ext.data.Store', {
         storeId: 'storeStock',
-        fields: ['id', 'workOrderId', 'quantity', 'materialId', 'materialCode', 'materialName', 'materialDesc', 'materialUnit', 'materialCost','materialTotalCost'],
+        fields: ['id', 'workOrderId', 'quantity', 'materialId',
+            'materialCode', 'materialName', 'materialDesc',
+            'materialUnit', 'materialCost', 'materialQty', 'materialTotalCost'],
         pageSize: 20,
     });
 
@@ -38,6 +40,7 @@
             {
                 xtype: 'actioncolumn',
                 text: 'Action',
+                id: "gridActionStock",
                 align: 'center',
                 width: 100,
                 items: [
@@ -82,7 +85,8 @@
             {text: '<fmt:message key="work.material.code"/>', dataIndex: 'materialCode', flex: 1, },
             {text: '<fmt:message key="work.material.name"/>', dataIndex: 'materialName', flex: 1, },
             {text: '<fmt:message key="work.material.description"/>', dataIndex: 'materialDesc', flex: 1, },
-            {text: '<fmt:message key="work.material.qty"/>', dataIndex: 'quantity', flex: 1,
+            {text: '<fmt:message key="work.material.unit"/>', dataIndex: 'materialUnit', flex: 1, },
+            {text: '<fmt:message key="work.material.qty"/>', dataIndex: 'quantity', xtype: 'numbercolumn', align: "right", flex: 1,
                 editor: {
                     completeOnEnter: true,
                     field: {
@@ -93,9 +97,8 @@
                     }
                 }
             },
-            {text: '<fmt:message key="work.material.unit"/>', dataIndex: 'materialUnit', flex: 1, },
-            {text: '<fmt:message key="work.material.cost"/>', dataIndex: 'materialCost', flex: 1, },
-            {text: '<fmt:message key="work.material.totalCost"/>', dataIndex: 'materialTotalCost', flex: 1, },
+            {text: '<fmt:message key="work.material.cost"/>', dataIndex: 'materialCost', xtype: 'numbercolumn', align: "right", flex: 1, },
+            {text: '<fmt:message key="work.material.totalCost"/>', xtype: 'numbercolumn', align: "right", dataIndex: 'materialTotalCost', flex: 1, },
         ],
         viewConfig: {
             autoFit: true,
@@ -119,6 +122,7 @@
                 dock: 'top',
                 items: [{
                         xtype: 'button',
+                        id: "btnGridAddStock",
                         text: '<fmt:message key="add"/>',
                         listeners: {
                             click: function (el) {

@@ -38,6 +38,7 @@ public class GrpEngineerAction extends BaseAction implements Preparable {
 
     public InputStream getTree() {
         try {
+            String groupReg = getRequest().getParameter("group");
             String idReq = getRequest().getParameter("id");
             Integer id = null;
             if (!StringUtils.isBlank(idReq)) {
@@ -51,7 +52,9 @@ public class GrpEngineerAction extends BaseAction implements Preparable {
             if (id == null || id <= 0) {
                 id = getGrpEngineerId();
             }
-            return new ByteArrayInputStream(groupEngineerDao.getTreeView(id).toString().getBytes("UTF8"));
+
+            Boolean groupEng = (!StringUtils.isBlank(groupReg)) ? groupReg.equalsIgnoreCase("1") : null;
+            return new ByteArrayInputStream(groupEngineerDao.getTreeView(id, groupEng).toString().getBytes("UTF8"));
         } catch (Exception e) {
             log.error("ERROR getTree: ", e);
             return null;

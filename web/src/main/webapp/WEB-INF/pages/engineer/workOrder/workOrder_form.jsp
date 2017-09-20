@@ -8,11 +8,13 @@
 
     var mechanicId = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
+        id: "mechanicId",
         hidden: true,
     });
 
     var mechanicName = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
+        id: "mechanicName",
         grow: true,
         tabIndex: 1,
         fieldLabel: '<fmt:message key="work.mechanic"/>',
@@ -26,7 +28,9 @@
         listeners: {
             'render': function (cmp) {
                 this.getEl().on('click', function () {
-                    mechanicTreeWindow.show();
+                    if (!mechanicName.readOnly) {
+                        mechanicTreeWindow.show();
+                    }
                 });
             }
         }
@@ -38,6 +42,7 @@
         layout: 'column',
         items: [mechanicId, mechanicName, {
                 xtype: 'button',
+                id: "btnChooseMechnic",
                 text: '<fmt:message key="choose"/>',
                 tabIndex: 2,
                 margin: '20 0 6 10',
@@ -69,7 +74,9 @@
         listeners: {
             'render': function (cmp) {
                 this.getEl().on('click', function () {
-                    workTypeTreeWindow.show();
+                    if (!wWorkTypeName.readOnly) {
+                        workTypeTreeWindow.show();
+                    }
                 });
             }
         }
@@ -81,6 +88,7 @@
         layout: 'column',
         items: [wWorkTypeId, wWorkTypeName, {
                 xtype: 'button',
+                id: "btnChooseWorkType",
                 text: '<fmt:message key="choose"/>',
                 tabIndex: 5,
                 margin: '10 0 6 10',
@@ -99,6 +107,7 @@
     });
 
     var grpEngineerName = Ext.create('Ext.form.field.Text', {
+        id: "grpEngineerName",
         xtype: 'textfield',
         grow: true,
         tabIndex: 7,
@@ -113,7 +122,9 @@
         listeners: {
             'render': function (cmp) {
                 this.getEl().on('click', function () {
-                    grpEngineerTreeWindow.show();
+                    if (!grpEngineerName.readOnly) {
+                        grpEngineerTreeWindow.show();
+                    }
                 });
             }
         }
@@ -125,6 +136,7 @@
         layout: 'column',
         items: [grpEngineerId, grpEngineerName, {
                 xtype: 'button',
+                id: "btnChooseGrpEngineer",
                 text: '<fmt:message key="choose"/>',
                 tabIndex: 8,
                 margin: '10 0 6 10',
@@ -182,7 +194,7 @@
         tabIndex: 11,
         fieldLabel: '<fmt:message key="machine.name"/>',
         name: 'name',
-        id: "mechanicName",
+        id: "workOrderName",
         labelAlign: 'right',
         anchor: '100%',
         allowBlank: false,
@@ -251,11 +263,11 @@
         margin: '13 10 10 10',
         listeners: {
             change: function (checkbox, newVal, oldVal) {
-                if(newVal){
+                if (newVal) {
                     workOrderInterval.allowBlank = false;
                     workOrderInterval.show();
                     Ext.getCmp("lbMon").show();
-                }else{
+                } else {
                     workOrderInterval.reset();
                     workOrderInterval.allowBlank = true;
                     Ext.getCmp("lbMon").hide();

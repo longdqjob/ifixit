@@ -12,7 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 public interface WorkOrderDao extends GenericDao<WorkOrder, Long> {
 
     @Transactional
-    Map getList(List<Integer> listEng,List<Integer> listWorkType,Long mechanicId, String code, String name, Integer start, Integer limit);
+    Map getList(List<Integer> listEng, List<Integer> listWorkType, Long mechanicId, String sStatusReq, String code, String name, Integer start, Integer limit);
+
+    @Transactional
+    Boolean validToDelete(List<Long> list);
 
     @Transactional
     Integer delete(List<Long> list);

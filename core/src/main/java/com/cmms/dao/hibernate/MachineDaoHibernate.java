@@ -47,7 +47,7 @@ public class MachineDaoHibernate extends GenericDaoHibernate<Machine, Long> impl
             if (listCompany != null && !listCompany.isEmpty()) {
                 criteria.add(Restrictions.in("company.id", listCompany));
             }
-            criteria.addOrder(Order.desc("name"));
+            criteria.addOrder(Order.asc("name"));
 
             HashMap<String, Object> param = new HashMap<>();
             StringBuffer sb = new StringBuffer();
