@@ -27,6 +27,18 @@
 //    }
 //    console.log(Ext.decode(decoded));
     var storeEngineer = Ext.create('Ext.data.TreeStore', {
+        fields: [
+            {name: 'id', type: 'int'},
+            {name: 'parentId', type: 'int'},
+            {name: 'code', type: 'string'},
+            {name: 'completeCode', type: 'string'},
+            {name: 'name', type: 'string'},
+            {name: 'cost', type: 'int'},
+            {name: 'description', type: 'string'},
+            {name: 'namedisplay', type: 'string'},
+            {name: 'completeParentCode', type: 'string'},
+            {name: 'parentName', type: 'string'},
+        ],
         proxy: {
             type: 'ajax',
             url: '../grpEngineer/getTree?group=1'
@@ -34,8 +46,12 @@
         root: {
             id: 0,
             name: '<fmt:message key="grpEngineer"/>',
+            namedisplay: '<fmt:message key="grpEngineer"/>',
             expanded: true
-        },
+        }, sorters: [{
+                property: 'namedisplay',
+                direction: 'ASC'
+            }],
         autoload: false
     });
 
@@ -70,7 +86,7 @@
                 width: 280,
                 text: '<fmt:message key="grpEngineer"/>',
                 sortable: true,
-                dataIndex: 'name',
+                dataIndex: 'namedisplay',
             }, {
                 text: '<fmt:message key="work.status.over"/>',
                 dataIndex: 'countOverDue',
@@ -122,10 +138,6 @@
                                 handler: function () {
                                     editEngineer(record);
                                 }}, {
-                                text: '<fmt:message key="moreDetail"/>',
-                                handler: function () {
-                                    console.log("Moreils: " + record.get("id") + " - " + record.get("name"));
-                                }}, {
                                 text: '<fmt:message key="button.delete"/>',
                                 iconCls: "delete-cls",
                                 handler: function () {
@@ -145,7 +157,7 @@
                                 iconCls: "refresh",
                                 handler: function () {
                                     selectedSystem = record;
-                                    console.log(selectedSystem);
+                                   // console.log(selectedSystem);
                                     loadWorkOrder(selectedSystem.get("id"));
                                 }
                             }, {

@@ -24,7 +24,7 @@
         },
         folderSort: true,
         sorters: [{
-                property: 'name',
+                property: 'namedisplay',
                 direction: 'ASC'
             }],
 //        listeners: {

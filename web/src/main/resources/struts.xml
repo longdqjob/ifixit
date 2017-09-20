@@ -9,7 +9,7 @@
     <constant name="struts.action.extension" value="action,"/>
     <constant name="struts.objectFactory" value="spring"/>
     <constant name="struts.custom.i18n.resources" value="ApplicationResources,errors"/>
-    <constant name="struts.multipart.maxSize" value="2097152"/>
+    <constant name="struts.multipart.maxSize" value="20971520"/>
     <constant name="struts.ui.theme" value="css_xhtml"/>
     <constant name="struts.codebehind.pathPrefix" value="/WEB-INF/pages/"/>
     <constant name="struts.enable.SlashesInActionNames" value="true"/>
