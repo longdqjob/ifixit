@@ -33,8 +33,8 @@
         :hover {
             text-decoration: none !important;
         }
-        #navbar navbar-default navbar-fixed-top{
-            height: 20px;
+        #navbar {
+            height: 20px !important;
         }
 
     </style>

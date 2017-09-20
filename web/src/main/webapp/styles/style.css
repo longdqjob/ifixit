@@ -205,13 +205,14 @@ span.pagelinks {
 /* Set the fixed height of the footer here */
 #footer {
     background-color: #f5f5f5;
+    height: 10px !important;
 }
 
 /* FOOTER */
 #footer {
     clear: both;
     margin: 0 auto;
-    padding: 10px 0 20px 0;
+    padding: 0px 0 20px 0;
     border-top: 4px solid #f0f0f0;
     text-align: center;
     background-color: white;
@@ -226,7 +227,7 @@ span.pagelinks {
 }
 
 #footer a:hover {
-    text-decoration: underline;
+    text-decoration: none;
 }
 
 #footer p {
@@ -336,6 +337,4 @@ span:hover{
 }*/
 
 
-/*.collapse navbar-collapse{
-    height: 10px !important;
-}*/
+
