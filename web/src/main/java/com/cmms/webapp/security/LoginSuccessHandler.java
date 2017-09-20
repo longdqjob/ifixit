@@ -157,12 +157,12 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
             GroupEngineerDao groupEngineerDao = ctx.getBean("groupEngineerDao", GroupEngineerDao.class);
             List<Integer> listEng = groupEngineerDao.getListChildren(engineerGrpID);
             request.getSession().setAttribute(LoginSuccessHandler.SESSION_LIST_GRP_ENGINNER, listEng);
-            
+
             //SESSION_SYSTEM_OBJ
             if (engineerGrpID > 0) {
                 try {
                     GroupEngineer groupEngineer = groupEngineerDao.get(engineerGrpID);
-                    request.getSession().setAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP_OBJ, groupEngineerDao.getTree(groupEngineer).toString());
+                    request.getSession().setAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP_OBJ, groupEngineerDao.getTree(groupEngineer, null).toString());
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

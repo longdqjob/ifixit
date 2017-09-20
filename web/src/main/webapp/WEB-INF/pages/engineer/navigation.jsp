@@ -29,7 +29,7 @@
     var storeEngineer = Ext.create('Ext.data.TreeStore', {
         proxy: {
             type: 'ajax',
-            url: '../grpEngineer/getTree'
+            url: '../grpEngineer/getTree?group=1'
         },
         root: {
             id: 0,
@@ -52,7 +52,7 @@
     //Ext.ux.tree.TreeGrid is no longer a Ux. You can simply use a tree.TreePanel
     var tree = Ext.create('Ext.tree.Panel', {
         resizable: false,
-        header: false,
+//        header: true,
         useArrows: false,
         rootVisible: true,
         lines: true,
@@ -60,17 +60,23 @@
         border: true,
         constrainHeader: false,
         store: storeEngineer,
-        hideHeaders: true,
+//        hideHeaders: false,
         minHeight: 400,
-         viewConfig: {
+        viewConfig: {
             toggleOnDblClick: false
         },
         columns: [{
                 xtype: 'treecolumn', //this is so we know which column will show the tree
-                width: 345,
+                width: 280,
+                text: '<fmt:message key="grpEngineer"/>',
                 sortable: true,
                 dataIndex: 'name',
-            }
+            }, {
+                text: '<fmt:message key="work.status.over"/>',
+                dataIndex: 'countOverDue',
+                flex: 1,
+                align: "center",
+            },
         ],
         listeners: {
             load: function () {

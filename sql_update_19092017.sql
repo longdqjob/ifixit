@@ -7,7 +7,7 @@ CREATE
 	DO BEGIN
 	
 		-- update overdue
-		UPDATE `work_order` SET `status`= 2 WHERE `start_time`>NOW();
+		UPDATE `work_order` SET last_update=NOW(),`status`= 2 WHERE `status`= 1 AND `start_time`<NOW();
 	    
 	END $$
 

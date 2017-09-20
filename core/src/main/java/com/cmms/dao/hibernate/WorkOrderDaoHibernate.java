@@ -2,11 +2,10 @@ package com.cmms.dao.hibernate;
 
 import com.cmms.dao.WorkOrderDao;
 import com.cmms.model.WorkOrder;
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,11 +31,14 @@ public class WorkOrderDaoHibernate extends GenericDaoHibernate<WorkOrder, Long> 
     }
 
     @Override
-    public Map getList(List<Integer> listEng, List<Integer> listWorkType, Long mechanicId, String code, String name, Integer start, Integer limit) {
+    public Map getList(List<Integer> listEng, List<Integer> listWorkType, Long mechanicId, String sStatusReq, String code, String name, Integer start, Integer limit) {
         try {
             Map result = new HashMap();
             Criteria criteria = getSession().createCriteria(WorkOrder.class);
 
+            if (mechanicId != null && mechanicId > 0) {
+                criteria.add(Restrictions.eq("machine.id", mechanicId));
+            }
             //Name
             if (!StringUtils.isBlank(code)) {
                 criteria.add(Restrictions.like("code", "%" + code.trim() + "%").ignoreCase());
@@ -44,8 +46,12 @@ public class WorkOrderDaoHibernate extends GenericDaoHibernate<WorkOrder, Long> 
             if (!StringUtils.isBlank(name)) {
                 criteria.add(Restrictions.like("name", "%" + name.trim() + "%").ignoreCase());
             }
-            if (mechanicId != null && mechanicId > 0) {
-                criteria.add(Restrictions.eq("machine.id", mechanicId));
+            if (!StringUtils.isBlank(sStatusReq)) {
+                if ("his".equalsIgnoreCase(sStatusReq)) {
+                    criteria.add(Restrictions.eq("status", WorkOrder.STATUS_COMPLETE));
+                } else if ("job".equalsIgnoreCase(sStatusReq)) {
+                    criteria.add(Restrictions.ne("status", WorkOrder.STATUS_COMPLETE));
+                }
             }
 
             if (listEng != null && !listEng.isEmpty()) {
@@ -54,7 +60,7 @@ public class WorkOrderDaoHibernate extends GenericDaoHibernate<WorkOrder, Long> 
             if (listWorkType != null && !listWorkType.isEmpty()) {
                 criteria.add(Restrictions.in("workType.id", listWorkType));
             }
-            criteria.addOrder(Order.desc("name"));
+            criteria.addOrder(Order.asc("name"));
 
             Integer total = 0;
             if (limit != null && limit > 0) {
@@ -74,6 +80,26 @@ public class WorkOrderDaoHibernate extends GenericDaoHibernate<WorkOrder, Long> 
             return result;
         } catch (Exception ex) {
             log.error("ERROR getList: ", ex);
+            return null;
+        }
+    }
+
+    //Return false neu cho phep delete
+    @Override
+    public Boolean validToDelete(List<Long> lstId) {
+        try {
+            if (lstId == null || lstId.isEmpty()) {
+                return false;
+            }
+            String hql = "SELECT COUNT(id) FROM work_order WHERE id in (:lstId) AND `status`=:status";
+            Query query = getSession()
+                    .createSQLQuery(hql)
+                    .setParameterList("lstId", lstId)
+                    .setParameter("status", WorkOrder.STATUS_COMPLETE);
+            List list = query.list();
+            return (((BigInteger) list.get(0)).intValue() > 0);
+        } catch (Exception ex) {
+            log.error("ERROR validToDelete: ", ex);
             return null;
         }
     }

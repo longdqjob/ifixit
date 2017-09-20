@@ -9,8 +9,8 @@
                 </li>
             </c:if>
             <!--<menu:displayMenu name="Home"/>-->
-            <menu:displayMenu name="SystemMenu"/>
             <menu:displayMenu name="workOrder"/>
+            <menu:displayMenu name="SystemMenu"/>
             <menu:displayMenu name="MaterialMenu"/>
             <menu:displayMenu name="UserMenu"/>
             <menu:displayMenu name="AdminMenu"/>

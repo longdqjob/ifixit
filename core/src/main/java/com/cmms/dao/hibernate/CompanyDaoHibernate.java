@@ -38,12 +38,12 @@ public class CompanyDaoHibernate extends GenericDaoHibernate<Company, Integer> i
             List<Company> rtn = new LinkedList<>();
             String hql = "";
             if (id == null || id <= 0) {
-                hql = "SELECT * FROM company WHERE parent_id IS NULL";
+                hql = "SELECT * FROM company WHERE parent_id IS NULL ORDER BY `completeCode`,`name` ASC";
                 rtn = getSession().createSQLQuery(hql)
                         .addEntity(Company.class)
                         .list();
             } else {
-                hql = "SELECT * FROM company WHERE parent_id=:parent_id";
+                hql = "SELECT * FROM company WHERE parent_id=:parent_id ORDER BY `completeCode`,`name` ASC";
                 rtn = getSession().createSQLQuery(hql)
                         .addEntity(Company.class)
                         .setParameter("parent_id", id)

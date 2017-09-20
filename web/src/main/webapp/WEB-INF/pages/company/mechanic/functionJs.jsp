@@ -45,7 +45,6 @@
         mechanicWindow.setIconCls('add-cls');
         enableCode();
         mechanicWindow.show();
-        gridHis.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
         mechanicCode.focus();
     }
 
@@ -87,7 +86,6 @@
         mechanicWindow.setIconCls('edit-cls');
         disableCode();
         mechanicWindow.show();
-        gridHis.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
         mechanicName.focus();
     }
 
@@ -95,14 +93,30 @@
         if (mechanicId) {
             gridHis.getStore().getProxy().extraParams = {
                 mechanicId: mechanicId,
+                sStatus: "his",
             };
             gridHis.getStore().loadPage(1, {
                 callback: function (records, operation, success) {
+                    gridHis.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
+                    storeRedirectIfNotAuthen(operation);
+                }
+            });
+            //Load Job
+            gridJob.getStore().getProxy().extraParams = {
+                mechanicId: mechanicId,
+                sStatus: "job",
+            };
+            gridJob.getStore().loadPage(1, {
+                callback: function (records, operation, success) {
+                    gridJob.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
                     storeRedirectIfNotAuthen(operation);
                 }
             });
         } else {
             gridHis.getStore().removeAll();
+            gridJob.getStore().removeAll();
+            gridHis.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
+            gridJob.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
         }
     }
 

@@ -70,6 +70,11 @@
                     if (this.rowspan) {
                         metaData.cellAttr = 'rowspan="' + this.rowspan + '"';
                     }
+                    if (record.get('status') == '2'
+                            || record.get('status') == 2) {
+                        metaData.style = 'background-color: #e88971 !important;';
+                    }
+                    
                     return store.indexOfTotal ? (store.indexOfTotal(record) + 1) : (rowIndex + 1);
                 }
             }),
@@ -156,8 +161,8 @@
             enableTextSelection: true,
             emptyText: '<div class="grid-data-empty"><div data-icon="/" class="empty-grid-icon"></div><div class="empty-grid-byline" style="text-align: center;"><fmt:message key="noRecord"/></div></div>',
             getRowClass: function (record, rowIndex, rowParams, store) {
-                if (record.get('status') == '0'
-                        || record.get('status') == '4') {
+                if (record.get('status') == '2'
+                        || record.get('status') == 2) {
                     return 'overdue';
                 }
                 return "";
@@ -218,9 +223,9 @@
         listeners: {
             afterrender: function (usergrid, eOpts) {
                 //console.log(usergrid);
-            },'rowdblclick': function (grid, record) {
+            }, 'rowdblclick': function (grid, record) {
                 editWorkOrder(record);
-            },validateedit: function (editor, context, eOpts) {
+            }, validateedit: function (editor, context, eOpts) {
                 var record = context.record;
                 if (record.get("status") == context.value) {
                     return true;

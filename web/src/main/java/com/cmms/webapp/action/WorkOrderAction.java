@@ -26,6 +26,7 @@ import com.opensymphony.xwork2.Preparable;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -127,8 +128,9 @@ public class WorkOrderAction extends BaseAction implements Preparable {
         try {
             JSONObject result = new JSONObject();
             String mechanicReq = getRequest().getParameter("mechanicId");
+            String sStatusReq = getRequest().getParameter("sStatus");
             List<Integer> listEng = groupEngineerDao.getListChildren(getGrpEngineerId());
-            Map pagingMap = workOrderDao.getList(listEng, null, Long.parseLong(mechanicReq), null, null, start, limit);
+            Map pagingMap = workOrderDao.getList(listEng, null, Long.parseLong(mechanicReq), sStatusReq, null, null, start, limit);
 
             ArrayList<WorkOrder> list = new ArrayList<WorkOrder>();
             if (pagingMap.get("list") != null) {
@@ -192,7 +194,7 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                 listEng = groupEngineerDao.getListChildren(engineerId);
             }
 
-            Map pagingMap = workOrderDao.getList(listEng, listWorkType, null, code, name, start, limit);
+            Map pagingMap = workOrderDao.getList(listEng, listWorkType, null, null, code, name, start, limit);
 
             ArrayList<WorkOrder> list = new ArrayList<WorkOrder>();
             if (pagingMap.get("list") != null) {
@@ -317,6 +319,7 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                     tmp.put("materialDesc", material.getDescription());
                     tmp.put("materialUnit", material.getUnit());
                     tmp.put("materialCost", material.getCost());
+                    tmp.put("materialQty", material.getQuantity());
                     tmp.put("materialTotalCost", material.getCost() * item.getQuantity());
                     stockTotalCost += material.getCost() * item.getQuantity();
                 } else {
@@ -326,6 +329,7 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                     tmp.put("materialDesc", "");
                     tmp.put("materialUnit", "");
                     tmp.put("materialCost", "");
+                    tmp.put("materialQty", 0);
                     tmp.put("materialTotalCost", "0");
                 }
                 tmp.put("stockTotalCost", stockTotalCost);
@@ -371,6 +375,25 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                 return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
             }
 
+            Boolean updateQtyMat = false;
+            //Check StockItem vuot qua so luong
+            String stockReq = getRequest().getParameter("stock");
+            List<StockItemObj> listStock = null;
+            if (!StringUtils.isBlank(stockReq)) {
+                listStock = gson.fromJson(stockReq, new TypeToken<List<StockItemObj>>() {
+                }.getType());
+
+                //Kiem tra so luong mat neu trang thai la COMPLETE
+                if (WorkOrder.STATUS_COMPLETE == Integer.parseInt(status)) {
+                    if (!checkQtyMaterial(listStock)) {
+                        result.put("success", "overQty");
+                        result.put("message", ResourceBundleUtils.getName("overQty"));
+                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                    }
+                    updateQtyMat = true;
+                }
+            }
+
             Boolean checkUnique = true;
 
             WorkOrder workOrder;
@@ -407,7 +430,7 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                 workOrder.setMachine(machine);
             }
             if (!StringUtils.isBlank(grpEngineerId)) {
-                GroupEngineer groupEngineer = groupEngineerDao.get(Integer.parseInt(workTypeId));
+                GroupEngineer groupEngineer = groupEngineerDao.get(Integer.parseInt(grpEngineerId));
                 workOrder.setGroupEngineer(groupEngineer);
             }
             workOrder.setCode(code);
@@ -473,59 +496,45 @@ public class WorkOrderAction extends BaseAction implements Preparable {
 
                 Float sotckTotalCost = 0F;
                 //<editor-fold defaultstate="collapsed" desc="save stock_item">
-                String stockReq = getRequest().getParameter("stock");
-                List<StockItemObj> listStock = null;
-                if (!StringUtils.isBlank(stockReq)) {
-                    listStock = gson.fromJson(stockReq, new TypeToken<List<StockItemObj>>() {
-                    }.getType());
-
-                    if (listStock != null && !listStock.isEmpty()) {
-                        StockItem stockItem;
-                        Material material;
-                        Long materialId = -1L;
-                        Boolean change = false;
-                        int lastQty = 0;
-                        Boolean changeQty = false;
-                        for (StockItemObj stockItemObj : listStock) {
-                            lastQty = 0;
-                            change = false;
-                            changeQty = false;
-                            material = materialDao.get(stockItemObj.getMaterialId());
-                            if (stockItemObj.getId() <= 0) {
-                                //Add
-                                stockItem = new StockItem();
-                                stockItem.setWorkOrder(workOrder);
-                                materialId = -1L;
-                                change = true;
-                                changeQty = true;
-                            } else {
-                                //Edit
-                                log.info("Edit stockItem: " + stockItemObj.getId());
-                                stockItem = stockItemDao.get(stockItemObj.getId());
-                                lastQty = stockItem.getQuantity();
-                                materialId = stockItem.getMaterialId();
-                                if (!Objects.equals(stockItem.getQuantity(), stockItemObj.getQuantity())) {
-                                    change = true;
-                                    changeQty = true;
-                                }
-                            }
-                            if (!Objects.equals(materialId, stockItemObj.getMaterialId())) {
-                                stockItem.setMaterial(material);
+                if (listStock != null && !listStock.isEmpty()) {
+                    StockItem stockItem;
+                    Material material;
+                    Long materialId = -1L;
+                    Boolean change = false;
+                    for (StockItemObj stockItemObj : listStock) {
+                        change = false;
+                        material = materialDao.get(stockItemObj.getMaterialId());
+                        if (stockItemObj.getId() <= 0) {
+                            //Add
+                            stockItem = new StockItem();
+                            stockItem.setWorkOrder(workOrder);
+                            materialId = -1L;
+                            change = true;
+                        } else {
+                            //Edit
+                            log.info("Edit stockItem: " + stockItemObj.getId());
+                            stockItem = stockItemDao.get(stockItemObj.getId());
+                            materialId = stockItem.getMaterialId();
+                            if (!Objects.equals(stockItem.getQuantity(), stockItemObj.getQuantity())) {
                                 change = true;
                             }
-                            log.info("Edit stockItem change: " + change);
-                            if (change) {
-                                stockItem.setQuantity(stockItemObj.getQuantity());
-                                stockItemDao.save(stockItem);
-                            }
-
-                            //Cap nhat Qty cua material
-                            if (changeQty) {
-                                material.setQuantity(material.getQuantity() - stockItem.getQuantity() + lastQty);
-                                material = materialDao.save(material);
-                            }
-                            sotckTotalCost += stockItem.getQuantity() * material.getCost();
                         }
+                        if (!Objects.equals(materialId, stockItemObj.getMaterialId())) {
+                            stockItem.setMaterial(material);
+                            change = true;
+                        }
+                        log.info("Edit stockItem change: " + change);
+                        if (change) {
+                            stockItem.setQuantity(stockItemObj.getQuantity());
+                            stockItemDao.save(stockItem);
+                        }
+
+                        //Cap nhat Qty cua material
+                        if (updateQtyMat) {
+                            material.setQuantity(material.getQuantity() - stockItem.getQuantity());
+                            material = materialDao.save(material);
+                        }
+                        sotckTotalCost += stockItem.getQuantity() * material.getCost();
                     }
                 }//</editor-fold>
 
@@ -589,6 +598,12 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                 List<Long> list = new ArrayList<>(ids.length);
                 for (String idTmp : ids) {
                     list.add(Long.parseLong(idTmp));
+                }
+                Boolean validToDelete = workOrderDao.validToDelete(list);
+                if (validToDelete != null && validToDelete) {
+                    result.put("success", false);
+                    result.put("message", ResourceBundleUtils.getName("deleteWoComplete"));
+                    return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
                 }
                 int delete = workOrderDao.delete(list);
                 if (delete != ids.length) {
@@ -768,21 +783,32 @@ public class WorkOrderAction extends BaseAction implements Preparable {
         workOrder = workOrderDao.save(workOrder);
     }//</editor-fold>
 
-    private void calcQtyMaterial(WorkOrder workOrder) {
-        if (WorkOrder.STATUS_COMPLETE == workOrder.getStatus()) {
-            Map mapStock = stockItemDao.getList(workOrder.getId(), null, null);
-            ArrayList<StockItem> listStock = new ArrayList<StockItem>();
-            if (mapStock.get("list") != null) {
-                listStock = (ArrayList<StockItem>) mapStock.get("list");
-            }
-            Material material;
-            for (StockItem stockItem : listStock) {
-                material = stockItem.getMaterial();
-                if (stockItem.getQuantity() != null && stockItem.getQuantity() > 0) {
-                    material.setQuantity(material.getQuantity() - stockItem.getQuantity());
-                }
-                material = materialDao.save(material);
-            }
+    //<editor-fold defaultstate="collapsed" desc="checkQtyMaterial">
+    //Return false neu vuot qua
+    private boolean checkQtyMaterial(List<StockItemObj> listStock) {
+        List<Long> lstMat = new ArrayList<Long>(listStock.size());
+        for (StockItemObj soObj : listStock) {
+            lstMat.add(soObj.getMaterialId());
         }
-    }
+        HashMap<Long, Integer> hsmMatQty = materialDao.getQty(lstMat);
+
+        //Check so luong
+        Integer tmp = 0;
+        for (StockItemObj soObj : listStock) {
+            tmp = hsmMatQty.get(soObj.getMaterialId());
+            log.info("-------getMaterialId|qty: " + soObj.getMaterialId() + " | " + tmp);
+            //Khong ton tai Material hoac qty cua MAterial da het
+            if (tmp == null || tmp <= 0) {
+                return false;
+            }
+            //So luong item lon hon so luong qty cua MAterial
+            tmp = tmp - soObj.getQuantity();
+            if (tmp < 0) {
+                return false;
+            }
+            //Cap nhat gia tri  qty cua MAterial  sau khi tru vao HashMap
+            hsmMatQty.put(soObj.getMaterialId(), tmp);
+        }
+        return true;
+    }//</editor-fold>
 }

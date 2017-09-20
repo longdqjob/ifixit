@@ -96,7 +96,7 @@ public class MaterialDaoHibernate extends GenericDaoHibernate<Material, Long> im
             if (lstItemType != null) {
                 criteria.add(Restrictions.in("itemType.id", lstItemType));
             }
-            
+
             //Name
             if (!StringUtils.isBlank(code)) {
                 criteria.add(Restrictions.like("code", "%" + code.trim() + "%").ignoreCase());
@@ -200,6 +200,34 @@ public class MaterialDaoHibernate extends GenericDaoHibernate<Material, Long> im
             return (((BigInteger) list.get(0)).intValue() > 0);
         } catch (Exception ex) {
             log.error("ERROR checkUse: ", ex);
+            return null;
+        }
+    }
+
+    @Override
+    public HashMap<Long, Integer> getQty(List<Long> lstId) {
+        try {
+            Query query;
+            if (lstId == null || lstId.isEmpty()) {
+                return new HashMap<Long, Integer>(0);
+            }
+            HashMap<Long, Integer> rtn = null;
+            String hql = "SELECT id,quantity FROM material WHERE id in :lstId";
+            query = getSession()
+                    .createSQLQuery(hql)
+                    .setParameterList("lstId", lstId);
+
+            List<Object[]> list = query.list();
+            rtn = new HashMap<>(lstId.size());
+            if (list != null && !list.isEmpty()) {
+                for (Object[] obj : list) {
+                    rtn.put(Long.valueOf(String.valueOf(obj[0])), Integer.valueOf(String.valueOf(obj[1])));
+                }
+            }
+
+            return rtn;
+        } catch (Exception ex) {
+            log.error("ERROR getQty: ", ex);
             return null;
         }
     }

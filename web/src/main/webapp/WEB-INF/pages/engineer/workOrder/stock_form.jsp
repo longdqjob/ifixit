@@ -66,7 +66,7 @@
         labelWidth: 50,
         allowDecimals: false,
         allowNegative: false,
-        minValue: 0,
+        minValue: 1,
         listeners: {
             'change': function (textfield, newValue, oldValue) {
                 calcQty();
@@ -74,10 +74,6 @@
         }
     });
 
-    var stockMatQty = Ext.create('Ext.form.field.Text', {
-        xtype: 'textfield',
-        hidden: true,
-    });
     var stockUnit = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         grow: true,
@@ -89,7 +85,7 @@
         margin: '10 10 10 10',
         width: 250,
         readOnly: true,
-        labelWidth: 50
+        labelWidth: 50,
     });
     var stockUnitCost = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
@@ -102,7 +98,12 @@
         margin: '10 10 10 10',
         width: 250,
         readOnly: true,
-        labelWidth: 80
+        labelWidth: 80,
+        listeners: {
+            'change': function (textfield, newValue, oldValue) {
+                calcQty();
+            }
+        }
     });
 
     var stockTotalCost = Ext.create('Ext.form.field.Text', {

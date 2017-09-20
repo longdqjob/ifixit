@@ -3,9 +3,11 @@ package com.cmms.dao.hibernate;
 import com.cmms.dao.GroupEngineerDao;
 import static com.cmms.dao.hibernate.ItemTypeDaoHibernate.TREE_LEVEL;
 import com.cmms.model.GroupEngineer;
+import com.cmms.model.WorkOrder;
 import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.codehaus.jettison.json.JSONArray;
@@ -14,6 +16,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import static org.hibernate.criterion.Projections.id;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -32,12 +35,12 @@ public class GroupEngineerDaoHibernate extends GenericDaoHibernate<GroupEngineer
             List<GroupEngineer> rtn = new LinkedList<>();
             String hql = "";
             if (id == null || id <= 0) {
-                hql = "SELECT * FROM group_engineer WHERE parent_id IS NULL order by name";
+                hql = "SELECT * FROM group_engineer WHERE parent_id IS NULL ORDER BY `complete_code`,`name` ASC";
                 rtn = getSession().createSQLQuery(hql)
                         .addEntity(GroupEngineer.class)
                         .list();
             } else {
-                hql = "SELECT * FROM group_engineer WHERE parent_id=:parent_id order by name";
+                hql = "SELECT * FROM group_engineer WHERE parent_id=:parent_id ORDER BY `complete_code`,`name` ASC";
                 rtn = getSession().createSQLQuery(hql)
                         .addEntity(GroupEngineer.class)
                         .setParameter("parent_id", id)
@@ -51,7 +54,7 @@ public class GroupEngineerDaoHibernate extends GenericDaoHibernate<GroupEngineer
     }
 
     @Override
-    public JSONObject getTree(GroupEngineer root) throws JSONException, SQLException {
+    public JSONObject getTree(GroupEngineer root, Boolean group) throws JSONException, SQLException {
         JSONObject obj = new JSONObject();
         GroupEngineer grpEnineer = root;
         obj.put("name", grpEnineer.getName());
@@ -60,23 +63,89 @@ public class GroupEngineerDaoHibernate extends GenericDaoHibernate<GroupEngineer
         obj.put("code", grpEnineer.getCode());
         obj.put("completeCode", grpEnineer.getCompleteCode());
         obj.put("cost", grpEnineer.getCost());
-
         obj.put("completeParentCode", grpEnineer.getParentCode());
         obj.put("parentName", grpEnineer.getParentName());
         obj.put("parentId", grpEnineer.getParentId());
         obj.put("leaf", false);
         obj.put("expand", true);
         obj.put("id", grpEnineer.getId());
+
+        if (group != null && group) {
+            obj.put("countComplete", 0);
+            obj.put("countOpen", 0);
+            obj.put("countOverDue", 0);
+            List<Integer> lstChild = getListChildren(root.getId());
+            if (lstChild != null && !lstChild.isEmpty()) {
+                obj.put("countOverDue", countWoOverDue(lstChild));
+            }
+        }
         return obj;
     }
 
-    @Override
-    public JSONArray getTreeView(Integer id) throws JSONException, SQLException {
-        List<GroupEngineer> roots = getListItem(id);
+    private Integer countWoOverDue(List<Integer> lstId) {
+        try {
+            String hql = "SELECT COUNT(`id`) FROM `work_order` "
+                    + " WHERE `status`= :status AND `group_engineer_id` IN :lstId ";
+            Query query = getSession()
+                    .createSQLQuery(hql)
+                    .setParameter("status", WorkOrder.STATUS_OVERDUE)
+                    .setParameterList("lstId", lstId);
+            
+            List list = query.list();
+            return ((BigInteger) list.get(0)).intValue();
+        } catch (Exception ex) {
+            log.error("ERROR countWoOverDue: ", ex);
+            return null;
+        }
+    }
 
+    private HashMap<Integer, GroupEngineer> groupWo(List<Integer> lstId) {
+        try {
+            String hql = "SELECT "
+                    + "  `group_engineer_id`,"
+                    + "  SUM(CASE `status` WHEN 0 THEN 1 ELSE 0 END)  AS `complete`,"
+                    + "  SUM(CASE `status` WHEN 1 THEN 1 ELSE 0 END)  AS `open`,"
+                    + "  SUM(CASE `status` WHEN 2 THEN 1 ELSE 0 END)  AS `overdue` "
+                    + " FROM `work_order` "
+                    + " WHERE `group_engineer_id` IN :lstId "
+                    + " GROUP BY `group_engineer_id`";
+            Query query = getSession()
+                    .createSQLQuery(hql)
+                    .setParameterList("lstId", lstId);
+
+            List<Object[]> areaList = query.list();
+            HashMap<Integer, GroupEngineer> rtn = new HashMap<Integer, GroupEngineer>();
+            GroupEngineer groupEngineer;
+            if (areaList != null && !areaList.isEmpty()) {
+                for (Object[] obj : areaList) {
+                    groupEngineer = new GroupEngineer();
+                    groupEngineer.setId(Integer.valueOf(String.valueOf(obj[0])));
+                    if (obj[1] != null && String.valueOf(obj[1]) != null) {
+                        groupEngineer.setCountComplete(Integer.valueOf(String.valueOf(obj[1])));
+                    }
+                    if (obj[2] != null && String.valueOf(obj[2]) != null) {
+                        groupEngineer.setCountOpen(Integer.valueOf(String.valueOf(obj[2])));
+                    }
+                    if (obj[3] != null && String.valueOf(obj[3]) != null) {
+                        groupEngineer.setCountOverDue(Integer.valueOf(String.valueOf(obj[3])));
+                    }
+                    rtn.put(groupEngineer.getId(), groupEngineer);
+                }
+            }
+
+            return rtn;
+        } catch (Exception ex) {
+            log.error("ERROR groupWo: ", ex);
+            return null;
+        }
+    }
+
+    @Override
+    public JSONArray getTreeView(Integer id, Boolean group) throws JSONException, SQLException {
+        List<GroupEngineer> roots = getListItem(id);
         JSONArray treeview = new JSONArray();
         for (GroupEngineer root : roots) {
-            JSONObject tree = getTree(root);
+            JSONObject tree = getTree(root, group);
             treeview.put(tree);
         }
         return treeview;
@@ -204,7 +273,7 @@ public class GroupEngineerDaoHibernate extends GenericDaoHibernate<GroupEngineer
             return null;
         }
     }
-    
+
     /**
      *
      * @param lstId

@@ -109,11 +109,20 @@
                 ],
             },
             ////////////////ITEM   
-            {text: 'ID', dataIndex: 'id', flex: 1, hidden: true,flex: 0.2},
-            {text: '<fmt:message key="material.code"/>', dataIndex: 'code', flex: 0.5, },
-            {text: '<fmt:message key="material.completeCode"/>', dataIndex: 'completeCode', flex: 1, },
+            {text: 'ID', dataIndex: 'id', flex: 1, hidden: true},
+            {text: '<fmt:message key="material.code"/>', dataIndex: 'completeCode', flex: 1, },
             {text: '<fmt:message key="material.name"/>', dataIndex: 'name', flex: 1, },
-            {text: '<fmt:message key="material.qty"/>', dataIndex: 'quantity', flex: 0.5,
+            {text: '<fmt:message key="material.unit"/>', dataIndex: 'unit', flex: 0.4,
+                editor: {
+                    xtype: 'combobox',
+                    queryMode: 'local',
+                    displayField: 'name',
+                    valueField: 'abbr',
+                    store: unitStore,
+                },
+            },
+            {text: '<fmt:message key="material.qty"/>', xtype: 'numbercolumn', align: "right",
+                dataIndex: 'quantity', flex: 0.5,
                 editor: {
                     completeOnEnter: true,
                     field: {
@@ -125,16 +134,8 @@
                     },
                 }
             },
-            {text: '<fmt:message key="material.unit"/>', dataIndex: 'unit', flex: 0.4,
-                editor: {
-                    xtype: 'combobox',
-                    queryMode: 'local',
-                    displayField: 'name',
-                    valueField: 'abbr',
-                    store: unitStore,
-                },
-            },
-            {text: '<fmt:message key="material.unitCost"/>', dataIndex: 'cost', flex: 0.5,
+            {text: '<fmt:message key="material.unitCost"/>', xtype: 'numbercolumn', align: "right",
+                dataIndex: 'cost', flex: 0.5,
                 editor: {
                     completeOnEnter: true,
                     field: {

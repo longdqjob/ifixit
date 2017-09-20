@@ -31,12 +31,12 @@ public class ItemTypeDaoHibernate extends GenericDaoHibernate<ItemType, Integer>
             List<ItemType> rtn = new LinkedList<>();
             String hql;
             if (id == null || id <= 0) {
-                hql = "SELECT * FROM item_type WHERE parent_id IS NULL";
+                hql = "SELECT * FROM item_type WHERE parent_id IS NULL ORDER BY `complete_code`,`name` ASC";
                 rtn = getSession().createSQLQuery(hql)
                         .addEntity(ItemType.class)
                         .list();
             } else {
-                hql = "SELECT * FROM item_type WHERE parent_id=:parent_id";
+                hql = "SELECT * FROM item_type WHERE parent_id=:parent_id ORDER BY `complete_code`,`name` ASC";
                 rtn = getSession().createSQLQuery(hql)
                         .addEntity(ItemType.class)
                         .setParameter("parent_id", id)

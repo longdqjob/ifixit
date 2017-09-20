@@ -18,10 +18,10 @@ public interface GroupEngineerDao extends GenericDao<GroupEngineer, Integer> {
     List<GroupEngineer> getListItem(Integer id);
 
     @Transactional
-    public JSONObject getTree(GroupEngineer root) throws JSONException, SQLException;
+    public JSONObject getTree(GroupEngineer root, Boolean group) throws JSONException, SQLException;
 
     @Transactional
-    JSONArray getTreeView(Integer id) throws JSONException, SQLException;
+    JSONArray getTreeView(Integer id, Boolean group) throws JSONException, SQLException;
 
     @Transactional
     List<Integer> getListChildren(Integer id);
