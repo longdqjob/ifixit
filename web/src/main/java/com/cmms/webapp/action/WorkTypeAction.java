@@ -4,12 +4,15 @@ import com.cmms.dao.CompanyDao;
 import com.cmms.dao.WorkTypeDao;
 import com.cmms.model.WorkType;
 import com.cmms.webapp.util.ResourceBundleUtils;
+import com.cmms.webapp.util.WebUtil;
 import com.opensymphony.xwork2.Preparable;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 /**
@@ -45,21 +48,31 @@ public class WorkTypeAction extends BaseAction implements Preparable {
         return SUCCESS;
     }
 
-    public InputStream getTree() {
+    public InputStream getLoadData() {
         try {
-            String idReq = getRequest().getParameter("id");
-            Integer id = null;
-            if (!StringUtils.isBlank(idReq)) {
-                id = Integer.parseInt(idReq);
-            } else {
-                idReq = getRequest().getParameter("node");
+            JSONObject result = new JSONObject();
+            String code = getRequest().getParameter("code");
+            String name = getRequest().getParameter("name");
+
+            Map pagingMap = workTypeDao.getList(code, name, start, limit);
+
+            ArrayList<WorkType> list = new ArrayList<WorkType>();
+            if (pagingMap.get("list") != null) {
+                list = (ArrayList<WorkType>) pagingMap.get("list");
             }
-            if (!StringUtils.isBlank(idReq)) {
-                id = Integer.parseInt(idReq);
+
+            Integer count = 0;
+            if (pagingMap.get("count") != null) {
+                count = (Integer) pagingMap.get("count");
             }
-            return new ByteArrayInputStream(workTypeDao.getTreeView(id).toString().getBytes("UTF8"));
-        } catch (Exception e) {
-            log.error("ERROR getTreeCompany: ", e);
+
+            JSONArray jSONArray = WebUtil.toJSONArray(list);
+            result.put("list", jSONArray);
+            result.put("totalCount", count);
+
+            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+        } catch (Exception ex) {
+            log.error("ERROR getLoadData: ", ex);
             return null;
         }
     }
@@ -71,9 +84,7 @@ public class WorkTypeAction extends BaseAction implements Preparable {
             Integer id = null;
 
             String code = getRequest().getParameter("code");
-            String completeCode = getRequest().getParameter("completeCode");
             String name = getRequest().getParameter("name");
-            String parent = getRequest().getParameter("parent");
 
             if (StringUtils.isBlank(code)) {
                 result.put("success", false);
@@ -86,7 +97,7 @@ public class WorkTypeAction extends BaseAction implements Preparable {
             if (!StringUtils.isBlank(idReq)) {
                 id = Integer.parseInt(idReq);
                 workType = workTypeDao.get(id);
-                if (completeCode.equals(workType.getCompleteCode())) {
+                if (code.equals(workType.getCode())) {
                     checkUnique = false;
                 }
             } else {
@@ -95,7 +106,7 @@ public class WorkTypeAction extends BaseAction implements Preparable {
 
             //Check unique
             if (checkUnique) {
-                checkUnique = workTypeDao.checkUnique(id, completeCode);
+                checkUnique = workTypeDao.checkUnique(id, code);
                 if (checkUnique == null) {
                     result.put("success", false);
                     result.put("message", ResourceBundleUtils.getName("systemError"));
@@ -107,12 +118,7 @@ public class WorkTypeAction extends BaseAction implements Preparable {
                 }
             }
 
-            if (!StringUtils.isBlank(parent)) {
-                WorkType parentObj = workTypeDao.get(Integer.parseInt(parent));
-                workType.setParent(parentObj);
-            }
             workType.setCode(code);
-            workType.setCompleteCode(completeCode);
             workType.setName(name);
             workType = workTypeDao.save(workType);
             if (workType != null) {
@@ -178,7 +184,7 @@ public class WorkTypeAction extends BaseAction implements Preparable {
             }
             return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
         } catch (Exception ex) {
-            log.error("ERROR getDeleteCompany: ", ex);
+            log.error("ERROR getDelete: ", ex);
             return null;
         }
     }

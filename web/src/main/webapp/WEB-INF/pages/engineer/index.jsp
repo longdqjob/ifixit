@@ -2,7 +2,7 @@
 
 <head>
     <title><fmt:message key="work.list"/></title>
-    <meta name="menu" content="workOrder"/>
+    <meta name="menu" content="workOrderMenu"/>
 </head>
 
 <script>
@@ -13,7 +13,7 @@
 <jsp:include page="../script.jsp" />
 <jsp:include page="../common/chooseMaterial.jsp" />
 <jsp:include page="../common/treeEngineer.jsp" />
-<jsp:include page="../common/treeWorkType.jsp" />
+<jsp:include page="../common/chooseWorkType.jsp" />
 <jsp:include page="../common/treeMechanic.jsp" />
 <jsp:include page="functionJs.jsp" />
 <jsp:include page="workOrder/manHrs_funcion.jsp" />

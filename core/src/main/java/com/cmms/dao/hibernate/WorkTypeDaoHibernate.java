@@ -3,12 +3,13 @@ package com.cmms.dao.hibernate;
 import com.cmms.dao.WorkTypeDao;
 import static com.cmms.dao.hibernate.ItemTypeDaoHibernate.TREE_LEVEL;
 import com.cmms.model.Company;
-import com.cmms.model.Machine;
 import com.cmms.model.WorkType;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -16,6 +17,9 @@ import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.CriteriaSpecification;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -29,89 +33,37 @@ public class WorkTypeDaoHibernate extends GenericDaoHibernate<WorkType, Integer>
     }
 
     @Override
-    public List<WorkType> getListItem(Integer id) {
+    public Map getList(String code, String name, Integer start, Integer limit) {
         try {
-            List<WorkType> rtn = new LinkedList<>();
-            String hql = "";
-            if (id == null || id <= 0) {
-                hql = "SELECT * FROM work_type WHERE parent_id IS NULL ORDER BY name ASC";
-                rtn = getSession().createSQLQuery(hql)
-                        .addEntity(WorkType.class)
-                        .list();
-            } else {
-                hql = "SELECT * FROM work_type WHERE parent_id=:parent_id ORDER BY name ASC";
-                rtn = getSession().createSQLQuery(hql)
-                        .addEntity(WorkType.class)
-                        .setParameter("parent_id", id)
-                        .list();
+            Map result = new HashMap();
+            Criteria criteria = getSession().createCriteria(WorkType.class);
+
+            //code
+            if (!StringUtils.isBlank(code)) {
+                criteria.add(Restrictions.like("code", code).ignoreCase());
             }
-            return rtn;
+            if (!StringUtils.isBlank(name)) {
+                criteria.add(Restrictions.like("name", name).ignoreCase());
+            }
+            criteria.addOrder(Order.asc("code"));
+            Integer total = 0;
+            if (limit != null && limit > 0) {
+                // get the count
+                criteria.setProjection(Projections.rowCount());
+                total = ((Long) criteria.uniqueResult()).intValue();
+                //Reset
+                criteria.setProjection(null);
+                criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+                //End get count
+
+                criteria.setFirstResult(start);
+                criteria.setMaxResults(limit);
+            }
+            result.put("list", criteria.list());
+            result.put("count", total);
+            return result;
         } catch (Exception ex) {
-            log.error("ERROR getListItem: ", ex);
-            return null;
-        }
-    }
-
-    public JSONObject getTree(WorkType root) throws JSONException, SQLException {
-        JSONObject obj = new JSONObject();
-        WorkType currentGroup = root;
-        obj.put("name", currentGroup.getName());
-        obj.put("code", currentGroup.getCode());
-        obj.put("completeCode", currentGroup.getCompleteCode());
-        obj.put("displayname", currentGroup.getCode() + "-" + currentGroup.getName());
-        obj.put("parentId", currentGroup.getParentId());
-        obj.put("parentCode", currentGroup.getParentCode());
-        obj.put("leaf", false);
-        obj.put("expand", true);
-        obj.put("id", currentGroup.getId());
-        return obj;
-    }
-
-    @Override
-    public JSONArray getTreeView(Integer id) throws JSONException, SQLException {
-        List<WorkType> roots = getListItem(id);
-
-        JSONArray treeview = new JSONArray();
-        for (WorkType root : roots) {
-            JSONObject tree = getTree(root);
-            treeview.put(tree);
-        }
-        return treeview;
-    }
-
-    @Override
-    public List<Integer> getListChildren(Integer id) {
-        try {
-            List<Integer> rtn = null;
-            Query query;
-            if (id == null || id <= 0) {
-                return new ArrayList<Integer>(0);
-            }
-            String hql = "SELECT id,GetWorkTypeTree(id,:level) FamilyTree FROM work_type WHERE id=:parent_id";
-            query = getSession()
-                    .createSQLQuery(hql)
-                    .setParameter("level", TREE_LEVEL)
-                    .setParameter("parent_id", id);
-
-            List<Object[]> areaList = query.list();
-            rtn = new LinkedList<>();
-            rtn.add(id);
-            if (areaList != null && !areaList.isEmpty()) {
-                String familyTree = "";
-                for (Object[] obj : areaList) {
-                    familyTree = String.valueOf(obj[1]);
-                }
-                if (familyTree.length() > 0) {
-                    String[] tmp = familyTree.split(",");
-                    for (String child : tmp) {
-                        rtn.add(Integer.valueOf(child));
-                    }
-                }
-            }
-
-            return rtn;
-        } catch (Exception ex) {
-            log.error("ERROR getListChildren: ", ex);
+            log.error("ERROR getList: ", ex);
             return null;
         }
     }
@@ -138,8 +90,6 @@ public class WorkTypeDaoHibernate extends GenericDaoHibernate<WorkType, Integer>
         Session session = null;
         try {
             List<Company> list = new ArrayList<Company>();
-
-            session = this.getSessionFactory().openSession();
             session = getSession();
             if (!session.isOpen() || !session.isConnected()) {
                 log.debug("Session is close...." + session.isOpen() + " --- " + session.isConnected());

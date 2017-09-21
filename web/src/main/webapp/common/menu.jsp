@@ -8,8 +8,7 @@
                     <a href="<c:url value="/login"/>"><fmt:message key="login.title"/></a>
                 </li>
             </c:if>
-            <!--<menu:displayMenu name="Home"/>-->
-            <menu:displayMenu name="workOrder"/>
+            <menu:displayMenu name="workOrderMenu"/>
             <menu:displayMenu name="SystemMenu"/>
             <menu:displayMenu name="MaterialMenu"/>
             <menu:displayMenu name="UserMenu"/>

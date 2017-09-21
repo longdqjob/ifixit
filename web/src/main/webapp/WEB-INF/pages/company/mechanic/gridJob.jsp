@@ -44,10 +44,12 @@
                         case 1 :
                             return '<fmt:message key="work.status.open"/>';
                         case 2 :
+                            return '<fmt:message key="work.status.inProgress"/>';
+                        case 3 :
                             return '<fmt:message key="work.status.over"/>';
                     }
                 }
-            },            
+            },
             {text: '<fmt:message key="machine.job.wo"/>', dataIndex: 'name', flex: 1, },
             {text: '<fmt:message key="machine.job.code"/>', dataIndex: 'code', flex: 1, },
             {text: '<fmt:message key="machine.job.start"/>', type: 'date', dataIndex: 'startTime', flex: 1,
@@ -66,7 +68,7 @@
                     }
                     return "";
                 }},
-            {text: '<fmt:message key="machine.job.cost"/>',xtype: 'numbercolumn', align: "right", dataIndex: 'mhTotalCost', flex: 1, },
+            {text: '<fmt:message key="machine.job.cost"/>', xtype: 'numbercolumn', align: "right", dataIndex: 'mhTotalCost', flex: 1, },
             {text: '<fmt:message key="machine.job.note"/>', dataIndex: 'note', flex: 1, },
         ],
         viewConfig: {

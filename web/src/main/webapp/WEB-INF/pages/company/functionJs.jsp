@@ -161,6 +161,12 @@
 //            return false;
 //        }
 
+        if (hasUnicode(companyCode.getValue())) {
+            companyCode.setActiveError('<fmt:message key="notUnicode"/>');
+            alertError('<fmt:message key="notUnicode"/>');
+            return false;
+        }
+
         mask();
         Ext.Ajax.request({
             url: "/company/saveCompany",

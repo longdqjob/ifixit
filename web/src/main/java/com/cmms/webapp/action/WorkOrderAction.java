@@ -174,7 +174,7 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             }
             List<Integer> listWorkType = null;
             if (workTypeReq != null && workTypeReq > 0) {
-                listWorkType = workTypeDao.getListChildren(workTypeReq);
+                listWorkType.add(workTypeReq);
             }
 
             //groupEngineerDao
@@ -564,9 +564,34 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             String idReq = getRequest().getParameter("id");
             String statusReq = getRequest().getParameter("status");
             WorkOrder workOrder = workOrderDao.get(Long.parseLong(idReq));
+            ArrayList<StockItem> listStock = new ArrayList<StockItem>();
+            //Chuyen sang trang thai COMPLETE -> Kiem tra quantity cua material
+            if (WorkOrder.STATUS_COMPLETE == Integer.parseInt(statusReq)) {
+                Map mapStock = stockItemDao.getList(workOrder.getId(), null, null);
+                if (mapStock.get("list") != null) {
+                    listStock = (ArrayList<StockItem>) mapStock.get("list");
+                }
+                if (!checkQtyMaterial(listStock)) {
+                    result.put("success", "overQty");
+                    result.put("message", ResourceBundleUtils.getName("overQty"));
+                    return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                }
+            }
             workOrder.setStatus(Integer.parseInt(statusReq));
             workOrder = workOrderDao.save(workOrder);
             if (workOrder != null) {
+                //Chuyen sang trang thai COMPLETE -> tru quantity cua material
+                if (WorkOrder.STATUS_COMPLETE == Integer.parseInt(statusReq)) {
+                    Material material;
+                    for (StockItem stockItem : listStock) {
+                        if (stockItem.getQuantity() > 0) {
+                            material = materialDao.get(stockItem.getMaterialId());
+                            material.setQuantity(material.getQuantity() - stockItem.getQuantity());
+                            material = materialDao.save(material);
+                        }
+                    }
+                }
+
                 result.put("success", true);
                 result.put("message", ResourceBundleUtils.getName("saveSuccess"));
             } else {
@@ -785,6 +810,33 @@ public class WorkOrderAction extends BaseAction implements Preparable {
 
     //<editor-fold defaultstate="collapsed" desc="checkQtyMaterial">
     //Return false neu vuot qua
+    private boolean checkQtyMaterial(ArrayList<StockItem> listStock) {
+        List<Long> lstMat = new ArrayList<Long>(listStock.size());
+        for (StockItem soObj : listStock) {
+            lstMat.add(soObj.getMaterialId());
+        }
+        HashMap<Long, Integer> hsmMatQty = materialDao.getQty(lstMat);
+
+        //Check so luong
+        Integer tmp = 0;
+        for (StockItem soObj : listStock) {
+            tmp = hsmMatQty.get(soObj.getMaterialId());
+            log.info("-------getMaterialId|qty: " + soObj.getMaterialId() + " | " + tmp);
+            //Khong ton tai Material hoac qty cua MAterial da het
+            if (tmp == null || tmp <= 0) {
+                return false;
+            }
+            //So luong item lon hon so luong qty cua MAterial
+            tmp = tmp - soObj.getQuantity();
+            if (tmp < 0) {
+                return false;
+            }
+            //Cap nhat gia tri  qty cua MAterial  sau khi tru vao HashMap
+            hsmMatQty.put(soObj.getMaterialId(), tmp);
+        }
+        return true;
+    }
+
     private boolean checkQtyMaterial(List<StockItemObj> listStock) {
         List<Long> lstMat = new ArrayList<Long>(listStock.size());
         for (StockItemObj soObj : listStock) {

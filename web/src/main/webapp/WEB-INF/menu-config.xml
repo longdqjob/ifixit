@@ -4,9 +4,12 @@
         <Displayer name="Velocity" type="net.sf.navigator.displayer.VelocityMenuDisplayer"/>
     </Displayers>
     <Menus>
-<!--        <Menu name="Home" title="home.title" page="/home" roles="ROLE_ADMIN,ROLE_USER"/>-->
+        <!--        <Menu name="Home" title="home.title" page="/home" roles="ROLE_ADMIN,ROLE_USER"/>-->
         
-        <Menu name="workOrder" title="menu.admin.workOrder" page="../admin/workOrder" roles="ROLE_ADMIN,ROLE_USER"/>
+        <Menu name="workOrderMenu" title="menu.admin.workOrder" description="Work Order Menu" roles="ROLE_ADMIN" page="../admin/workOrder">
+            <Menu name="workOrder" title="menu.admin.workOrder" page="../admin/workOrder" roles="ROLE_ADMIN,ROLE_USER"/>
+            <Menu name="workTypeMenu" title="workType" page="../admin/workType" roles="ROLE_ADMIN,ROLE_USER"/>
+        </Menu>
         <Menu name="MaterialMenu" title="menu.admin.material" page="../admin/material" roles="ROLE_ADMIN,ROLE_USER"/>
         <Menu name="SystemMenu" title="menu.admin.company" description="Admin Menu" roles="ROLE_ADMIN" page="../admin/company">
             <Item name="company" title="menu.admin.company" page="/admin/company"/>

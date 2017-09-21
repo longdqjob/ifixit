@@ -64,6 +64,12 @@
             return false;
         }
 
+        if (hasUnicode(supplierCode.getValue())) {
+            supplierCode.setActiveError('<fmt:message key="notUnicode"/>');
+            alertError('<fmt:message key="notUnicode"/>');
+            return false;
+        }
+
         mask();
         Ext.Ajax.request({
             url: "/supplier/save",

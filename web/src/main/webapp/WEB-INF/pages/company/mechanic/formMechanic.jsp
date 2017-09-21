@@ -586,6 +586,11 @@
         listeners: {
             show: function (window) {
                 Ext.getCmp("tabMechanic").setActiveTab(Ext.getCmp("indentify"));
+                setTimeout(function () {
+                    console.log(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
+                    gridHis.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
+                    gridJob.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
+                }, 1);
             },
             afterRender: function (thisForm, options) {
                 this.keyNav = Ext.create('Ext.util.KeyNav', this.el, {

@@ -120,6 +120,12 @@
 //            }
             return false;
         }
+        
+        if (hasUnicode(workOrderCode.getValue())) {
+            workOrderCode.setActiveError('<fmt:message key="notUnicode"/>');
+            alertError('<fmt:message key="notUnicode"/>');
+            return false;
+        }
 
         maskTarget(workOrderWindow);
         Ext.Ajax.request({

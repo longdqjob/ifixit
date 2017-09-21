@@ -77,6 +77,12 @@
         if (!valid || valid.length > 0) {
             return false;
         }
+        
+        if (hasUnicode(machineTypeCode.getValue())) {
+            machineTypeCode.setActiveError('<fmt:message key="notUnicode"/>');
+            alertError('<fmt:message key="notUnicode"/>');
+            return false;
+        }
 
         mask();
         Ext.Ajax.request({

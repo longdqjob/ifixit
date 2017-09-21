@@ -131,6 +131,12 @@
             return false;
         }
 
+        if (hasUnicode(itemTypeCode.getValue())) {
+            itemTypeCode.setActiveError('<fmt:message key="notUnicode"/>');
+            alertError('<fmt:message key="notUnicode"/>');
+            return false;
+        }
+
         maskTarget(itemTypeWindow);
         Ext.Ajax.request({
             url: "../itemType/save",

@@ -171,6 +171,12 @@
         if (!valid || valid.length > 0) {
             return false;
         }
+        
+        if (hasUnicode(materialCode.getValue())) {
+            materialCode.setActiveError('<fmt:message key="notUnicode"/>');
+            alertError('<fmt:message key="notUnicode"/>');
+            return false;
+        }
 
         maskTarget(materialWindow);
         Ext.Ajax.request({

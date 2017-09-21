@@ -1,59 +1,47 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <script>
-    var cmWorkTypeId = Ext.create('Ext.form.field.Text', {
+    var workTypeId = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
+        id: "workTypeId",
         hidden: true,
     });
 
-    var cmWorkTypeName = Ext.create('Ext.form.field.Text', {
+    var workTypeCode = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         grow: true,
-        fieldLabel: '<fmt:message key="companyName"/>',
-        name: 'name',
+        fieldLabel: '<fmt:message key="workType.code"/>',
         labelAlign: 'left',
         anchor: '100%',
         allowBlank: false,
         margin: '10 10 10 10',
         width: 350,
-        maxLength: 255,
+        maxLength: 50,
     });
 
-    var cmWorkTypeCode = Ext.create('Ext.form.field.Text', {
+    var workTypeName = Ext.create('Ext.form.field.Text', {
         xtype: 'textfield',
         grow: true,
-        fieldLabel: '<fmt:message key="companyCode"/>',
+        fieldLabel: '<fmt:message key="workType.name"/>',
         labelAlign: 'left',
         anchor: '100%',
         allowBlank: false,
         margin: '10 10 10 10',
         width: 350,
-        maxLength: 20,
+        maxLength: 50,
     });
+    
 
-    var cmWorkTypeForm = Ext.create('Ext.form.Panel', {
+    var workTypeForm = Ext.create('Ext.form.Panel', {
         xtype: 'form',
         layout: 'anchor',
         bodyStyle: 'background-color: transparent;',
-        items: [{
-                xtype: 'container',
-                anchor: '100%',
-                columnWidth: 1,
-                layout: 'column',
-                height: '100%',
-                items: [{
-                        xtype: 'container',
-                        anchor: '100%',
-                        columnWidth: 1,
-                        height: '100%',
-                        items: [cmWorkTypeId, cmWorkTypeCode, cmWorkTypeName]
-                    }]
-            },
-        ]
+        items: [workTypeId,workTypeCode,workTypeName]
     });
 
 
-    var cmWorkTypeWindow = Ext.create('Ext.window.Window', {
+    var workTypeWindow = Ext.create('Ext.window.Window', {
         closeAction: 'hide',
+        id: 'workTypeWindow',
         autoEl: 'form',
         width: 400,
         constrainHeader: true,
@@ -62,24 +50,24 @@
         defaults: {
             anchor: '100%'
         },
-        items: [cmWorkTypeForm],
+        items: [workTypeForm],
         buttons: [{
-                text: '<fmt:message key="button.save"/>',
+                text: 'Save',
                 type: 'submit',
                 handler: function () {
-                    saveCmWorkType();
+                    saveForm();
                 }
             }, {
-                text: '<fmt:message key="button.cancel"/>',
+                text: 'Cancel',
                 handler: function () {
-                    cmWorkTypeWindow.hide();
+                    workTypeWindow.hide();
                 }
             }],
         listeners: {
             afterRender: function (thisForm, options) {
                 this.keyNav = Ext.create('Ext.util.KeyNav', this.el, {
                     enter: function () {
-                        saveCmWorkType();
+                        saveForm();
                     }
                 });
             },

@@ -97,7 +97,6 @@
             };
             gridHis.getStore().loadPage(1, {
                 callback: function (records, operation, success) {
-                    gridHis.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
                     storeRedirectIfNotAuthen(operation);
                 }
             });
@@ -108,15 +107,12 @@
             };
             gridJob.getStore().loadPage(1, {
                 callback: function (records, operation, success) {
-                    gridJob.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
                     storeRedirectIfNotAuthen(operation);
                 }
             });
         } else {
             gridHis.getStore().removeAll();
             gridJob.getStore().removeAll();
-            gridHis.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
-            gridJob.setHeight(mechanicForm.getHeight() - mechanicType.getHeight() - mechanicCode.getHeight() - 50);
         }
     }
 
@@ -301,6 +297,7 @@
 
     function saveMechanic() {
         var valid = mechanicForm.query("field{isValid()==false}");
+
         if (!valid || valid.length > 0) {
             if (mechanicTypeId.getValue() == null || mechanicTypeId.getValue() === "") {
                 mechanicTypeName.reset();
@@ -321,6 +318,12 @@
             return false;
         }
 
+        if (hasUnicode(mechanicCode.getValue())) {
+            mechanicCode.setActiveError('<fmt:message key="notUnicode"/>');
+            alertError('<fmt:message key="notUnicode"/>');
+            return false;
+        }
+
         if (mechanicTypeId.getValue() == null || mechanicTypeId.getValue() === "") {
             mechanicTypeName.reset();
             mechanicTypeName.setActiveError('<fmt:message key="message.required"/>');
@@ -335,6 +338,8 @@
             companyTreeWindow.show();
             return false;
         }
+
+
 
         maskTarget(mechanicWindow);
         console.log(Ext.getCmp("sinceField").getRawValue());

@@ -75,7 +75,7 @@
             'render': function (cmp) {
                 this.getEl().on('click', function () {
                     if (!wWorkTypeName.readOnly) {
-                        workTypeTreeWindow.show();
+                        cmWorkTypeWindow.show();
                     }
                 });
             }
@@ -94,7 +94,7 @@
                 margin: '10 0 6 10',
                 width: 80,
                 handler: function () {
-                    workTypeTreeWindow.show();
+                    cmWorkTypeWindow.show();
                 }
             }]
     });
@@ -149,9 +149,10 @@
     var statusStore = Ext.create('Ext.data.Store', {
         fields: ['abbr', 'name'],
         data: [
-            {"abbr": 1, "name": "<fmt:message key="work.status.open"/>"},
-            {"abbr": 2, "name": "<fmt:message key="work.status.over"/>"},
             {"abbr": 0, "name": "<fmt:message key="work.status.complete"/>"},
+            {"abbr": 1, "name": "<fmt:message key="work.status.open"/>"},
+            {"abbr": 2, "name": "<fmt:message key="work.status.inProgress"/>"},
+            {"abbr": 3, "name": "<fmt:message key="work.status.over"/>"},
         ]
     });
 

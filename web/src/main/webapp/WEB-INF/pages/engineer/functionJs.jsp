@@ -9,7 +9,7 @@
         Ext.getCmp('gridId').setWidth(Ext.getCmp("searchform").getWidth());
         Ext.getCmp('gridId').setHeight(Ext.getCmp("viewport").getHeight() - Ext.getCmp("searchform").getHeight() - 110);
         Ext.getCmp("gridId").updateLayout();
-        tree.setHeight(Ext.getCmp("gridId").getHeight()-5);
+        tree.setHeight(Ext.getCmp("gridId").getHeight() - 5);
     }
 
     function loadWorkOrder(engineerId) {
@@ -104,6 +104,12 @@
     function saveEngineer() {
         var valid = engneerForm.query("field{isValid()==false}");
         if (!valid || valid.length > 0) {
+            return false;
+        }
+
+        if (hasUnicode(engneerCode.getValue())) {
+            engneerCode.setActiveError('<fmt:message key="notUnicode"/>');
+            alertError('<fmt:message key="notUnicode"/>');
             return false;
         }
 
