@@ -6,6 +6,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
+import java.util.Map;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -137,4 +139,8 @@ public interface UserManager extends GenericManager<User, Long> {
      * @throws UserExistsException
      */
     User updatePassword(String username, String currentPassword, String recoveryToken, String newPassword, String applicationUrl) throws UserExistsException;
+    
+    
+    @Transactional
+    Map getList(List<Integer> lstSystem, List<Integer> listEng, String username, String name, String email,  Integer start, Integer limit);
 }

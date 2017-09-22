@@ -191,6 +191,12 @@
             <interceptor-ref name="adminCheck"/>
             <result name="success">/WEB-INF/pages/material/index.jsp</result>
         </action>
+        
+        <!-- Users -->
+        <action name="user" class="materialAction" method="index">
+            <interceptor-ref name="adminCheck"/>
+            <result name="success">/WEB-INF/pages/user/index.jsp</result>
+        </action>
     </package>
     
     <package name="itemType" extends="default" namespace="/itemType">
@@ -440,6 +446,26 @@
         <action name="deleteStock" class="workOrderAction">
             <result type="stream">
                 <param name="inputName">deleteStock</param>
+            </result>
+        </action>
+    </package>
+    
+    <!-- UserAction -->
+    <package name="userAction" extends="default" namespace="/user">
+        <action name="loadData" class="userAction">
+            <interceptor-ref name="adminOnly"/>
+            <result type="stream">
+                <param name="inputName">loadData</param>
+            </result>
+        </action>
+        <action name="save" class="userAction">
+            <result type="stream">
+                <param name="inputName">save</param>
+            </result>
+        </action>
+        <action name="delete" class="userAction">
+            <result type="stream">
+                <param name="inputName">delete</param>
             </result>
         </action>
     </package>

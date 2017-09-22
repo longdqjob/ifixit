@@ -16,7 +16,6 @@ import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import static org.hibernate.criterion.Projections.id;
 import org.hibernate.criterion.Restrictions;
 
 /**

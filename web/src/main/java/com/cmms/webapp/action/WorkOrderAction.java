@@ -447,8 +447,21 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             workOrder.setTask(task);
             workOrder.setNote(note);
             workOrder.setReason(reason);
+
+            //Clone WO
+            WorkOrder woClone = null;
+            if (Objects.equals(WorkOrder.STATUS_COMPLETE, workOrder.getStatus())
+                    && workOrder.getIsRepeat() != null && workOrder.getIsRepeat() > 0) {
+                //Clone WO
+                woClone = workOrder.cloneWo();
+            }
             workOrder = workOrderDao.save(workOrder);
             if (workOrder != null) {
+                if (woClone != null) {
+                    //Clone WO
+                    woClone = workOrderDao.save(woClone);
+                    log.info("-----------CLONE WO: " + workOrder.getId() + " ---> " + woClone.getId());
+                }
                 Float totalMh = 0F;
                 Float totalCost = 0F;
                 //<editor-fold defaultstate="collapsed" desc="Save list man_hour">
@@ -565,7 +578,9 @@ public class WorkOrderAction extends BaseAction implements Preparable {
             String statusReq = getRequest().getParameter("status");
             WorkOrder workOrder = workOrderDao.get(Long.parseLong(idReq));
             ArrayList<StockItem> listStock = new ArrayList<StockItem>();
-            //Chuyen sang trang thai COMPLETE -> Kiem tra quantity cua material
+            //Chuyen sang trang thai COMPLETE -> Kiem tra quantity cua material + Clone neu repeat
+            WorkOrder woClone = null;
+
             if (WorkOrder.STATUS_COMPLETE == Integer.parseInt(statusReq)) {
                 Map mapStock = stockItemDao.getList(workOrder.getId(), null, null);
                 if (mapStock.get("list") != null) {
@@ -576,10 +591,20 @@ public class WorkOrderAction extends BaseAction implements Preparable {
                     result.put("message", ResourceBundleUtils.getName("overQty"));
                     return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
                 }
+
+                if (workOrder.getIsRepeat() != null && workOrder.getIsRepeat() > 0) {
+                    //Clone WO
+                    woClone = workOrder.cloneWo();
+                }
             }
             workOrder.setStatus(Integer.parseInt(statusReq));
             workOrder = workOrderDao.save(workOrder);
             if (workOrder != null) {
+                //Clone
+                if(woClone != null){
+                    woClone = workOrderDao.save(woClone);
+                    log.info("-----------CLONE WO: " + workOrder.getId() + " ---> " + woClone.getId());
+                }
                 //Chuyen sang trang thai COMPLETE -> tru quantity cua material
                 if (WorkOrder.STATUS_COMPLETE == Integer.parseInt(statusReq)) {
                     Material material;

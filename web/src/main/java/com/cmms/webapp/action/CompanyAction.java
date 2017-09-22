@@ -72,7 +72,7 @@ public class CompanyAction extends BaseAction implements Preparable {
             if (!StringUtils.isBlank(idReq)) {
                 id = Integer.parseInt(idReq);
             }
-            List<Integer> listChildrent = companyDao.getListChildren(id);
+            List<Integer> listChildrent = companyDao.getListChildren(id, true);
             Map pagingMap = companyDao.getListCompany(listChildrent, null, null, start, limit);
 
             ArrayList<Company> list = new ArrayList<Company>();

@@ -68,6 +68,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     public static final String SESSION_ENGINNER_GRP_OBJ = "userGrpEngineerObj";
     public static final String SESSION_ENGINNER_GRP_NAME = "grpEngineerName";
     public static final String SESSION_LIST_GRP_ENGINNER = "lstEngineerGrp";
+    public static final String CSRF_TOKEN = "CSRF_TOKEN";
+    public static final String LAST_REQUEST = "LAST_REQUEST";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -78,7 +80,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         Integer engineerGrpID = (Integer) session.getAttribute(SESSION_ENGINNER_GRP);
 
         //System
-        List<Integer> lstChild = companyDao.getListChildren(systemId);
+        List<Integer> lstChild = companyDao.getListChildren(systemId, true);
         System.out.println("lstChild: " + StringUtils.join(lstChild, " , "));
         session.setAttribute(SESSION_LIST_SYSTEM_ID, lstChild);
 
@@ -88,11 +90,16 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         session.setAttribute(SESSION_LIST_GRP_ENGINNER, lstGrpEng);
         System.out.println("SESSION_SYSTEM_ID: " + session.getAttribute(SESSION_SYSTEM_ID));
 
-        //set our response to OK status
-        response.setStatus(HttpServletResponse.SC_OK);
-        //since we have created our custom success handler, its up to us to where
-        //we will redirect the user after successfully login
-        response.sendRedirect("admin/workOrder");
+        String lastRequest = (String) request.getSession().getAttribute(LoginSuccessHandler.LAST_REQUEST);
+        if (lastRequest != null) {
+            request.getSession().setAttribute(LoginSuccessHandler.LAST_REQUEST, null);
+            System.out.println("----------lastRequest .getRequestURL(): " + lastRequest);
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.sendRedirect(lastRequest);
+        } else {
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.sendRedirect("admin/workOrder");
+        }
     }
 
     public static void updateSession(HttpServletRequest request) {
@@ -112,13 +119,10 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
             ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getServletContext());
             //System
-            Integer systemId = 3;
-            if (userId < 0) {
-                systemId = 0;
-            }
+            Integer systemId = authUser.getSystemId();
             session.setAttribute(SESSION_SYSTEM_ID, systemId);
             CompanyDao companyDao = ctx.getBean("companyDao", CompanyDao.class);
-            List<Integer> list = companyDao.getListChildren(systemId);
+            List<Integer> list = companyDao.getListChildren(systemId, true);
             request.getSession().setAttribute(LoginSuccessHandler.SESSION_LIST_SYSTEM_ID, list);
 
             //SESSION_SYSTEM_OBJ
@@ -149,10 +153,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
             ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getServletContext());
             //ENGINNER_GRP
-            Integer engineerGrpID = 2;
-            if (userId < 0) {
-                engineerGrpID = 0;
-            }
+            Integer engineerGrpID = authUser.getGroupEngineerId();
+
             session.setAttribute(SESSION_ENGINNER_GRP, engineerGrpID);
             GroupEngineerDao groupEngineerDao = ctx.getBean("groupEngineerDao", GroupEngineerDao.class);
             List<Integer> listEng = groupEngineerDao.getListChildren(engineerGrpID);

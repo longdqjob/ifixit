@@ -2,6 +2,7 @@ package com.cmms.dao.hibernate;
 
 import com.cmms.dao.UserDao;
 import com.cmms.model.User;
+import java.util.HashMap;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -14,17 +15,23 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.Table;
 import java.util.List;
+import java.util.Map;
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.CriteriaSpecification;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 
 /**
- * This class interacts with Hibernate session to save/delete and
- * retrieve User objects.
+ * This class interacts with Hibernate session to save/delete and retrieve User
+ * objects.
  *
  * @author <a href="mailto:matt@raibledesigns.com">Matt Raible</a>
- *         Modified by <a href="mailto:dan@getrolling.com">Dan Kibler</a>
- *         Extended to implement Acegi UserDetailsService interface by David Carter david@carter.net
- *         Modified by <a href="mailto:bwnoll@gmail.com">Bryan Noll</a> to work with
- *         the new BaseDaoHibernate implementation that uses generics.
- *         Modified by jgarcia (updated to hibernate 4)
+ * Modified by <a href="mailto:dan@getrolling.com">Dan Kibler</a>
+ * Extended to implement Acegi UserDetailsService interface by David Carter
+ * david@carter.net Modified by <a href="mailto:bwnoll@gmail.com">Bryan Noll</a>
+ * to work with the new BaseDaoHibernate implementation that uses generics.
+ * Modified by jgarcia (updated to hibernate 4)
  */
 @Repository("userDao")
 public class UserDaoHibernate extends GenericDaoHibernate<User, Long> implements UserDao, UserDetailsService {
@@ -59,9 +66,8 @@ public class UserDaoHibernate extends GenericDaoHibernate<User, Long> implements
     }
 
     /**
-     * Overridden simply to call the saveUser method. This is happening
-     * because saveUser flushes the session and saveObject of BaseDaoHibernate
-     * does not.
+     * Overridden simply to call the saveUser method. This is happening because
+     * saveUser flushes the session and saveObject of BaseDaoHibernate does not.
      *
      * @param user the user to save
      * @return the modified user (with a primary key set if they're new)
@@ -87,10 +93,63 @@ public class UserDaoHibernate extends GenericDaoHibernate<User, Long> implements
      * {@inheritDoc}
      */
     public String getUserPassword(Long userId) {
-        JdbcTemplate jdbcTemplate =
-                new JdbcTemplate(SessionFactoryUtils.getDataSource(getSessionFactory()));
+        JdbcTemplate jdbcTemplate
+                = new JdbcTemplate(SessionFactoryUtils.getDataSource(getSessionFactory()));
         Table table = AnnotationUtils.findAnnotation(User.class, Table.class);
         return jdbcTemplate.queryForObject(
                 "select password from " + table.name() + " where id=?", String.class, userId);
+    }
+
+    @Override
+    public Map getList(List<Integer> lstSystem, List<Integer> listEng, String username, String name, String email, Integer start, Integer limit) {
+        try {
+            Map result = new HashMap();
+            Criteria criteria = getSession().createCriteria(User.class);
+            if (lstSystem != null) {
+                log.info("lstSystem: " + lstSystem.size());
+                if (lstSystem.isEmpty()) {
+                    log.info("lstSystem isEmpty: ");
+                    return result;
+                }
+                criteria.add(Restrictions.in("system.id", lstSystem));
+            }
+            if (listEng != null) {
+                log.info("listEng: " + listEng.size());
+                if (listEng.isEmpty()) {
+                    log.info("listEng isEmpty: ");
+                    return result;
+                }
+                criteria.add(Restrictions.in("groupEngineer.id", listEng));
+            }
+            //Name
+            if (!StringUtils.isBlank(username)) {
+                criteria.add(Restrictions.like("username", "%" + username.trim() + "%").ignoreCase());
+            }
+            if (!StringUtils.isBlank(email)) {
+                criteria.add(Restrictions.like("email", "%" + email.trim() + "%").ignoreCase());
+            }
+
+            criteria.addOrder(Order.asc("username"));
+
+            Integer total = 0;
+            if (limit != null && limit > 0) {
+                // get the count
+                criteria.setProjection(Projections.rowCount());
+                total = ((Long) criteria.uniqueResult()).intValue();
+                //Reset
+                criteria.setProjection(null);
+                criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+                //End get count
+
+                criteria.setFirstResult(start);
+                criteria.setMaxResults(limit);
+            }
+            result.put("list", criteria.list());
+            result.put("count", total);
+            return result;
+        } catch (Exception ex) {
+            log.error("ERROR getList: ", ex);
+            return null;
+        }
     }
 }

@@ -25,7 +25,7 @@ public interface CompanyDao extends GenericDao<Company, Integer> {
     JSONArray getTreeView(Integer id) throws JSONException, SQLException;
 
     @Transactional
-    List<Integer> getListChildren(Integer id);
+    List<Integer> getListChildren(Integer id, boolean appendParent);
 
     @Transactional
     Map getListCompany(List<Integer> listParent, String code, String name, Integer start, Integer limit);

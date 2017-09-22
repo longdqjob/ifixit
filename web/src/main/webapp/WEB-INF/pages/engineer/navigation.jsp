@@ -87,6 +87,7 @@
                 text: '<fmt:message key="grpEngineer"/>',
                 sortable: true,
                 dataIndex: 'namedisplay',
+                locked: true
             }, {
                 text: '<fmt:message key="work.status.over"/>',
                 dataIndex: 'countOverDue',
@@ -157,7 +158,7 @@
                                 iconCls: "refresh",
                                 handler: function () {
                                     selectedSystem = record;
-                                   // console.log(selectedSystem);
+                                    // console.log(selectedSystem);
                                     loadWorkOrder(selectedSystem.get("id"));
                                 }
                             }, {

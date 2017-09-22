@@ -17,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
@@ -37,19 +38,20 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
- * This class represents the basic "user" object in AppFuse that allows for authentication
- * and user management.  It implements Spring Security's UserDetails interface.
+ * This class represents the basic "user" object in AppFuse that allows for
+ * authentication and user management. It implements Spring Security's
+ * UserDetails interface.
  *
  * @author <a href="mailto:matt@raibledesigns.com">Matt Raible</a>
- *         Updated by Dan Kibler (dan@getrolling.com)
- *         Extended to implement Spring UserDetails interface
- *         by David Carter david@carter.net
+ * Updated by Dan Kibler (dan@getrolling.com) Extended to implement Spring
+ * UserDetails interface by David Carter david@carter.net
  */
 @Entity
 @Table(name = "app_user")
 @Indexed
 @XmlRootElement
 public class User extends BaseObject implements Serializable, UserDetails {
+
     private static final long serialVersionUID = 3832626162173359411L;
 
     private Long id;
@@ -69,6 +71,9 @@ public class User extends BaseObject implements Serializable, UserDetails {
     private boolean accountExpired;
     private boolean accountLocked;
     private boolean credentialsExpired;
+
+    private GroupEngineer groupEngineer;
+    private Company system;
 
     /**
      * Default constructor - creates a new instance with no values set.
@@ -137,7 +142,7 @@ public class User extends BaseObject implements Serializable, UserDetails {
     }
 
     @Column(name = "phone_number")
-    @Field(analyze= Analyze.NO)
+    @Field(analyze = Analyze.NO)
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -167,7 +172,8 @@ public class User extends BaseObject implements Serializable, UserDetails {
     @Fetch(FetchMode.SELECT)
     @JoinTable(
             name = "user_role",
-            joinColumns = { @JoinColumn(name = "user_id") },
+            joinColumns = {
+                @JoinColumn(name = "user_id")},
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     public Set<Role> getRoles() {
@@ -204,7 +210,8 @@ public class User extends BaseObject implements Serializable, UserDetails {
 
     /**
      * @return GrantedAuthority[] an array of roles.
-     * @see org.springframework.security.core.userdetails.UserDetails#getAuthorities()
+     * @see
+     * org.springframework.security.core.userdetails.UserDetails#getAuthorities()
      */
     @Transient
     @JsonIgnore // needed for UserApiITest in appfuse-ws archetype
@@ -230,7 +237,8 @@ public class User extends BaseObject implements Serializable, UserDetails {
     }
 
     /**
-     * @see org.springframework.security.core.userdetails.UserDetails#isAccountNonExpired()
+     * @see
+     * org.springframework.security.core.userdetails.UserDetails#isAccountNonExpired()
      * @return true if account is still active
      */
     @Transient
@@ -244,7 +252,8 @@ public class User extends BaseObject implements Serializable, UserDetails {
     }
 
     /**
-     * @see org.springframework.security.core.userdetails.UserDetails#isAccountNonLocked()
+     * @see
+     * org.springframework.security.core.userdetails.UserDetails#isAccountNonLocked()
      * @return false if account is locked
      */
     @Transient
@@ -258,7 +267,8 @@ public class User extends BaseObject implements Serializable, UserDetails {
     }
 
     /**
-     * @see org.springframework.security.core.userdetails.UserDetails#isCredentialsNonExpired()
+     * @see
+     * org.springframework.security.core.userdetails.UserDetails#isCredentialsNonExpired()
      * @return true if credentials haven't expired
      */
     @Transient
@@ -385,4 +395,57 @@ public class User extends BaseObject implements Serializable, UserDetails {
         }
         return sb.toString();
     }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_engineer_id")
+    public GroupEngineer getGroupEngineer() {
+        return groupEngineer;
+    }
+
+    @Transient
+    public Integer getGroupEngineerId() {
+        if (this.groupEngineer == null) {
+            return 0;
+        }
+        return this.groupEngineer.getId();
+    }
+
+    @Transient
+    public String getGroupEngineerName() {
+        if (this.groupEngineer == null) {
+            return "";
+        }
+        return this.groupEngineer.getName();
+    }
+
+    public void setGroupEngineer(GroupEngineer groupEngineer) {
+        this.groupEngineer = groupEngineer;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "system_id")
+    public Company getSystem() {
+        return system;
+    }
+
+    @Transient
+    public Integer getSystemId() {
+        if (this.system == null) {
+            return 0;
+        }
+        return this.system.getId();
+    }
+
+    @Transient
+    public String getSystemName() {
+        if (this.system == null) {
+            return "";
+        }
+        return this.system.getName();
+    }
+
+    public void setSystem(Company company) {
+        this.system = company;
+    }
+
 }

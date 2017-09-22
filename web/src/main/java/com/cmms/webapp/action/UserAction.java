@@ -3,11 +3,18 @@ package com.cmms.webapp.action;
 import com.opensymphony.xwork2.Preparable;
 import org.apache.struts2.ServletActionContext;
 import com.cmms.Constants;
+import com.cmms.dao.CompanyDao;
+import com.cmms.dao.GroupEngineerDao;
 import com.cmms.dao.SearchException;
+import com.cmms.model.Company;
+import com.cmms.model.GroupEngineer;
 import com.cmms.model.Role;
 import com.cmms.model.User;
 import com.cmms.service.UserExistsException;
+import com.cmms.webapp.security.LoginSuccessHandler;
 import com.cmms.webapp.util.RequestUtil;
+import com.cmms.webapp.util.ResourceBundleUtils;
+import com.cmms.webapp.util.WebUtil;
 import java.io.ByteArrayInputStream;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.mail.MailException;
@@ -26,6 +33,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -35,11 +44,30 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class UserAction extends BaseAction implements Preparable {
 
+    //<editor-fold defaultstate="collapsed" desc="Other">
     private static final long serialVersionUID = 6776558938712115191L;
     private List<User> users;
     private User user;
     private String id;
     private String query;
+    private CompanyDao companyDao;
+    private GroupEngineerDao groupEngineerDao;
+
+    public CompanyDao getCompanyDao() {
+        return companyDao;
+    }
+
+    public void setCompanyDao(CompanyDao companyDao) {
+        this.companyDao = companyDao;
+    }
+
+    public GroupEngineerDao getGroupEngineerDao() {
+        return groupEngineerDao;
+    }
+
+    public void setGroupEngineerDao(GroupEngineerDao groupEngineerDao) {
+        this.groupEngineerDao = groupEngineerDao;
+    }
 
     /**
      * Grab the entity from the database before populating with request
@@ -52,6 +80,276 @@ public class UserAction extends BaseAction implements Preparable {
         }
     }
 
+    public String index() {
+        updateSessionSystem();
+        return SUCCESS;
+    }//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="getLoadData">
+    public InputStream getLoadData() {
+        try {
+            JSONObject result = new JSONObject();
+            String username = getRequest().getParameter("username");
+            String name = getRequest().getParameter("name");
+            String email = getRequest().getParameter("email");
+
+            //systemId
+            String systemIdReq = getRequest().getParameter("systemId");
+            Integer systemId = null;
+            if (!StringUtils.isBlank(systemIdReq)) {
+                systemId = Integer.parseInt(systemIdReq);
+            }
+            List<Integer> listSystem = null;
+            if (systemId == null || systemId <= 0) {
+                systemId = getSytemId();
+            }
+            if (systemId > getSytemId()) {
+                listSystem = companyDao.getListChildren(systemId, true);
+            } else {
+                //Chi list user con, khong load user cung cap
+                listSystem = companyDao.getListChildren(getSytemId(), false);
+            }
+
+            //groupEngineerDao
+            String engineerIdReq = getRequest().getParameter("engineerId");
+            Integer engineerId = null;
+            if (!StringUtils.isBlank(engineerIdReq)) {
+                engineerId = Integer.parseInt(engineerIdReq);
+            }
+            List<Integer> listEng = null;
+            if (engineerId == null || engineerId <= 0) {
+                engineerId = null;
+                if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP) != null) {
+                    engineerId = (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP);
+                }
+            }
+            if (engineerId > 0) {
+                listEng = groupEngineerDao.getListChildren(engineerId);
+            }
+
+            Map pagingMap = userManager.getList(listSystem, listEng, username, name, email, start, limit);
+
+            ArrayList<User> list = new ArrayList<User>();
+            if (pagingMap.get("list") != null) {
+                list = (ArrayList<User>) pagingMap.get("list");
+            }
+
+            Integer count = 0;
+            if (pagingMap.get("count") != null) {
+                count = (Integer) pagingMap.get("count");
+            }
+
+            JSONArray jSONArray = new JSONArray();
+            JSONObject tmp;
+            Company company;
+            GroupEngineer groupEngineer;
+            for (User user : list) {
+                tmp = new JSONObject();
+                tmp = WebUtil.toJSONObject(user, "groupEngineer,system");
+                groupEngineer = user.getGroupEngineer();
+                if (groupEngineer != null) {
+                    tmp.put("grpEngineerId", groupEngineer.getId());
+                    tmp.put("grpEngineerName", groupEngineer.getName());
+                } else {
+                    tmp.put("grpEngineerId", "");
+                    tmp.put("grpEngineerName", "");
+                }
+                company = user.getSystem();
+                if (company != null) {
+                    tmp.put("systemId", company.getId());
+                    tmp.put("systemName", company.getName());
+                } else {
+                    tmp.put("systemId", "");
+                    tmp.put("systemName", "");
+                }
+                jSONArray.put(tmp);
+            }
+
+            //Add current user
+            User authUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            boolean add = true;
+            if (!StringUtils.isBlank(username)) {
+                if (!authUser.getUsername().trim().toLowerCase().contains(username.trim().toLowerCase())) {
+                    add = false;
+                }
+            }
+            if (add) {
+                if (!StringUtils.isBlank(email)) {
+                    if (!authUser.getEmail().trim().toLowerCase().contains(email.trim().toLowerCase())) {
+                        add = false;
+                    }
+                }
+            }
+            if (add) {
+                if (Objects.equals(systemId, authUser.getSystemId())) {
+                    //Truong hop khong tim kiem theo system
+                    add = true;
+                } else {
+                    if (listSystem != null) {
+                        boolean found = false;
+                        for (Integer system : listSystem) {
+                            if (Objects.equals(authUser.getSystemId(), system)) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        add = found;
+                    }
+                }
+            }
+            if (add) {
+                if (listEng != null) {
+                    boolean found = false;
+                    for (Integer system : listEng) {
+                        if (Objects.equals(authUser.getGroupEngineerId(), system)) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    add = found;
+                }
+            }
+
+            if (add) {
+                tmp = new JSONObject();
+                tmp = WebUtil.toJSONObject(authUser, "groupEngineer,system");
+                groupEngineer = authUser.getGroupEngineer();
+                if (groupEngineer != null) {
+                    tmp.put("grpEngineerId", groupEngineer.getId());
+                    tmp.put("grpEngineerName", groupEngineer.getName());
+                } else {
+                    tmp.put("grpEngineerId", "");
+                    tmp.put("grpEngineerName", "");
+                }
+                company = authUser.getSystem();
+                if (company != null) {
+                    tmp.put("systemId", company.getId());
+                    tmp.put("systemName", company.getName());
+                } else {
+                    tmp.put("systemId", "");
+                    tmp.put("systemName", "");
+                }
+                jSONArray.put(tmp);
+                count++;
+            }
+
+            result.put("list", jSONArray);
+            result.put("totalCount", count);
+            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+        } catch (Exception ex) {
+            log.error("ERROR getLoadData: ", ex);
+            return null;
+        }
+    }//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="getSave">
+    public InputStream getSave() {
+        try {
+            JSONObject result = new JSONObject();
+            String idReq = getRequest().getParameter("id");
+            Long id = null;
+            String username = getRequest().getParameter("username");
+            String name = getRequest().getParameter("name");
+            String email = getRequest().getParameter("email");
+            String systemId = getRequest().getParameter("systemId");
+            String engineerId = getRequest().getParameter("engineerId");
+
+            User user;
+            if (!StringUtils.isBlank(idReq)) {
+                id = Long.parseLong(idReq);
+                user = userManager.get(id);
+            } else {
+                user = new User();
+                user.setUsername(username);
+                User userCheck = userManager.getUserByUsername(username);
+                if (userCheck != null) {
+                    result.put("success", "usernameExits");
+                    result.put("message", ResourceBundleUtils.getName("usernameExits"));
+                    return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                }
+            }
+            user.setLastName(name);
+            user.setEmail(email);
+
+            if (!StringUtils.isBlank(systemId)) {
+                Company company = companyDao.get(Integer.parseInt(systemId));
+                user.setSystem(company);
+            } else {
+                if (getSytemId() > 0) {
+                    result.put("success", "userSystemRequired");
+                    result.put("message", ResourceBundleUtils.getName("userSystemRequired"));
+                    return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                }
+            }
+
+            if (!StringUtils.isBlank(engineerId)) {
+                GroupEngineer groupEngineer = groupEngineerDao.get(Integer.parseInt(engineerId));
+                user.setGroupEngineer(groupEngineer);
+            } else {
+                if (getGrpEngineerId() > 0) {
+                    result.put("success", "userEngRequired");
+                    result.put("message", ResourceBundleUtils.getName("userEngRequired"));
+                    return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                }
+            }
+
+            user = userManager.save(user);
+            if (user != null) {
+                result.put("success", true);
+                result.put("message", ResourceBundleUtils.getName("saveSuccess"));
+            } else {
+                result.put("success", false);
+                result.put("message", ResourceBundleUtils.getName("saveFail"));
+            }
+            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+        } catch (Exception ex) {
+            log.error("ERROR getSave: ", ex);
+            return null;
+        }
+    }//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="getDelete">
+    private String[] ids;
+
+    public String[] getIds() {
+        return ids;
+    }
+
+    public void setIds(String[] ids) {
+        this.ids = ids;
+    }
+
+    public InputStream getDelete() {
+        try {
+            JSONObject result = new JSONObject();
+            if (ids != null && ids.length > 0) {
+                User authUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                Boolean check = false;
+                for (String id : ids) {
+                    if (authUser.getId() == Long.parseLong(id)) {
+                        check = true;
+                    }
+                    userManager.remove(Long.parseLong(id));
+                }
+                if (check) {
+                    result.put("success", true);
+                    result.put("message", ResourceBundleUtils.getName("deleteCurrent"));
+                    return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                }
+                result.put("success", true);
+                result.put("message", ResourceBundleUtils.getName("deleteSuccess"));
+            } else {
+                result.put("success", false);
+                result.put("message", ResourceBundleUtils.getName("notSelect"));
+            }
+            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+        } catch (Exception ex) {
+            log.error("ERROR getDelete: ", ex);
+            return null;
+        }
+    }//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="linh tinh">
     /**
      * Holder for users to display on list screen
      *
@@ -163,8 +461,9 @@ public class UserAction extends BaseAction implements Preparable {
             return "home";
         }
         return "cancel";
-    }
+    }//</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="save">
     /**
      * Save user
      *
@@ -240,8 +539,9 @@ public class UserAction extends BaseAction implements Preparable {
         // redisplay the unencrypted passwords
         user.setPassword(user.getConfirmPassword());
         return INPUT;
-    }
+    }//</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="list">
     /**
      * Fetch all users from database and put into local "users" variable for
      * retrieval in the UI.
@@ -256,8 +556,9 @@ public class UserAction extends BaseAction implements Preparable {
             users = userManager.getUsers();
         }
         return SUCCESS;
-    }
+    }//</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="getAllUser">
     public InputStream getAllUser() throws JSONException, UnsupportedEncodingException {
 
 //        HttpServletRequest request = getRequest();
@@ -265,7 +566,7 @@ public class UserAction extends BaseAction implements Preparable {
         System.out.println("page: " + page);
         System.out.println("start: " + start);
         System.out.println("limit: " + limit);
-        
+
         List<User> userList = new ArrayList<User>();
         try {
             userList = userManager.getAll();
@@ -286,8 +587,9 @@ public class UserAction extends BaseAction implements Preparable {
         result.put("list", deviceList);
         result.put("totalCount", 60);
         return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
-    }
+    }//</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="getAllTask">
     public InputStream getAllTask() throws JSONException, UnsupportedEncodingException {
         String result = "";
         result = "{\n"
@@ -481,6 +783,6 @@ public class UserAction extends BaseAction implements Preparable {
                 + "}";
 
         return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
-    }
+    }//</editor-fold>
 
 }

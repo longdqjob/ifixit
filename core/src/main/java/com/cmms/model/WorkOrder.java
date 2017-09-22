@@ -8,6 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 import javax.persistence.Column;
@@ -18,8 +19,11 @@ import javax.persistence.ManyToOne;
 @Entity
 @Table(name = "work_order")
 public class WorkOrder extends BaseObject implements Serializable {
+
     public static final Integer STATUS_COMPLETE = 0;
-    public static final Integer STATUS_OVERDUE = 2;
+    public static final Integer STATUS_OPEN = 1;
+    public static final Integer STATUS_INPROGRESS = 2;
+    public static final Integer STATUS_OVERDUE = 3;
 
     private static final long serialVersionUID = -1L;
     private Long id;
@@ -211,5 +215,49 @@ public class WorkOrder extends BaseObject implements Serializable {
     @Override
     public int hashCode() {
         return 0;
+    }
+
+    public static void main(String[] args) {
+        String code = "AABC_22092017";
+        System.out.println("" + code.substring(0, code.lastIndexOf("_")));
+    }
+
+    public static final String CODE_SPA = "_";
+
+    private String genCode(Date date) {
+        String oldCode = this.code;
+        if (this.code.contains(CODE_SPA)) {
+            String dateTmp = this.code.substring(this.code.lastIndexOf(CODE_SPA) + 1);
+            try {
+                sdf.parse(dateTmp);
+                oldCode = oldCode.substring(0, oldCode.lastIndexOf(CODE_SPA));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        return oldCode + CODE_SPA + sdf.format(date);
+    }
+
+    public static final SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyyHHmmss");
+    public static final SimpleDateFormat sdf1 = new SimpleDateFormat("dd/MM/yyyy");
+
+    public WorkOrder cloneWo() {
+        Date date = new Date();
+        WorkOrder rtn = new WorkOrder();
+        rtn.setCode(genCode(date));
+        rtn.setName(this.name);
+        rtn.setStartTime(this.startTime);
+        rtn.setEndTime(this.endTime);
+        rtn.setStatus(STATUS_OPEN);
+        rtn.setInterval(this.interval);
+        rtn.setIsRepeat(this.isRepeat);
+        rtn.setNote("WO được tự động sinh bởi hệ thống ngày " + sdf1.format(date));
+        rtn.setWorkType(this.workType);
+        rtn.setMachine(this.machine);
+        rtn.setGroupEngineer(this.groupEngineer);
+        rtn.setMhTotal(0F);
+        rtn.setMhTotalCost(0F);
+        rtn.setStockTotalCost(0F);
+        return rtn;
     }
 }

@@ -110,7 +110,7 @@ public class MachineAction extends BaseAction implements Preparable {
                 }
                 listCompany = getListSytem2();
             } else {
-                listCompany = companyDao.getListChildren(companyId);
+                listCompany = companyDao.getListChildren(companyId, true);
             }
 
             return new ByteArrayInputStream(machineDao.getTreeView(listCompany, id).toString().getBytes("UTF8"));
@@ -125,7 +125,7 @@ public class MachineAction extends BaseAction implements Preparable {
         List<Integer> listCompany = getListSytem();
         if (listCompany == null) {
             if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID) != null) {
-                listCompany = companyDao.getListChildren((Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID));
+                listCompany = companyDao.getListChildren((Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_SYSTEM_ID), true);
                 getRequest().getSession().setAttribute(LoginSuccessHandler.SESSION_LIST_SYSTEM_ID, listCompany);
             }
         }
@@ -158,7 +158,7 @@ public class MachineAction extends BaseAction implements Preparable {
                 }
                 listCompany = getListSytem2();
             } else {
-                listCompany = companyDao.getListChildren(companyId);
+                listCompany = companyDao.getListChildren(companyId, true);
             }
 
             String code = getRequest().getParameter("code");

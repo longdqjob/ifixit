@@ -88,7 +88,7 @@ public class CompanyDaoHibernate extends GenericDaoHibernate<Company, Integer> i
     }
 
     @Override
-    public List<Integer> getListChildren(Integer id) {
+    public List<Integer> getListChildren(Integer id, boolean appendParent) {
         try {
             List<Integer> rtn = null;
             Query query;
@@ -111,7 +111,9 @@ public class CompanyDaoHibernate extends GenericDaoHibernate<Company, Integer> i
 
                 List<Object[]> areaList = query.list();
                 rtn = new LinkedList<>();
-                rtn.add(id);
+                if (appendParent) {
+                    rtn.add(id);
+                }
                 if (areaList != null && !areaList.isEmpty()) {
                     String familyTree = "";
                     for (Object[] obj : areaList) {

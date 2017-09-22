@@ -3,25 +3,19 @@
     <Displayers>
         <Displayer name="Velocity" type="net.sf.navigator.displayer.VelocityMenuDisplayer"/>
     </Displayers>
-    <Menus>
-        <!--        <Menu name="Home" title="home.title" page="/home" roles="ROLE_ADMIN,ROLE_USER"/>-->
-        
-        <Menu name="workOrderMenu" title="menu.admin.workOrder" description="Work Order Menu" roles="ROLE_ADMIN" page="../admin/workOrder">
-            <Menu name="workOrder" title="menu.admin.workOrder" page="../admin/workOrder" roles="ROLE_ADMIN,ROLE_USER"/>
-            <Menu name="workTypeMenu" title="workType" page="../admin/workType" roles="ROLE_ADMIN,ROLE_USER"/>
+    <Menus>        
+        <Menu name="workOrderMenu" title="menu.admin.workOrder" description="Work Order Menu" roles="ROLE_ADMIN" >
+            <Item name="workOrder" title="menu.admin.workOrder" page="../admin/workOrder" roles="ROLE_ADMIN,ROLE_USER"/>
+            <Item name="workTypeMenu" title="workType" page="../admin/workType" roles="ROLE_ADMIN,ROLE_USER"/>
         </Menu>
         <Menu name="MaterialMenu" title="menu.admin.material" page="../admin/material" roles="ROLE_ADMIN,ROLE_USER"/>
         <Menu name="SystemMenu" title="menu.admin.company" description="Admin Menu" roles="ROLE_ADMIN" page="../admin/company">
-            <Item name="company" title="menu.admin.company" page="/admin/company"/>
-            <Item name="machineType" title="menu.admin.machineType" page="/admin/machineType"/>
+            <Item name="company" title="menu.admin.company" page="../admin/company"/>
+            <Item name="machineType" title="menu.admin.machineType" page="../admin/machineType"/>
         </Menu>
-        <Menu name="UserMenu" title="menu.user" description="User Menu" page="/editProfile" roles="ROLE_ADMIN,ROLE_USER"/>
-        <Menu name="AdminMenu" title="menu.admin" description="Admin Menu" roles="ROLE_ADMIN" page="/admin/users">
-            <!--<Item name="supplier" title="menu.admin.supplier" page="/admin/supplier"/>-->
-            <!--<Item name="machineType" title="menu.admin.machineType" page="/admin/machineType"/>-->
-            <!--<Item name="company" title="menu.admin.company" page="/admin/company"/>-->
-            <!--<Item name="workOrder" title="menu.admin.workOrder" page="/admin/workType"/>-->
-            <!--<Item name="ItemType" title="menu.admin.itemType" page="/admin/item"/>-->
+        <Menu name="UserManagerMenu" title="menu.userManager" description="User Managerment" page="../admin/user" roles="ROLE_ADMIN,ROLE_USER"/>
+        <Menu name="UserMenu" title="menu.user" description="User Menu" page="../editProfile" roles="ROLE_ADMIN,ROLE_USER"/>
+        <Menu name="AdminMenu" title="menu.admin" description="Admin Menu" roles="ROLE_ADMIN" page="../admin/users">
             <Item name="ViewUsers" title="menu.admin.users" page="/admin/users"/>
             <Item name="ActiveUsers" title="home.activeUsers" page="/admin/activeUsers"/>
             <Item name="ReloadContext" title="menu.admin.reload" page="/admin/reload"/>

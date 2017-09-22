@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 /**
  * Implementation of UserManager interface.
  *
@@ -29,6 +28,7 @@ import java.util.Map;
 @Service("userManager")
 @WebService(serviceName = "UserService", endpointInterface = "com.cmms.service.UserService")
 public class UserManagerImpl extends GenericManagerImpl<User, Long> implements UserManager, UserService {
+
     private PasswordEncoder passwordEncoder;
     private UserDao userDao;
 
@@ -71,8 +71,11 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
      * Velocity template name to send users a password recovery mail (default
      * passwordRecovery.vm).
      *
-     * @param passwordRecoveryTemplate the Velocity template to use (relative to classpath)
-     * @see com.cmms.service.MailEngine#sendMessage(org.springframework.mail.SimpleMailMessage, String, java.util.Map)
+     * @param passwordRecoveryTemplate the Velocity template to use (relative to
+     * classpath)
+     * @see
+     * com.cmms.service.MailEngine#sendMessage(org.springframework.mail.SimpleMailMessage,
+     * String, java.util.Map)
      */
     public void setPasswordRecoveryTemplate(final String passwordRecoveryTemplate) {
         this.passwordRecoveryTemplate = passwordRecoveryTemplate;
@@ -82,8 +85,11 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
      * Velocity template name to inform users their password was updated
      * (default passwordUpdated.vm).
      *
-     * @param passwordUpdatedTemplate the Velocity template to use (relative to classpath)
-     * @see com.cmms.service.MailEngine#sendMessage(org.springframework.mail.SimpleMailMessage, String, java.util.Map)
+     * @param passwordUpdatedTemplate the Velocity template to use (relative to
+     * classpath)
+     * @see
+     * com.cmms.service.MailEngine#sendMessage(org.springframework.mail.SimpleMailMessage,
+     * String, java.util.Map)
      */
     public void setPasswordUpdatedTemplate(final String passwordUpdatedTemplate) {
         this.passwordUpdatedTemplate = passwordUpdatedTemplate;
@@ -175,7 +181,9 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
      *
      * @param username the login name of the human
      * @return User the populated user object
-     * @throws org.springframework.security.core.userdetails.UsernameNotFoundException thrown when username not found
+     * @throws
+     * org.springframework.security.core.userdetails.UsernameNotFoundException
+     * thrown when username not found
      */
     @Override
     public User getUserByUsername(final String username) throws UsernameNotFoundException {
@@ -267,4 +275,10 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
         // or throw exception
         return null;
     }
+
+    @Override
+    public Map getList(List<Integer> lstSystem, List<Integer> listEng, String username, String name, String email, Integer start, Integer limit) {
+        return userDao.getList(lstSystem, listEng, username, name, email, start, limit);
+    }
+
 }

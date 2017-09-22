@@ -32,6 +32,7 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 public class CustomLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPoint {
 
     private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
+    private static final String URL_HOME = "/home";
 
     /**
      * @param loginFormUrl URL where the login page can be found. Should either
@@ -47,8 +48,14 @@ public class CustomLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticati
 
         System.out.println("----------aaaaa---------------");
         if (RequestUtil.isAjaxRequest(request) && authException != null) {
+            System.out.println("--------getRequestURI isAjaxRequest: " + request.getRequestURI());
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         } else {
+            String lastRequest = request.getRequestURI().replaceAll(".action", "");
+            System.out.println("--------lastRequest: " + lastRequest);
+            if (!lastRequest.equalsIgnoreCase(URL_HOME)) {
+                request.getSession().setAttribute(LoginSuccessHandler.LAST_REQUEST, lastRequest);
+            }
             super.commence(request, response, authException);
         }
     }
