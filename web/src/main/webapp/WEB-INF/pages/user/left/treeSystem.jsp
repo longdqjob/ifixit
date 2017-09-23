@@ -77,6 +77,7 @@
                 //tree.expandPath(record.getPath());
             },
             itemdblclick: function (tree, record, item, index, e, eOpts) {
+                selectedSystem = record;
                 searchUser(record.get("id"));
                 console.log("dbClick Load data " + record.get("id") + " - " + record.get("name"));
             },

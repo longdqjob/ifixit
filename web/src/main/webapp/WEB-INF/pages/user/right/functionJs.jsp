@@ -8,6 +8,8 @@
         } else {
             if (selectedSystem) {
                 prEng = selectedSystem.get("id");
+            } else {
+                prEng = systemIdSs;
             }
         }
         gridUser.getStore().getProxy().extraParams = {
