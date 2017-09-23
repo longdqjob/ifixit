@@ -321,4 +321,22 @@ public class CompanyDaoHibernate extends GenericDaoHibernate<Company, Integer> i
         }
     }
 
+    @Override
+    public Boolean checkUseByUser(List<Integer> lstId) {
+        try {
+            if (lstId == null || lstId.isEmpty()) {
+                return false;
+            }
+            String hql = "SELECT COUNT(id) FROM app_user WHERE system_id in (:lstId)";
+            Query query = getSession()
+                    .createSQLQuery(hql)
+                    .setParameterList("lstId", lstId);
+
+            List list = query.list();
+            return (((BigInteger) list.get(0)).intValue() > 0);
+        } catch (Exception ex) {
+            log.error("ERROR checkUseByUser: ", ex);
+            return null;
+        }
+    }
 }

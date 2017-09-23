@@ -89,7 +89,7 @@ public class GroupEngineerDaoHibernate extends GenericDaoHibernate<GroupEngineer
                     .createSQLQuery(hql)
                     .setParameter("status", WorkOrder.STATUS_OVERDUE)
                     .setParameterList("lstId", lstId);
-            
+
             List list = query.list();
             return ((BigInteger) list.get(0)).intValue();
         } catch (Exception ex) {
@@ -317,6 +317,25 @@ public class GroupEngineerDaoHibernate extends GenericDaoHibernate<GroupEngineer
             return (((BigInteger) list.get(0)).intValue() > 0);
         } catch (Exception ex) {
             log.error("ERROR checkUseByManHrs: ", ex);
+            return null;
+        }
+    }
+
+    @Override
+    public Boolean checkUseByUser(List<Integer> lstId) {
+        try {
+            if (lstId == null || lstId.isEmpty()) {
+                return false;
+            }
+            String hql = "SELECT COUNT(id) FROM app_user WHERE group_engineer_id in (:lstId)";
+            Query query = getSession()
+                    .createSQLQuery(hql)
+                    .setParameterList("lstId", lstId);
+
+            List list = query.list();
+            return (((BigInteger) list.get(0)).intValue() > 0);
+        } catch (Exception ex) {
+            log.error("ERROR checkUseByUser: ", ex);
             return null;
         }
     }

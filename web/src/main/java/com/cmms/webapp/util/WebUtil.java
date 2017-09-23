@@ -52,6 +52,8 @@ public class WebUtil {
                 try {
                     value = m.invoke(o);
                 } catch (Exception e) {
+                    System.out.println("---------toJSONObject: " + name);
+                    e.printStackTrace();
                     throw new RuntimeException(e);
                 }
                 map.put(key, value);

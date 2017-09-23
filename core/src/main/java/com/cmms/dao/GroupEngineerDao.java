@@ -40,4 +40,7 @@ public interface GroupEngineerDao extends GenericDao<GroupEngineer, Integer> {
 
     @Transactional
     Boolean checkUseByManHrs(List<Integer> lstId);
+
+    @Transactional
+    Boolean checkUseByUser(List<Integer> lstId);
 }

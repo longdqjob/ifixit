@@ -179,7 +179,7 @@ public class UserAction extends BaseAction implements Preparable {
             for (User user : list) {
                 roleTmp = "";
                 tmp = new JSONObject();
-                tmp = WebUtil.toJSONObject(user, "groupEngineer,system");
+                tmp = WebUtil.toJSONObject(user, "groupEngineer,system,address");
                 groupEngineer = user.getGroupEngineer();
                 if (groupEngineer != null) {
                     tmp.put("grpEngineerId", groupEngineer.getId());

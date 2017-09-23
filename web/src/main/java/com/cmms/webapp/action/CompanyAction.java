@@ -244,6 +244,11 @@ public class CompanyAction extends BaseAction implements Preparable {
                         result.put("message", ResourceBundleUtils.getName("deleteUsing"));
                         return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
                     }
+                    if (companyDao.checkUseByUser(list)) {
+                        result.put("success", false);
+                        result.put("message", ResourceBundleUtils.getName("deleteUsing"));
+                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                    }
                     companyDao.remove(Integer.parseInt(ids[0]));
                 } else {
                     for (String idTmp : ids) {
@@ -255,6 +260,11 @@ public class CompanyAction extends BaseAction implements Preparable {
                         return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
                     }
                     if (companyDao.checkUseByMachenic(list)) {
+                        result.put("success", false);
+                        result.put("message", ResourceBundleUtils.getName("deleteUsing"));
+                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                    }
+                    if (companyDao.checkUseByUser(list)) {
                         result.put("success", false);
                         result.put("message", ResourceBundleUtils.getName("deleteUsing"));
                         return new ByteArrayInputStream(result.toString().getBytes("UTF8"));

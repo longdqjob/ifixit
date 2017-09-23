@@ -29,6 +29,7 @@
         allowBlank: false,
         margin: '10 10 10 10',
         width: 350,
+        labelWidth: 120,
         maxLength: 50,
     });
 
@@ -44,6 +45,7 @@
         allowBlank: true,
         itemId: 'userPass',
         margin: '10 10 10 10',
+        labelWidth: 120,
         width: 350,
         maxLength: 50,
     });
@@ -57,6 +59,7 @@
         labelAlign: 'left',
         anchor: '100%',
         margin: '10 10 10 10',
+        labelWidth: 120,
         width: 350,
         maxLength: 50,
         vtype: 'password',
@@ -71,6 +74,7 @@
         anchor: '100%',
         allowBlank: false,
         margin: '10 10 10 10',
+        labelWidth: 120,
         width: 350,
         maxLength: 50,
     });
@@ -84,6 +88,7 @@
         anchor: '100%',
         allowBlank: false,
         margin: '10 10 10 10',
+        labelWidth: 120,
         width: 350,
         maxLength: 255,
     });
@@ -96,6 +101,7 @@
         anchor: '100%',
         allowBlank: false,
         margin: '10 10 10 10',
+        labelWidth: 120,
         width: 350,
         maxLength: 255,
         vtype: 'email'
@@ -117,6 +123,7 @@
         anchor: '100%',
         allowBlank: true,
         margin: '10 10 10 10',
+        labelWidth: 120,
         width: 250,
         readOnly: true,
     });
@@ -150,6 +157,7 @@
         anchor: '100%',
         allowBlank: true,
         margin: '10 10 10 10',
+        labelWidth: 120,
         width: 250,
         readOnly: true,
     });
@@ -203,6 +211,7 @@
         allowBlank: true,
         margin: '10 10 10 10',
         store: storeUserRoles,
+        labelWidth: 120,
         displayField: 'name',
         valueField: 'id',
         queryMode: 'local',
