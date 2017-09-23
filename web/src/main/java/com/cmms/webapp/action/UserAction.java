@@ -31,9 +31,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -75,7 +77,8 @@ public class UserAction extends BaseAction implements Preparable {
      */
     public void prepare() {
         // prevent failures on new
-        if (getRequest().getMethod().equalsIgnoreCase("post") && (!"".equals(getRequest().getParameter("user.id")))) {
+        if (getRequest().getMethod().equalsIgnoreCase("post")
+                && !StringUtils.isBlank(getRequest().getParameter("user.id"))) {
             user = userManager.getUser(getRequest().getParameter("user.id"));
         }
     }
@@ -85,9 +88,30 @@ public class UserAction extends BaseAction implements Preparable {
         return SUCCESS;
     }//</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="getLoadRoles">
+    public InputStream getLoadRoles() {
+        try {
+            JSONObject result = new JSONObject();
+            List<Role> listRoles = roleManager.getAll();
+            JSONObject tmp;
+            JSONArray jSONArray = new JSONArray();
+            for (Role role : listRoles) {
+                tmp = new JSONObject();
+                tmp = WebUtil.toJSONObject(role, "");
+                jSONArray.put(tmp);
+            }
+            result.put("list", jSONArray);
+            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+        } catch (Exception ex) {
+            log.error("ERROR getLoadRoles: ", ex);
+            return null;
+        }
+    }//</editor-fold>
+
     //<editor-fold defaultstate="collapsed" desc="getLoadData">
     public InputStream getLoadData() {
         try {
+            Long exUserId = null;
             JSONObject result = new JSONObject();
             String username = getRequest().getParameter("username");
             String name = getRequest().getParameter("name");
@@ -100,14 +124,21 @@ public class UserAction extends BaseAction implements Preparable {
                 systemId = Integer.parseInt(systemIdReq);
             }
             List<Integer> listSystem = null;
-            if (systemId == null || systemId <= 0) {
-                systemId = getSytemId();
-            }
-            if (systemId > getSytemId()) {
-                listSystem = companyDao.getListChildren(systemId, true);
+
+            systemId = (systemId == null || systemId < getSytemId()) ? getSytemId() : systemId;
+            if (systemId <= 0) {
+                //Full quyen
             } else {
-                //Chi list user con, khong load user cung cap
-                listSystem = companyDao.getListChildren(getSytemId(), false);
+                //Phan quyen theo system
+                if (Objects.equals(systemId, getSytemId())) {
+                    //Khoi dau -> Chi lay system con cua user
+                    User authUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                    exUserId = authUser.getId();
+                    listSystem = companyDao.getListChildren(systemId, false);
+                } else {
+                    //Tim kiem -> Lay theo ca system cha cua gia tri tim kiem
+                    listSystem = companyDao.getListChildren(systemId, true);
+                }
             }
 
             //groupEngineerDao
@@ -127,7 +158,7 @@ public class UserAction extends BaseAction implements Preparable {
                 listEng = groupEngineerDao.getListChildren(engineerId);
             }
 
-            Map pagingMap = userManager.getList(listSystem, listEng, username, name, email, start, limit);
+            Map pagingMap = userManager.getList(exUserId, listSystem, listEng, username, name, email, start, limit);
 
             ArrayList<User> list = new ArrayList<User>();
             if (pagingMap.get("list") != null) {
@@ -143,7 +174,10 @@ public class UserAction extends BaseAction implements Preparable {
             JSONObject tmp;
             Company company;
             GroupEngineer groupEngineer;
+            Set<Role> lstRole;
+            String roleTmp;
             for (User user : list) {
+                roleTmp = "";
                 tmp = new JSONObject();
                 tmp = WebUtil.toJSONObject(user, "groupEngineer,system");
                 groupEngineer = user.getGroupEngineer();
@@ -162,75 +196,19 @@ public class UserAction extends BaseAction implements Preparable {
                     tmp.put("systemId", "");
                     tmp.put("systemName", "");
                 }
-                jSONArray.put(tmp);
-            }
-
-            //Add current user
-            User authUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            boolean add = true;
-            if (!StringUtils.isBlank(username)) {
-                if (!authUser.getUsername().trim().toLowerCase().contains(username.trim().toLowerCase())) {
-                    add = false;
-                }
-            }
-            if (add) {
-                if (!StringUtils.isBlank(email)) {
-                    if (!authUser.getEmail().trim().toLowerCase().contains(email.trim().toLowerCase())) {
-                        add = false;
+                lstRole = user.getRoles();
+                if (lstRole != null && !lstRole.isEmpty()) {
+                    for (Role role : lstRole) {
+                        roleTmp += role.getId() + ",";
                     }
-                }
-            }
-            if (add) {
-                if (Objects.equals(systemId, authUser.getSystemId())) {
-                    //Truong hop khong tim kiem theo system
-                    add = true;
-                } else {
-                    if (listSystem != null) {
-                        boolean found = false;
-                        for (Integer system : listSystem) {
-                            if (Objects.equals(authUser.getSystemId(), system)) {
-                                found = true;
-                                break;
-                            }
-                        }
-                        add = found;
+                    if (roleTmp.length() > 0) {
+                        roleTmp = roleTmp.substring(0, roleTmp.length() - 1);
                     }
-                }
-            }
-            if (add) {
-                if (listEng != null) {
-                    boolean found = false;
-                    for (Integer system : listEng) {
-                        if (Objects.equals(authUser.getGroupEngineerId(), system)) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    add = found;
-                }
-            }
-
-            if (add) {
-                tmp = new JSONObject();
-                tmp = WebUtil.toJSONObject(authUser, "groupEngineer,system");
-                groupEngineer = authUser.getGroupEngineer();
-                if (groupEngineer != null) {
-                    tmp.put("grpEngineerId", groupEngineer.getId());
-                    tmp.put("grpEngineerName", groupEngineer.getName());
+                    tmp.put("lstRole", roleTmp);
                 } else {
-                    tmp.put("grpEngineerId", "");
-                    tmp.put("grpEngineerName", "");
-                }
-                company = authUser.getSystem();
-                if (company != null) {
-                    tmp.put("systemId", company.getId());
-                    tmp.put("systemName", company.getName());
-                } else {
-                    tmp.put("systemId", "");
-                    tmp.put("systemName", "");
+                    tmp.put("lstRole", "");
                 }
                 jSONArray.put(tmp);
-                count++;
             }
 
             result.put("list", jSONArray);
@@ -241,6 +219,8 @@ public class UserAction extends BaseAction implements Preparable {
             return null;
         }
     }//</editor-fold>
+
+    public static final String PASS_DEFAULT = "123456789";
 
     //<editor-fold defaultstate="collapsed" desc="getSave">
     public InputStream getSave() {
@@ -253,6 +233,11 @@ public class UserAction extends BaseAction implements Preparable {
             String email = getRequest().getParameter("email");
             String systemId = getRequest().getParameter("systemId");
             String engineerId = getRequest().getParameter("engineerId");
+            String password = getRequest().getParameter("password");
+            String passwordHint = getRequest().getParameter("passwordHint");
+            String[] lstRole = getRequest().getParameterValues("lstRole");
+
+            log.info("----lstRole: " + lstRole.toString());
 
             User user;
             if (!StringUtils.isBlank(idReq)) {
@@ -293,7 +278,27 @@ public class UserAction extends BaseAction implements Preparable {
                 }
             }
 
-            user = userManager.save(user);
+            if (StringUtils.isBlank(password)) {
+                if (StringUtils.isBlank(idReq)) {
+                    user.setPassword(PASS_DEFAULT);
+                    user.setPasswordHint(PASS_DEFAULT);
+                }
+            } else {
+                user.setPassword(password);
+                user.setPasswordHint(passwordHint);
+            }
+            user.setFirstName("");
+            user.setCredentialsExpired(false);
+            user.setEnabled(true);
+            Set<Role> roles = null;
+            if (lstRole != null && lstRole.length > 0) {
+                roles = new HashSet<Role>();
+                for (String role : lstRole) {
+                    roles.add(roleManager.get(Long.parseLong(role)));
+                }
+            }
+            user.setRoles(roles);
+            user = userManager.saveUser(user);
             if (user != null) {
                 result.put("success", true);
                 result.put("message", ResourceBundleUtils.getName("saveSuccess"));

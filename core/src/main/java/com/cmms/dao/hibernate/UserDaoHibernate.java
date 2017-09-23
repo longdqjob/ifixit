@@ -2,6 +2,7 @@ package com.cmms.dao.hibernate;
 
 import com.cmms.dao.UserDao;
 import com.cmms.model.User;
+import java.util.Arrays;
 import java.util.HashMap;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
@@ -16,9 +17,11 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.Table;
 import java.util.List;
 import java.util.Map;
+import static javafx.scene.input.KeyCode.Y;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.CriteriaSpecification;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 
@@ -83,7 +86,8 @@ public class UserDaoHibernate extends GenericDaoHibernate<User, Long> implements
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         List users = getSession().createCriteria(User.class).add(Restrictions.eq("username", username)).list();
         if (users == null || users.isEmpty()) {
-            throw new UsernameNotFoundException("user '" + username + "' not found...");
+            return null;
+//            throw new UsernameNotFoundException("user '" + username + "' not found...");
         } else {
             return (UserDetails) users.get(0);
         }
@@ -101,26 +105,34 @@ public class UserDaoHibernate extends GenericDaoHibernate<User, Long> implements
     }
 
     @Override
-    public Map getList(List<Integer> lstSystem, List<Integer> listEng, String username, String name, String email, Integer start, Integer limit) {
+    public Map getList(Long id, List<Integer> lstSystem, List<Integer> listEng, String username, String name, String email, Integer start, Integer limit) {
         try {
             Map result = new HashMap();
             Criteria criteria = getSession().createCriteria(User.class);
+
             if (lstSystem != null) {
-                log.info("lstSystem: " + lstSystem.size());
                 if (lstSystem.isEmpty()) {
-                    log.info("lstSystem isEmpty: ");
                     return result;
                 }
-                criteria.add(Restrictions.in("system.id", lstSystem));
+                log.info("--------lstSystem: " + StringUtils.join(lstSystem, ","));
+                if (id == null) {
+                    criteria.add(Restrictions.in("system.id", lstSystem));
+                } else {
+                    Criterion rest1 = Restrictions.and(Restrictions.in("system.id", lstSystem));
+                    criteria.add(Restrictions.or(rest1, Restrictions.eq("id", id)));
+                }
             }
             if (listEng != null) {
-                log.info("listEng: " + listEng.size());
                 if (listEng.isEmpty()) {
-                    log.info("listEng isEmpty: ");
                     return result;
                 }
+                log.info("--------listEng: " + StringUtils.join(listEng, ","));
                 criteria.add(Restrictions.in("groupEngineer.id", listEng));
             }
+
+//            if (lstSystem != null && rest1 != null) {
+//                criteria.add(Restrictions.or(rest1, Restrictions.eq("id", id)));
+//            }
             //Name
             if (!StringUtils.isBlank(username)) {
                 criteria.add(Restrictions.like("username", "%" + username.trim() + "%").ignoreCase());

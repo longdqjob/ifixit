@@ -6,6 +6,7 @@
 </head>
 
 <jsp:include page="../common/require.jsp" />
+<jsp:include page="../vtypes.jsp" />
 <jsp:include page="../script.jsp" />
 <jsp:include page="../common/treeEngineer.jsp" />
 <jsp:include page="../common/treeCompany.jsp" />

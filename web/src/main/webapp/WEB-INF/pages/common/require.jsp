@@ -4,6 +4,8 @@
     Author     : thuyetlv
 --%>
 <script>
+    
+    Ext.Loader.setConfig({disableCaching: true});
     Ext.require([
         'Ext.data.*',
         'Ext.grid.*',

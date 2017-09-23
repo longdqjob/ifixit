@@ -277,8 +277,8 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
     }
 
     @Override
-    public Map getList(List<Integer> lstSystem, List<Integer> listEng, String username, String name, String email, Integer start, Integer limit) {
-        return userDao.getList(lstSystem, listEng, username, name, email, start, limit);
+    public Map getList(Long id, List<Integer> lstSystem, List<Integer> listEng, String username, String name, String email, Integer start, Integer limit) {
+        return userDao.getList(id, lstSystem, listEng, username, name, email, start, limit);
     }
 
 }

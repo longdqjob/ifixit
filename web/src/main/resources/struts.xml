@@ -458,6 +458,12 @@
                 <param name="inputName">loadData</param>
             </result>
         </action>
+        <action name="loadRoles" class="userAction">
+            <interceptor-ref name="adminOnly"/>
+            <result type="stream">
+                <param name="inputName">loadRoles</param>
+            </result>
+        </action>
         <action name="save" class="userAction">
             <result type="stream">
                 <param name="inputName">save</param>

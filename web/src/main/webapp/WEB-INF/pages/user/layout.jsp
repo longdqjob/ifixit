@@ -57,7 +57,6 @@
         Ext.getCmp("westPn").getHeader().hide();
         search.render('searchDiv');
         gridUsePanel.render('gridDiv');
-        console.log("-------------------------" + gridUser.getWidth());
     });
 
 </script>

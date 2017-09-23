@@ -53,6 +53,6 @@ public interface UserDao extends GenericDao<User, Long> {
     String getUserPassword(Long userId);
 
     @Transactional
-    public Map getList(List<Integer> lstSystem, List<Integer> listEng, String username, String name, String email, Integer start, Integer limit);
+    public Map getList(Long id,List<Integer> lstSystem, List<Integer> listEng, String username, String name, String email, Integer start, Integer limit);
 
 }
