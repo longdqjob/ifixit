@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 import javax.persistence.Column;
@@ -246,8 +247,17 @@ public class WorkOrder extends BaseObject implements Serializable {
         WorkOrder rtn = new WorkOrder();
         rtn.setCode(genCode(date));
         rtn.setName(this.name);
-        rtn.setStartTime(this.startTime);
+        
+        //Set Time
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(this.startTime.getTime());
+        cal.add(Calendar.MONTH, this.interval);
+        rtn.setStartTime(cal.getTime());
+        
+        cal.setTimeInMillis(this.endTime.getTime());
+        cal.add(Calendar.MONTH, this.interval);
         rtn.setEndTime(this.endTime);
+        //End
         rtn.setStatus(STATUS_OPEN);
         rtn.setInterval(this.interval);
         rtn.setIsRepeat(this.isRepeat);

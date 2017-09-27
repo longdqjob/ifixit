@@ -220,7 +220,9 @@
                     tmp = obj[key];
                     if (tmp.hasOwnProperty("value")) {
 //                        Ext.getCmp("specification_" + key).setFieldLabel(tmp["label"]);
-                        Ext.getCmp("specification_" + key).setValue(tmp["value"]);
+                        if (Ext.getCmp("specificationlb_" + key).getValue() != "") {
+                            Ext.getCmp("specification_" + key).setValue(tmp["value"]);
+                        }
                     }
                 }
             }
@@ -239,7 +241,7 @@
             }
             if (Ext.getCmp("specification_" + tmp).getValue() != "") {
                 rtn[tmp] = {
-                    "label": Ext.getCmp("specification_" + tmp).getValue(),
+                    "label": Ext.getCmp("specificationlb_" + tmp).getValue(),
                     "value": Ext.getCmp("specification_" + tmp).getValue()
                 };
             }

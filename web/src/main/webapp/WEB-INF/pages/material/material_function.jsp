@@ -47,9 +47,11 @@
 
         if (data.get("itemType")) {
             itemTypeObj = Ext.decode(data.get("itemType"));
+            console.log(itemTypeObj);
             materialFatherId.setValue(itemTypeObj.id);
             materialFatherName.setValue(itemTypeObj.name);
             materialFatherCode.setValue(itemTypeObj.completeCode);
+            materialFillSpec(itemTypeObj.specification);
         }
 
         materialCode.setValue(data.get("code"));
@@ -334,14 +336,72 @@
             for (var key in obj) {
                 if (key && obj.hasOwnProperty(key)) {
                     tmp = obj[key];
-                    if (tmp.hasOwnProperty("label")) {
-                        Ext.getCmp("mat_speclb_" + key).setValue(tmp["label"]);
-                    }
-                    if (tmp.hasOwnProperty("value")) {
-                        Ext.getCmp("mat_spec_" + key).setValue(tmp["value"]);
+//                    if (tmp.hasOwnProperty("label")) {
+//                        Ext.getCmp("mat_speclb_" + key).setValue(tmp["label"]);
+//                    }
+                    if (Ext.getCmp("mat_speclb_" + key).getValue() != "") {
+                        if (tmp.hasOwnProperty("value")) {
+                            Ext.getCmp("mat_spec_" + key).setValue(tmp["value"]);
+                        }
                     }
                 }
             }
+        }
+    }
+
+    function importMaterial() {
+        Ext.getCmp("btnExeImport").hide();
+        storeDataImport.removeAll();
+        loadDataGridImport();
+        materialImportForm.reset();
+        materialImportWindow.show();
+    }
+
+    function validateImport() {
+        maskTarget(materialImportWindow);
+        materialImportForm.getForm().submit({
+            url: '../material/validateImport',
+            waitMsg: '<fmt:message key="uploadingMsg"/>',
+            handleResponse: function (response) {
+                var res = JSON.parse(response.responseXML.body.textContent);
+                console.log(res);
+                return res;
+            },
+            success: function (fp, o) {
+                unMaskTarget();
+                alertSuccess('Success: ' + o.result && o.result.message || '<fmt:message key="uploadSuccessMsg"/>');
+                storeDataImport.removeAll();
+                storeDataImport.loadData(o.result.list);
+                loadDataGridImport();
+            },
+            failure: function (form, o) {
+                unMaskTarget();
+                storeDataImport.removeAll();
+                loadDataGridImport();
+                alertError('Error: ' + o.result && o.result.message || '<fmt:message key="uploadFailMsg"/>');
+            }
+        });
+    }
+
+    function executeImport() {
+    }
+
+    function loadDataGridImport() {
+        console.log("----------loadDataGridImport-----------");
+        var data = [];
+        var error = false;
+        storeDataImport.each(function (rec) {
+            data.push(rec.data);
+            if (rec.data.imgPath !== "Success") {
+                error = true;
+            }
+        });
+        console.log("----------loadDataGridImport: " + data.length);
+        storeDataPaging.proxy.data = data;
+        storeDataPaging.load();
+        console.log("----------storeDataPaging: " + gridDataImport.getStore().data.length);
+        if (!error) {
+            Ext.getCmp("btnExeImport").show();
         }
     }
 </script>

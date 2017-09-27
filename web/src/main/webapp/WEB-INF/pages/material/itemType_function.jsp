@@ -159,6 +159,7 @@
                     alertSuccess(res.message);
                     itemTypeWindow.hide();
                     reloadTreeItemType();
+                    loadMaterial();
                 } else {
                     if (res.message || res.message == "true") {
                         alertError(res.message);

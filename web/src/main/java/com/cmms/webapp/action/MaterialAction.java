@@ -4,6 +4,7 @@ import com.cmms.dao.ItemTypeDao;
 import com.cmms.dao.MaterialDao;
 import com.cmms.model.ItemType;
 import com.cmms.model.Material;
+import com.cmms.webapp.util.ApachePOIExcel;
 import com.cmms.webapp.util.ImageUtil;
 import com.cmms.webapp.util.ResourceBundleUtils;
 import com.cmms.webapp.util.WebUtil;
@@ -17,6 +18,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang.StringUtils;
@@ -323,7 +326,7 @@ public class MaterialAction extends BaseAction implements Preparable {
     public InputStream getSaveImg() {
         try {
             JSONObject result = new JSONObject();
-            String rtn = saveFile();
+            String rtn = saveFile(true);
             if (rtn != null) {
                 String uploadDir = ServletActionContext.getServletContext().getRealPath("/");
                 uploadDir += File.separator + PATH_UPLOAD + File.separator + PATH_MATERIAL + File.separator;
@@ -343,7 +346,7 @@ public class MaterialAction extends BaseAction implements Preparable {
     }//</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="saveFile">
-    private String saveFile() {
+    private String saveFile(boolean resizeImg) {
         InputStream stream = null;
         String rtn = null;
         try {
@@ -365,7 +368,12 @@ public class MaterialAction extends BaseAction implements Preparable {
             }
 
             stream = new FileInputStream(this.file);
-            String fullPath = uploadDir + "tmp_" + fileName;
+            String fullPath = "";
+            if (resizeImg) {
+                fullPath = uploadDir + "tmp_" + fileName;
+            } else {
+                fullPath = uploadDir + fileName;
+            }
             fullPath = fullPath.replace("\\", File.separator);
             // write the file to the file specified
             log.info("-------fullPath: " + fullPath);
@@ -377,7 +385,9 @@ public class MaterialAction extends BaseAction implements Preparable {
                 }
                 bos.flush();
             }
-            ImageUtil.resize(fullPath, uploadDir + fileName);
+            if (resizeImg) {
+                ImageUtil.resize(fullPath, uploadDir + fileName);
+            }
             rtn = fileName;
         } catch (FileNotFoundException ex) {
             log.error("ERROR FileNotFoundException: ", ex);
@@ -393,5 +403,120 @@ public class MaterialAction extends BaseAction implements Preparable {
             }
         }
         return rtn;
+    }//</editor-fold>
+
+    private Map checkData(List data) {
+        Map rtn = new HashMap<>();
+        ArrayList<Material> list = new ArrayList<Material>(data.size());
+        String[] tmp;
+        Material material;
+        int i = 0;
+
+        String completeCode = "";
+        //Tao list check unique completeCode
+        List<String> lstCode = new ArrayList<>(data.size());
+        for (Object mat : data) {
+            if (i++ == 0) {
+                continue;
+            }
+            tmp = (String[]) mat;
+            if (StringUtils.isBlank(tmp[0])) {
+                completeCode = tmp[1].trim();
+            } else {
+                completeCode = tmp[0].trim() + "." + tmp[1].trim();
+            }
+            lstCode.add(completeCode);
+        }
+        HashMap<String, Material> hsmMatExits = new HashMap<>();
+
+        //Tao list Material de hien thi
+        for (Object mat : data) {
+            if (i++ == 0) {
+                continue;
+            }
+            tmp = (String[]) mat;
+            System.out.println(Arrays.toString(tmp));
+            if (StringUtils.isBlank(tmp[0])) {
+                completeCode = tmp[1].trim();
+            } else {
+                completeCode = tmp[0].trim() + "." + tmp[1].trim();
+            }
+            material = hsmMatExits.get(completeCode);
+            if (material == null) {
+                material = new Material();
+                hsmMatExits.put(completeCode, material);
+            } else {
+                material.setImgPath("CompleteCode Exits");
+                rtn.put("message", "CompleteCode Exits");
+            }
+            material.setCode(tmp[1]);
+            material.setCompleteCode(completeCode);
+            material.setName(tmp[2]);
+            material.setUnit(tmp[3]);
+            material.setQuantity(((Double) Double.parseDouble(tmp[4])).intValue());
+            material.setCost(Float.parseFloat(tmp[5]));
+            material.setLocation(tmp[6]);
+            //Set error
+            material.setImgPath("Success");
+            list.add(material);
+        }
+        rtn.put("list", list);
+        return rtn;
+    }
+
+    //<editor-fold defaultstate="collapsed" desc="getValidateImport">
+    private static final int NUMBER_FIELD = 7;
+
+    public InputStream getValidateImport() {
+        try {
+            JSONObject result = new JSONObject();
+            String rtn = saveFile(false);
+            if (rtn != null) {
+                String uploadDir = ServletActionContext.getServletContext().getRealPath("/");
+                uploadDir += File.separator + PATH_UPLOAD + File.separator + PATH_MATERIAL + File.separator;
+
+                List data = ApachePOIExcel.readFile(uploadDir + rtn, NUMBER_FIELD);
+                Map checkData = checkData(data);
+                JSONArray jSONArray = WebUtil.toJSONArray((ArrayList<Material>) checkData.get("list"));
+                result.put("list", jSONArray);
+                result.put("success", true);
+                if (checkData.get("message") != null && !StringUtils.isBlank((String) checkData.get("message"))) {
+                    result.put("message", (String) checkData.get("message"));
+                } else {
+                    result.put("message", ResourceBundleUtils.getName("uploadSuccessMsg"));
+                }
+            } else {
+                result.put("success", false);
+                result.put("message", ResourceBundleUtils.getName("uploadFailMsg"));
+            }
+            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+        } catch (Exception ex) {
+            log.error("ERROR getValidateImport: ", ex);
+            return null;
+        }
+    }//</editor-fold>
+    //<editor-fold defaultstate="collapsed" desc="getExeImport">
+
+    public InputStream getExeImport() {
+        try {
+            JSONObject result = new JSONObject();
+            String rtn = saveFile(false);
+            if (rtn != null) {
+                String uploadDir = ServletActionContext.getServletContext().getRealPath("/");
+                uploadDir += File.separator + PATH_UPLOAD + File.separator + PATH_MATERIAL + File.separator;
+                result.put("success", true);
+                result.put("url", "../" + PATH_UPLOAD + "/" + PATH_MATERIAL + "/" + rtn);
+                result.put("path", uploadDir + rtn);
+                result.put("message", ResourceBundleUtils.getName("uploadSuccessMsg"));
+
+            } else {
+                result.put("success", false);
+                result.put("message", ResourceBundleUtils.getName("uploadFailMsg"));
+            }
+            return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+        } catch (Exception ex) {
+            log.error("ERROR getExeImport: ", ex);
+            return null;
+        }
     }//</editor-fold>
 }

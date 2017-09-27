@@ -9,6 +9,7 @@
     var numSpecification = 10;
 </script>
 
+<jsp:include page="../pagingmemory.jsp" />
 <jsp:include page="../common/require.jsp" />
 <jsp:include page="../script.jsp" />
 <jsp:include page="../common/treeItemType.jsp" />
@@ -16,6 +17,7 @@
 <jsp:include page="itemType_function.jsp" />
 <jsp:include page="material_form.jsp" />
 <jsp:include page="itemType_form.jsp" />
+<jsp:include page="import_material.jsp" />
 <jsp:include page="navigation.jsp" />
 <jsp:include page="search.jsp" />
 <jsp:include page="grid.jsp" />

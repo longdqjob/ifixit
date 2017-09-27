@@ -109,7 +109,7 @@ public class MaterialDaoHibernate extends GenericDaoHibernate<Material, Long> im
             if (limit != null && limit > 0) {
                 // get the count
                 criteria.setProjection(Projections.rowCount());
-                total = ((Long) criteria.uniqueResult()).longValue();
+                total = ((Long) criteria.uniqueResult());
                 //Reset
                 criteria.setProjection(null);
                 criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);

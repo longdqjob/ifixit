@@ -389,6 +389,16 @@
                 <param name="inputName">saveImg</param>
             </result>
         </action>
+        <action name="validateImport" class="materialAction">
+            <result type="stream">
+                <param name="inputName">validateImport</param>
+            </result>
+        </action>
+        <action name="exeImport" class="materialAction">
+            <result type="stream">
+                <param name="inputName">exeImport</param>
+            </result>
+        </action>
     </package>
     
     <!-- workOrderAction -->

@@ -205,6 +205,16 @@
                             }
                         }//end of listeners
                     },
+                    {
+                        iconCls: 'add-cls',
+                        xtype: 'button',
+                        text: '<fmt:message key="button.import"/>',
+                        listeners: {
+                            click: function (el) {
+                                importMaterial();
+                            }
+                        }//end of listeners
+                    },
                     '<fmt:message key="perPage"/>',
                     combo
                 ]
