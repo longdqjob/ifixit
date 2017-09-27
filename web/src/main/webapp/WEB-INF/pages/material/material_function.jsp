@@ -20,7 +20,9 @@
     function resetImgPreView() {
         materialImgUrl.reset();
         try {
-            materialImgPreview.el.dom.src = "../images/no-preview-available.png";
+            setTimeout(function () {
+                materialImgPreview.el.dom.src = "../images/no-preview-available.png";
+            }, 1);
         } catch (c) {
             console.error(c);
         }
@@ -28,7 +30,9 @@
     function setImgPreView(url) {
         materialImgUrl.setValue(url);
         try {
-            materialImgPreview.el.dom.src = url;
+            setTimeout(function () {
+                materialImgPreview.el.dom.src = url;
+            }, 1);
         } catch (c) {
             console.error(c);
         }
@@ -43,7 +47,6 @@
 
         if (data.get("itemType")) {
             itemTypeObj = Ext.decode(data.get("itemType"));
-            console.log(itemTypeObj);
             materialFatherId.setValue(itemTypeObj.id);
             materialFatherName.setValue(itemTypeObj.name);
             materialFatherCode.setValue(itemTypeObj.completeCode);
@@ -171,7 +174,7 @@
         if (!valid || valid.length > 0) {
             return false;
         }
-        
+
         if (hasUnicode(materialCode.getValue())) {
             materialCode.setActiveError('<fmt:message key="notUnicode"/>');
             alertError('<fmt:message key="notUnicode"/>');
