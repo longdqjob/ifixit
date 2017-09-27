@@ -39,9 +39,9 @@ public class ApachePOIExcel {
 
     private static final String FILE_NAME = "D:\\tmp\\MyFirstExcel.xlsx";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 //        write();
-        List rtn = readFile("D:\\tmp\\tmp\\MaterialTemplate.xlsx", 7);
+        List rtn = readFile("D:\\tmp\\tmp\\MaterialTemplate.xlsx", 7, false);
         String[] tmp;
         for (Object rtn1 : rtn) {
             tmp = (String[]) rtn1;
@@ -92,10 +92,12 @@ public class ApachePOIExcel {
         System.out.println("Done");
     }
 
-    public static List readFile(String fileName, int lenghData) {
+    public static List readFile(String fileName, int lenghData, boolean delete) throws IOException {
+        File file = null;
         try {
             List rtn = new ArrayList();
-            FileInputStream excelFile = new FileInputStream(new File(fileName));
+            file = new File(fileName);
+            FileInputStream excelFile = new FileInputStream(file);
             Workbook workbook = new XSSFWorkbook(excelFile);
             Sheet datatypeSheet = workbook.getSheetAt(0);
             Iterator<Row> iterator = datatypeSheet.iterator();
@@ -119,12 +121,10 @@ public class ApachePOIExcel {
             }
 
             return rtn;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
         }
     }
 }

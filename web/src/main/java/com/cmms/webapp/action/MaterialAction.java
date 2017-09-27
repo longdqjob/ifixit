@@ -475,7 +475,7 @@ public class MaterialAction extends BaseAction implements Preparable {
                 String uploadDir = ServletActionContext.getServletContext().getRealPath("/");
                 uploadDir += File.separator + PATH_UPLOAD + File.separator + PATH_MATERIAL + File.separator;
 
-                List data = ApachePOIExcel.readFile(uploadDir + rtn, NUMBER_FIELD);
+                List data = ApachePOIExcel.readFile(uploadDir + rtn, NUMBER_FIELD, true);
                 Map checkData = checkData(data);
                 JSONArray jSONArray = WebUtil.toJSONArray((ArrayList<Material>) checkData.get("list"));
                 result.put("list", jSONArray);
