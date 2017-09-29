@@ -10,6 +10,10 @@ import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "work_type")
@@ -19,6 +23,10 @@ public class WorkType extends BaseObject implements Serializable {
     private Integer id;
     private String code;
     private String name;
+    private Integer interval;
+    private Integer isRepeat;
+    private String task;
+    private GroupEngineer groupEngineer;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -46,6 +54,59 @@ public class WorkType extends BaseObject implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Column(name = "i_interval")
+    public Integer getInterval() {
+        return interval;
+    }
+
+    public void setInterval(Integer interval) {
+        this.interval = interval;
+    }
+
+    @Column(name = "is_repeat")
+    public Integer getIsRepeat() {
+        return isRepeat;
+    }
+
+    public void setIsRepeat(Integer isRepeat) {
+        this.isRepeat = isRepeat;
+    }
+
+    @Column(name = "task")
+    public String getTask() {
+        return task;
+    }
+
+    public void setTask(String task) {
+        this.task = task;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_engineer_id")
+    public GroupEngineer getGroupEngineer() {
+        return groupEngineer;
+    }
+
+    @Transient
+    public Integer getGroupEngineerId() {
+        if (this.groupEngineer == null) {
+            return null;
+        }
+        return this.groupEngineer.getId();
+    }
+
+    @Transient
+    public String getGroupEngineerName() {
+        if (this.groupEngineer == null) {
+            return "";
+        }
+        return this.groupEngineer.getName();
+    }
+
+    public void setGroupEngineer(GroupEngineer groupEngineer) {
+        this.groupEngineer = groupEngineer;
     }
 
     @Override

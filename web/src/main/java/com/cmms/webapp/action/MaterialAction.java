@@ -4,10 +4,13 @@ import com.cmms.dao.ItemTypeDao;
 import com.cmms.dao.MaterialDao;
 import com.cmms.model.ItemType;
 import com.cmms.model.Material;
+import com.cmms.obj.MaterialObj;
 import com.cmms.webapp.util.ApachePOIExcel;
 import com.cmms.webapp.util.ImageUtil;
 import com.cmms.webapp.util.ResourceBundleUtils;
 import com.cmms.webapp.util.WebUtil;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.opensymphony.xwork2.Preparable;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -405,16 +408,16 @@ public class MaterialAction extends BaseAction implements Preparable {
         return rtn;
     }//</editor-fold>
 
-    private Map checkData(List data) {
+    //<editor-fold defaultstate="collapsed" desc="checkDataWithParent">
+    private Map checkDataWithParent(List data) {
         Map rtn = new HashMap<>();
-        ArrayList<Material> list = new ArrayList<Material>(data.size());
-        String[] tmp;
-        Material material;
-        int i = 0;
+        ArrayList<MaterialObj> list = new ArrayList<MaterialObj>(data.size());
 
+        int i = 0;
+        String[] tmp;
         String completeCode = "";
         //Tao list check unique completeCode
-        List<String> lstCode = new ArrayList<>(data.size());
+        HashMap<String, String> lstCode = new HashMap<>();
         for (Object mat : data) {
             if (i++ == 0) {
                 continue;
@@ -423,13 +426,17 @@ public class MaterialAction extends BaseAction implements Preparable {
             if (StringUtils.isBlank(tmp[0])) {
                 completeCode = tmp[1].trim();
             } else {
-                completeCode = tmp[0].trim() + "." + tmp[1].trim();
+                completeCode = tmp[0].trim() + Material.CODE_SPA + tmp[1].trim();
+                lstCode.put(tmp[0].trim(), tmp[0].trim());                     //Lay Id parent
             }
-            lstCode.add(completeCode);
+            lstCode.put(completeCode, completeCode);
         }
-        HashMap<String, Material> hsmMatExits = new HashMap<>();
+        HashMap<String, Long> hsmMatExits = materialDao.getList(new ArrayList<String>(lstCode.values()));
 
         //Tao list Material de hien thi
+        i = 0;
+        MaterialObj material;
+        Long matId;
         for (Object mat : data) {
             if (i++ == 0) {
                 continue;
@@ -439,37 +446,161 @@ public class MaterialAction extends BaseAction implements Preparable {
             if (StringUtils.isBlank(tmp[0])) {
                 completeCode = tmp[1].trim();
             } else {
-                completeCode = tmp[0].trim() + "." + tmp[1].trim();
+                completeCode = tmp[0].trim() + Material.CODE_SPA + tmp[1].trim();
             }
-            material = hsmMatExits.get(completeCode);
-            if (material == null) {
-                material = new Material();
-                hsmMatExits.put(completeCode, material);
-            } else {
-                material.setImgPath("CompleteCode Exits");
-                rtn.put("message", "CompleteCode Exits");
-            }
-            material.setCode(tmp[1]);
+
+            material = new MaterialObj();
+            material.setCode(tmp[1].trim());
+            material.setParentCode(tmp[0].trim());
             material.setCompleteCode(completeCode);
             material.setName(tmp[2]);
             material.setUnit(tmp[3]);
-            material.setQuantity(((Double) Double.parseDouble(tmp[4])).intValue());
-            material.setCost(Float.parseFloat(tmp[5]));
+            try {
+                material.setQuantity(((Double) Double.parseDouble(tmp[4])).intValue());
+                material.setCost(Float.parseFloat(tmp[5]));
+            } catch (Exception ex) {
+                log.error("EROR parse: " + Arrays.toString(tmp), ex);
+            }
             material.setLocation(tmp[6]);
-            //Set error
-            material.setImgPath("Success");
+
+            //Ktra du lieu parent
+            if (!StringUtils.isBlank(tmp[0])) {
+                matId = hsmMatExits.get(tmp[0].trim());
+                if (matId == null) {
+                    material.setErrorCode(MaterialObj.ERR_PARENT_NOT_EXITS);
+                    material.setMessage(ResourceBundleUtils.getName("import.parentNotExits"));
+                    list.add(material);
+                    continue;
+                }
+                material.setParentId(matId);
+            }
+
+            matId = hsmMatExits.get(completeCode);
+            if (matId != null) {
+                material.setErrorCode(MaterialObj.ERR_CODE_EXITS);
+                material.setMessage(ResourceBundleUtils.getName("import.codeExits"));
+                list.add(material);
+                continue;
+            }
+            material.setId(Long.valueOf(0 - i));
+            hsmMatExits.put(material.getCompleteCode(), material.getId());
             list.add(material);
         }
         rtn.put("list", list);
+        rtn.put("totalCount", list.size());
         return rtn;
-    }
+    }//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="checkData">
+    private Map checkData(List data) {
+        Map rtn = new HashMap<>();
+        ArrayList<MaterialObj> list = new ArrayList<MaterialObj>(data.size());
+
+        int i = 0;
+        String[] tmp;
+        String completeCode = "";
+        //Tao list check unique completeCode
+        HashMap<String, String> lstItemCode = new HashMap<>();
+        HashMap<String, String> lstCode = new HashMap<>();
+        for (Object mat : data) {
+            if (i++ == 0) {
+                continue;
+            }
+            tmp = (String[]) mat;
+            if (StringUtils.isBlank(tmp[0])) {
+                completeCode = tmp[1].trim();
+            } else {
+                completeCode = tmp[0].trim() + Material.CODE_SPA + tmp[1].trim();
+                lstItemCode.put(tmp[0].trim(), tmp[0].trim());                     //Lay Id parent
+            }
+            lstCode.put(completeCode, completeCode);
+        }
+        HashMap<String, Long> hsmMatExits = materialDao.getList(new ArrayList<String>(lstCode.values()));
+
+        HashMap<String, Integer> hsmItem = itemTypeDao.getList(new ArrayList<String>(lstItemCode.values()));
+
+        //Tao list Material de hien thi
+        i = 0;
+        MaterialObj material;
+        Long matId;
+        Integer itemId;
+        for (Object mat : data) {
+            if (i++ == 0) {
+                continue;
+            }
+            tmp = (String[]) mat;
+            System.out.println(Arrays.toString(tmp));
+            if (StringUtils.isBlank(tmp[0])) {
+                completeCode = tmp[1].trim();
+            } else {
+                completeCode = tmp[0].trim() + Material.CODE_SPA + tmp[1].trim();
+            }
+
+            material = new MaterialObj();
+            material.setCode(tmp[1].trim());
+            material.setParentCode(tmp[0].trim());
+            material.setCompleteCode(completeCode);
+            material.setName(tmp[2]);
+            material.setUnit(tmp[3]);
+            try {
+                material.setQuantity(((Double) Double.parseDouble(tmp[4])).intValue());
+                material.setCost(Float.parseFloat(tmp[5]));
+            } catch (Exception ex) {
+                log.error("EROR parse: " + Arrays.toString(tmp), ex);
+            }
+            material.setLocation(tmp[6]);
+
+            //Ktra du lieu parent
+            if (!StringUtils.isBlank(tmp[0])) {
+                itemId = hsmItem.get(tmp[0].trim());
+                if (itemId == null) {
+                    material.setErrorCode(MaterialObj.ERR_PARENT_NOT_EXITS);
+                    material.setMessage(ResourceBundleUtils.getName("import.parentNotExits"));
+                    list.add(material);
+                    continue;
+                }
+                material.setItemTypeId(itemId);
+            }
+
+            matId = hsmMatExits.get(completeCode);
+            if (matId != null) {
+                material.setErrorCode(MaterialObj.ERR_CODE_EXITS);
+                material.setMessage(ResourceBundleUtils.getName("import.codeExits"));
+                list.add(material);
+                continue;
+            }
+            material.setId(Long.valueOf(0 - i));
+            hsmMatExits.put(material.getCompleteCode(), material.getId());
+            list.add(material);
+        }
+        rtn.put("list", list);
+        rtn.put("totalCount", list.size());
+        return rtn;
+    }//</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="getValidateImport">
     private static final int NUMBER_FIELD = 7;
 
+    private String getExtension(String fileName) {
+        if (StringUtils.isBlank(fileName)) {
+            return "";
+        }
+        if (!fileName.contains(".")) {
+            return "";
+        }
+        return fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
+    }
+
     public InputStream getValidateImport() {
         try {
             JSONObject result = new JSONObject();
+
+            String extension = getExtension(fileFileName);
+            if (!"xls".equalsIgnoreCase(extension) && !"xlsx".equalsIgnoreCase(extension)) {
+                result.put("success", false);
+                result.put("message", ResourceBundleUtils.getName("invalidFormatImport"));
+                return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+            }
             String rtn = saveFile(false);
             if (rtn != null) {
                 String uploadDir = ServletActionContext.getServletContext().getRealPath("/");
@@ -479,6 +610,7 @@ public class MaterialAction extends BaseAction implements Preparable {
                 Map checkData = checkData(data);
                 JSONArray jSONArray = WebUtil.toJSONArray((ArrayList<Material>) checkData.get("list"));
                 result.put("list", jSONArray);
+                result.put("totalCount", (Integer) checkData.get("totalCount"));
                 result.put("success", true);
                 if (checkData.get("message") != null && !StringUtils.isBlank((String) checkData.get("message"))) {
                     result.put("message", (String) checkData.get("message"));
@@ -495,24 +627,30 @@ public class MaterialAction extends BaseAction implements Preparable {
             return null;
         }
     }//</editor-fold>
-    //<editor-fold defaultstate="collapsed" desc="getExeImport">
 
+    //<editor-fold defaultstate="collapsed" desc="getExeImport">
     public InputStream getExeImport() {
         try {
             JSONObject result = new JSONObject();
-            String rtn = saveFile(false);
-            if (rtn != null) {
-                String uploadDir = ServletActionContext.getServletContext().getRealPath("/");
-                uploadDir += File.separator + PATH_UPLOAD + File.separator + PATH_MATERIAL + File.separator;
-                result.put("success", true);
-                result.put("url", "../" + PATH_UPLOAD + "/" + PATH_MATERIAL + "/" + rtn);
-                result.put("path", uploadDir + rtn);
-                result.put("message", ResourceBundleUtils.getName("uploadSuccessMsg"));
-
-            } else {
-                result.put("success", false);
-                result.put("message", ResourceBundleUtils.getName("uploadFailMsg"));
+            String dataReq = getRequest().getParameter("data");
+            List<MaterialObj> listData = null;
+            if (!StringUtils.isBlank(dataReq)) {
+                Gson gson = new Gson();
+                listData = gson.fromJson(dataReq, new TypeToken<List<MaterialObj>>() {
+                }.getType());
+                Integer rtn = materialDao.insertListUseSql(listData);
+                if (rtn != null && rtn > 0) {
+                    result.put("success", true);
+                    result.put("message", ResourceBundleUtils.getName("import.success"));
+                } else {
+                    result.put("success", false);
+                    result.put("message", ResourceBundleUtils.getName("import.fail"));
+                }
+                return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
             }
+
+            result.put("success", false);
+            result.put("message", ResourceBundleUtils.getName("import.noData"));
             return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
         } catch (Exception ex) {
             log.error("ERROR getExeImport: ", ex);

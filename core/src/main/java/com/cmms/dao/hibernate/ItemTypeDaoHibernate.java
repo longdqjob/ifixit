@@ -5,6 +5,7 @@ import com.cmms.model.ItemType;
 import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.codehaus.jettison.json.JSONArray;
@@ -250,4 +251,33 @@ public class ItemTypeDaoHibernate extends GenericDaoHibernate<ItemType, Integer>
             return null;
         }
     }
+
+    //<editor-fold defaultstate="collapsed" desc="getList">
+    @Override
+    public HashMap<String, Integer> getList(List<String> lstCode) {
+        try {
+            Query query;
+            if (lstCode == null || lstCode.isEmpty()) {
+                return new HashMap<String, Integer>();
+            }
+            HashMap<String, Integer> rtn = null;
+            String hql = "SELECT id,complete_code FROM item_type WHERE complete_code in :lstId";
+            query = getSession()
+                    .createSQLQuery(hql)
+                    .setParameterList("lstId", lstCode);
+
+            List<Object[]> list = query.list();
+            rtn = new HashMap<>();
+            if (list != null && !list.isEmpty()) {
+                for (Object[] obj : list) {
+                    rtn.put(String.valueOf(obj[1]), Integer.valueOf(String.valueOf(obj[0])));
+                }
+            }
+
+            return rtn;
+        } catch (Exception ex) {
+            log.error("ERROR getList: ", ex);
+            return null;
+        }
+    }//</editor-fold>
 }

@@ -13,36 +13,82 @@
         listeners: {
             change: function (fld, value) {
                 var newValue = value.replace(/C:\\fakepath\\/g, '');
+                var ext = getExtOfFile(newValue);
+                if (ext != "xls" && ext != "xlsx") {
+                    fld.setRawValue("");
+                    alertError('<fmt:message key="invalidFormatImport"/>');
+                    return;
+                }
                 fld.setRawValue(newValue);
                 validateImport();
             }
         }
     };
 
+    var materialImportDownloadTmp = new Ext.create('Ext.Component', {
+        margin: '15 10 10 10',
+        html: '<fmt:message key="downloadTpl"/>' + ' <a href="../admin/download?file=' + "eec34d804c9ce6c89cff596be555e6a4" + '">' + '<fmt:message key="here"/>' + '</a>.',
+        listeners: {
+            'click': function () {
+                // do stuff
+            },
+            // name of the component property which refers to the element to add the listener to
+            element: 'el',
+            // css selector to filter the target element
+            delegate: 'a'
+        }
+    });
+
     var materialImportForm = Ext.create('Ext.form.Panel', {
         xtype: 'form',
         layout: 'anchor',
         bodyStyle: 'background-color: transparent;',
-        items: [materialImportFile]
+        items: [{
+                xtype: 'container',
+                anchor: '100%',
+                columnWidth: 1,
+                layout: 'column',
+                height: '100%',
+                items: [{
+                        xtype: 'container',
+                        columnWidth: 0.5,
+                        layout: 'anchor',
+                        items: [materialImportFile]
+                    }, {
+                        xtype: 'container',
+                        columnWidth: 0.5,
+                        layout: 'anchor',
+                        items: [materialImportDownloadTmp]
+                    },
+                ]
+            }
+        ],
     });
 
     //--------------------------------GRID--------------------------------------
     var storeDataImport = Ext.create('Ext.data.Store', {
         storeId: 'storeDataImport',
-        pageSize: 20,
+        listeners: {
+            load: function () {
+                console.log("---------storeDataImport--------");
+                storeDataPaging.getProxy().setData(storeDataImport.getRange());
+                storeDataPaging.load();
+            }
+        }
     });
 
     var storeDataPaging = Ext.create('Ext.data.Store', {
+        proxy: {
+            type: 'memory',
+            enablePaging: true,
+        },
         autoLoad: false,
         pageSize: 5,
-        proxy: {
-            type: 'pagingmemory'
-        }
     });
 
     var gridDataImport = Ext.create('Ext.grid.Panel', {
         id: 'gridDataImport',
-        store: storeDataImport,
+        store: storeDataPaging,
         autoWidth: true,
         border: true,
         layout: 'fit',
@@ -57,18 +103,21 @@
                     if (this.rowspan) {
                         metaData.cellAttr = 'rowspan="' + this.rowspan + '"';
                     }
-                    return store.indexOfTotal ? (store.indexOfTotal(record) + 1) : (rowIndex + 1);
+                    if (record.get('errorCode') != '0') {
+                        metaData.style = 'background-color: #e88971 !important;';
+                    }
+                    return ((store.currentPage - 1) * store.pageSize) + (rowIndex + 1);
                 }
             }),
             ////////////////ITEM
-            {text: '<fmt:message key="material.code"/>', dataIndex: 'code', flex: 2, },
-            {text: '<fmt:message key="material.completeCode"/>', dataIndex: 'completeCode', flex: 2, },
-            {text: '<fmt:message key="material.name"/>', dataIndex: 'name', flex: 2, },
-            {text: '<fmt:message key="material.unit"/>', dataIndex: 'unit', flex: 2, },
-            {text: '<fmt:message key="material.qty"/>', dataIndex: 'quantity', flex: 2, },
-            {text: '<fmt:message key="material.unitCost"/>', dataIndex: 'cost', flex: 2, },
-            {text: '<fmt:message key="material.location"/>', dataIndex: 'location', flex: 2, },
-            {text: '<fmt:message key="material.import.status"/>', dataIndex: 'imgPath', flex: 2, },
+            {text: '<fmt:message key="material.code"/>', dataIndex: 'code', flex: 0.75, },
+            {text: '<fmt:message key="material.completeCode"/>', dataIndex: 'completeCode', flex: 1.25, },
+            {text: '<fmt:message key="material.name"/>', dataIndex: 'name', flex: 1.5, },
+            {text: '<fmt:message key="material.unit"/>', dataIndex: 'unit', flex: 0.5, },
+            {text: '<fmt:message key="material.qty"/>', dataIndex: 'quantity', flex: 1, },
+            {text: '<fmt:message key="material.unitCost"/>', dataIndex: 'cost', flex: 1, },
+            {text: '<fmt:message key="material.location"/>', dataIndex: 'location', flex: 1.5, },
+            {text: '<fmt:message key="material.import.status"/>', dataIndex: 'message', flex: 2, },
         ],
         viewConfig: {
             autoFit: true,
@@ -78,11 +127,19 @@
             onStoreLoad: Ext.emptyFn,
             enableTextSelection: true,
             emptyText: '<div class="grid-data-empty"><div data-icon="/" class="empty-grid-icon"></div><div class="empty-grid-byline" style="text-align: center;"><fmt:message key="noRecord"/></div></div>',
+            getRowClass: function (record, rowIndex, rowParams, store) {
+                if (record.get('errorCode') == '1') {
+                    return 'parentNotExits';
+                } else if (record.get('errorCode') == '2') {
+                    return 'codeExits';
+                }
+                return "";
+            },
         },
         dockedItems: [{
                 xtype: 'pagingtoolbar',
                 dock: 'bottom',
-                store: storeDataImport,
+                store: storeDataPaging,
                 displayInfo: true
             }],
         listeners: {
@@ -102,7 +159,7 @@
         title: '<fmt:message key="material.import.title"/>',
         closeAction: 'hide',
         autoEl: 'form',
-        width: '60%',
+        width: '80%',
         height: "80%",
         autoScroll: true,
         constrainHeader: true,

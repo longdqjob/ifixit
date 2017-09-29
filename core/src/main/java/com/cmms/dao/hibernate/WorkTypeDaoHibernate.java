@@ -33,7 +33,7 @@ public class WorkTypeDaoHibernate extends GenericDaoHibernate<WorkType, Integer>
     }
 
     @Override
-    public Map getList(String code, String name, Integer start, Integer limit) {
+    public Map getList(List<Integer> listEng,String code, String name, Integer start, Integer limit) {
         try {
             Map result = new HashMap();
             Criteria criteria = getSession().createCriteria(WorkType.class);
@@ -44,6 +44,9 @@ public class WorkTypeDaoHibernate extends GenericDaoHibernate<WorkType, Integer>
             }
             if (!StringUtils.isBlank(name)) {
                 criteria.add(Restrictions.like("name", name).ignoreCase());
+            }
+            if (listEng != null && !listEng.isEmpty()) {
+                criteria.add(Restrictions.in("groupEngineer.id", listEng));
             }
             criteria.addOrder(Order.asc("code"));
             Integer total = 0;

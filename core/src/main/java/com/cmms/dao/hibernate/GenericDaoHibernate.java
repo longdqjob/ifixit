@@ -41,6 +41,7 @@ public class GenericDaoHibernate<T, PK extends Serializable> implements GenericD
     /**
      * Log variable for all child classes. Uses LogFactory.getLog(getClass()) from Commons Logging
      */
+    public static final int BATCH_LIMIT = 100;
     protected final Log log = LogFactory.getLog(getClass());
     private Class<T> persistentClass;
     @Resource

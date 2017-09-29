@@ -74,7 +74,7 @@
                     if (this.rowspan) {
                         metaData.cellAttr = 'rowspan="' + this.rowspan + '"';
                     }
-                    return store.indexOfTotal ? (store.indexOfTotal(record) + 1) : (rowIndex + 1);
+                    return ((store.currentPage - 1) * store.pageSize) + (rowIndex + 1);
                 }
             }),
             //////////////ACTION
@@ -206,7 +206,7 @@
                         }//end of listeners
                     },
                     {
-                        iconCls: 'add-cls',
+                        iconCls: 'import-cls',
                         xtype: 'button',
                         text: '<fmt:message key="button.import"/>',
                         listeners: {

@@ -170,6 +170,11 @@ public class GrpEngineerAction extends BaseAction implements Preparable {
                         result.put("message", ResourceBundleUtils.getName("deleteUsing"));
                         return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
                     }
+                    if (groupEngineerDao.checkUseByWT(list)) {
+                        result.put("success", false);
+                        result.put("message", ResourceBundleUtils.getName("deleteUsing"));
+                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                    }
                     if (groupEngineerDao.checkUseByWo(list)) {
                         result.put("success", false);
                         result.put("message", ResourceBundleUtils.getName("deleteUsing"));
@@ -191,6 +196,11 @@ public class GrpEngineerAction extends BaseAction implements Preparable {
                         list.add(Integer.parseInt(idTmp));
                     }
                     if (groupEngineerDao.checkUseParent(list)) {
+                        result.put("success", false);
+                        result.put("message", ResourceBundleUtils.getName("deleteUsing"));
+                        return new ByteArrayInputStream(result.toString().getBytes("UTF8"));
+                    }
+                    if (groupEngineerDao.checkUseByWT(list)) {
                         result.put("success", false);
                         result.put("message", ResourceBundleUtils.getName("deleteUsing"));
                         return new ByteArrayInputStream(result.toString().getBytes("UTF8"));

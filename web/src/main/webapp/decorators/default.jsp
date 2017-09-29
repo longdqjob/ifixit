@@ -41,6 +41,20 @@
                 background-color: #e88971 !important;
                 color:black ;
             }
+
+            .parentNotExits{
+                background-color: #ffff99 !important;
+                color: black ;
+            }
+            .codeExits{
+                background-color: #99FF99 !important;
+                color: black ;
+            }
+            
+            .success{
+                background-color: #e88971 !important;
+                color: black ;
+            }
         </style>
 
     </head>

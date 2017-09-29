@@ -299,6 +299,10 @@ span.pagelinks {
     background-image: url(/images/add.png);
     background-repeat: no-repeat;
 }
+.import-cls {
+    background-image: url(/images/excel.png);
+    background-repeat: no-repeat;
+}
 .delete-cls {
     background-image: url(/images/delete.png);
     background-repeat: no-repeat;

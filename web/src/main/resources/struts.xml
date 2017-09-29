@@ -197,6 +197,17 @@
             <interceptor-ref name="adminCheck"/>
             <result name="success">/WEB-INF/pages/user/index.jsp</result>
         </action>
+        
+        <!-- Download  -->
+        <action name="download" method="download"  class="com.cmms.webapp.action.DownloadAction">
+            <result name="success" type="stream">
+                <param name="contentType">application/octet-stream</param>
+                <param name="inputName">fileInputStream</param>
+                <param name="contentDisposition">attachment;filename="${fileName}"</param>
+                <param name="bufferSize">1024</param>
+            </result>
+            <result name="error">/live/useradminerror.jsp</result>
+        </action> 
     </package>
     
     <package name="itemType" extends="default" namespace="/itemType">

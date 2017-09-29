@@ -19,6 +19,12 @@
         workTypeId.setValue(data.get("id"));
         workTypeCode.setValue(data.get("code"));
         workTypeName.setValue(data.get("name"));
+        
+        grpEngineerId.setValue("grpEngineerId");
+        grpEngineerName.setValue("grpEngineerName");
+        workTypeInterval.setValue("interval");
+        workTypeRepeat.setValue((data.get('isRepeat') == "1"));
+        workTypeTask.setValue("task");
 
         workTypeWindow.setTitle('<fmt:message key="workType.edit"/>');
         workTypeWindow.show();
@@ -72,6 +78,10 @@
                 id: workTypeId.getValue(),
                 code: workTypeCode.getValue(),
                 name: workTypeName.getValue(),
+                grpEngineerId: grpEngineerId.getValue(),
+                interval: workTypeInterval.getValue(),
+                repeat: (workTypeRepeat.getValue()) ? 1 : 0,
+                task: workTypeTask.getValue(),
             },
             success: function (response) {
                 unmask();
@@ -111,5 +121,10 @@
                 storeRedirectIfNotAuthen(operation);
             }
         });
+    }
+    
+    function choosegrpEngineer(record){
+        grpEngineerName.setValue(record.get('name'));
+        grpEngineerId.setValue(record.get('id'));
     }
 </script>

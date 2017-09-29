@@ -155,7 +155,6 @@
             waitMsg: '<fmt:message key="uploadingMsg"/>',
             handleResponse: function (response) {
                 var res = JSON.parse(response.responseXML.body.textContent);
-                console.log(res);
                 return res;
             },
             success: function (fp, o) {
@@ -364,7 +363,6 @@
             waitMsg: '<fmt:message key="uploadingMsg"/>',
             handleResponse: function (response) {
                 var res = JSON.parse(response.responseXML.body.textContent);
-                console.log(res);
                 return res;
             },
             success: function (fp, o) {
@@ -383,23 +381,50 @@
         });
     }
 
+    function getListDataImport() {
+        var data = [];
+        storeDataImport.each(function (rec) {
+            data.push(rec.data);
+        });
+        return data;
+    }
+
     function executeImport() {
+        maskTarget(materialImportWindow);
+        Ext.Ajax.request({
+            url: "../material/exeImport",
+            method: "POST",
+            params: {
+                data: Ext.encode(getListDataImport())
+            },
+            success: function (response) {
+                unMaskTarget();
+                var res = JSON.parse(response.responseText);
+                if ("true" == res.success || true === res.success) {
+                    materialImportWindow.hide();
+                    alertSuccess(res.message);
+                    loadMaterial(0);
+                }
+            },
+            failure: function (response, opts) {
+                redirectIfNotAuthen(response);
+                alertSystemError();
+                unMaskTarget();
+            },
+        });
     }
 
     function loadDataGridImport() {
-        console.log("----------loadDataGridImport-----------");
         var data = [];
         var error = false;
         storeDataImport.each(function (rec) {
             data.push(rec.data);
-            if (rec.data.imgPath !== "Success") {
+            if (rec.data.errorCode !== 0) {
                 error = true;
             }
         });
-        console.log("----------loadDataGridImport: " + data.length);
         storeDataPaging.proxy.data = data;
         storeDataPaging.load();
-        console.log("----------storeDataPaging: " + gridDataImport.getStore().data.length);
         if (!error) {
             Ext.getCmp("btnExeImport").show();
         }

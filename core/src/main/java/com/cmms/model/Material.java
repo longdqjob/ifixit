@@ -19,6 +19,8 @@ import javax.persistence.Transient;
 @Table(name = "material")
 public class Material extends BaseObject implements Serializable {
 
+    public static final String CODE_SPA = ".";
+
     private static final long serialVersionUID = -1L;
     private Long id;
     private String code;
@@ -182,6 +184,14 @@ public class Material extends BaseObject implements Serializable {
     @JoinColumn(name = "item_type_id")
     public ItemType getItemType() {
         return itemType;
+    }
+
+    @Transient
+    public Integer getItemTypeId() {
+        if (this.itemType == null) {
+            return null;
+        }
+        return this.itemType.getId();
     }
 
     public void setItemType(ItemType itemType) {

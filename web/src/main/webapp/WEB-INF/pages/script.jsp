@@ -200,4 +200,8 @@
         }
         return false;
     }
+    
+    function getExtOfFile(filename){
+        return filename.split('.').pop();
+    }
 </script>

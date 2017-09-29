@@ -375,4 +375,5 @@ public class BaseAction extends ActionSupport {
     public static final String PATH_UPLOAD = "upload";
     public static final String PATH_MATERIAL = "material";
     public static final String PATH_MECHANIC = "mechanic";
+    public static final String PATH_TEMPLATE = "template";
 }

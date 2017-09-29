@@ -1,8 +1,13 @@
 package com.cmms.webapp.action;
 
 import com.cmms.dao.CompanyDao;
+import com.cmms.dao.GroupEngineerDao;
 import com.cmms.dao.WorkTypeDao;
+import com.cmms.model.GroupEngineer;
+import com.cmms.model.Machine;
+import com.cmms.model.WorkOrder;
 import com.cmms.model.WorkType;
+import com.cmms.webapp.security.LoginSuccessHandler;
 import com.cmms.webapp.util.ResourceBundleUtils;
 import com.cmms.webapp.util.WebUtil;
 import com.opensymphony.xwork2.Preparable;
@@ -21,8 +26,18 @@ import org.codehaus.jettison.json.JSONObject;
 public class WorkTypeAction extends BaseAction implements Preparable {
 
     private static final long serialVersionUID = -1L;
+    //<editor-fold defaultstate="collapsed" desc="get & set">
     private WorkTypeDao workTypeDao;
     private CompanyDao companyDao;
+    private GroupEngineerDao groupEngineerDao;
+
+    public GroupEngineerDao getGroupEngineerDao() {
+        return groupEngineerDao;
+    }
+
+    public void setGroupEngineerDao(GroupEngineerDao groupEngineerDao) {
+        this.groupEngineerDao = groupEngineerDao;
+    }
 
     public CompanyDao getCompanyDao() {
         return companyDao;
@@ -38,7 +53,7 @@ public class WorkTypeAction extends BaseAction implements Preparable {
 
     public void setWorkTypeDao(WorkTypeDao workTypeDao) {
         this.workTypeDao = workTypeDao;
-    }
+    }//</editor-fold>
 
     @Override
     public void prepare() throws Exception {
@@ -54,7 +69,24 @@ public class WorkTypeAction extends BaseAction implements Preparable {
             String code = getRequest().getParameter("code");
             String name = getRequest().getParameter("name");
 
-            Map pagingMap = workTypeDao.getList(code, name, start, limit);
+            //groupEngineerDao
+            String engineerIdReq = getRequest().getParameter("engineerId");
+            Integer engineerId = null;
+            if (!StringUtils.isBlank(engineerIdReq)) {
+                engineerId = Integer.parseInt(engineerIdReq);
+            }
+            List<Integer> listEng;
+            if (engineerId == null || engineerId <= 0) {
+                engineerId = null;
+                if (getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP) != null) {
+                    engineerId = (Integer) getRequest().getSession().getAttribute(LoginSuccessHandler.SESSION_ENGINNER_GRP);
+                }
+                listEng = getListGrpEngineer();
+            } else {
+                listEng = groupEngineerDao.getListChildren(engineerId);
+            }
+
+            Map pagingMap = workTypeDao.getList(listEng, code, name, start, limit);
 
             ArrayList<WorkType> list = new ArrayList<WorkType>();
             if (pagingMap.get("list") != null) {
@@ -66,7 +98,22 @@ public class WorkTypeAction extends BaseAction implements Preparable {
                 count = (Integer) pagingMap.get("count");
             }
 
-            JSONArray jSONArray = WebUtil.toJSONArray(list);
+            JSONArray jSONArray = new JSONArray();
+            JSONObject tmp;
+            GroupEngineer groupEngineer;
+            for (WorkType workType : list) {
+                tmp = new JSONObject();
+                tmp = WebUtil.toJSONObject(workType, "groupEngineer");
+                groupEngineer = workType.getGroupEngineer();
+                if (groupEngineer != null) {
+                    tmp.put("grpEngineerId", groupEngineer.getId());
+                    tmp.put("grpEngineerName", groupEngineer.getName());
+                } else {
+                    tmp.put("grpEngineerId", "");
+                    tmp.put("grpEngineerName", "");
+                }
+                jSONArray.put(tmp);
+            }
             result.put("list", jSONArray);
             result.put("totalCount", count);
 
@@ -118,8 +165,24 @@ public class WorkTypeAction extends BaseAction implements Preparable {
                 }
             }
 
+            String grpEngineerId = getRequest().getParameter("grpEngineerId");
+            String interval = getRequest().getParameter("interval");
+            String repeat = getRequest().getParameter("repeat");
+            String task = getRequest().getParameter("task");
+
             workType.setCode(code);
             workType.setName(name);
+            if (!StringUtils.isBlank(grpEngineerId) && Integer.parseInt(grpEngineerId) > 0) {
+                GroupEngineer groupEngineer = groupEngineerDao.get(Integer.parseInt(grpEngineerId));
+                workType.setGroupEngineer(groupEngineer);
+            }
+            if (!StringUtils.isBlank(interval)) {
+                workType.setInterval(Integer.parseInt(interval));
+            } else {
+                workType.setInterval(0);
+            }
+            workType.setIsRepeat(Integer.parseInt(repeat));
+            workType.setTask(task);
             workType = workTypeDao.save(workType);
             if (workType != null) {
                 result.put("success", true);

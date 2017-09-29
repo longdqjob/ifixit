@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 public interface WorkTypeDao extends GenericDao<WorkType, Integer> {
 
     @Transactional
-    Map getList(String code, String name, Integer start, Integer limit);
+    Map getList(List<Integer> listEng,String code, String name, Integer start, Integer limit);
 
     @Transactional
     Integer delete(List<Integer> list);

@@ -1,11 +1,12 @@
 <%@ include file="/common/taglibs.jsp" %>
 
 <head>
-    <title><fmt:message key="supplier.title"/></title>
+    <title><fmt:message key="workType.title"/></title>
     <meta name="menu" content="workOrderMenu"/>
 </head>
 
 <jsp:include page="../common/require.jsp" />
+<jsp:include page="../common/treeEngineer.jsp" />
 <jsp:include page="../script.jsp" />
 <jsp:include page="functionJs.jsp" />
 <jsp:include page="search.jsp" />

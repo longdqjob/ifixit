@@ -36,6 +36,9 @@ public interface GroupEngineerDao extends GenericDao<GroupEngineer, Integer> {
     Boolean checkUseParent(List<Integer> lstId);
 
     @Transactional
+    Boolean checkUseByWT(List<Integer> lstId);
+    
+    @Transactional
     Boolean checkUseByWo(List<Integer> lstId);
 
     @Transactional

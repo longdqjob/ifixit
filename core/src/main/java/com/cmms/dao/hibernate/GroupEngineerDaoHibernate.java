@@ -273,6 +273,25 @@ public class GroupEngineerDaoHibernate extends GenericDaoHibernate<GroupEngineer
         }
     }
 
+    @Override
+    public Boolean checkUseByWT(List<Integer> lstId) {
+        try {
+            if (lstId == null || lstId.isEmpty()) {
+                return false;
+            }
+            String hql = "SELECT COUNT(id) FROM work_type WHERE group_engineer_id in (:lstId)";
+            Query query = getSession()
+                    .createSQLQuery(hql)
+                    .setParameterList("lstId", lstId);
+
+            List list = query.list();
+            return (((BigInteger) list.get(0)).intValue() > 0);
+        } catch (Exception ex) {
+            log.error("ERROR checkUseByWT: ", ex);
+            return null;
+        }
+    }
+
     /**
      *
      * @param lstId

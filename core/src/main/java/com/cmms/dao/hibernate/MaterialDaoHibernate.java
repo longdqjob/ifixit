@@ -1,9 +1,13 @@
 package com.cmms.dao.hibernate;
 
 import com.cmms.dao.MaterialDao;
-import com.cmms.model.GroupEngineer;
+import static com.cmms.dao.hibernate.GenericDaoHibernate.BATCH_LIMIT;
 import com.cmms.model.Material;
+import com.cmms.obj.MaterialObj;
 import java.math.BigInteger;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,10 +21,12 @@ import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.jdbc.ReturningWork;
 
 /**
  *
@@ -32,6 +38,7 @@ public class MaterialDaoHibernate extends GenericDaoHibernate<Material, Long> im
         super(Material.class);
     }
 
+    //<editor-fold defaultstate="collapsed" desc="getListItem">
     @Override
     public List<Material> getListItem(Long id) {
         try {
@@ -54,8 +61,9 @@ public class MaterialDaoHibernate extends GenericDaoHibernate<Material, Long> im
             log.error("ERROR getListItem: ", ex);
             return null;
         }
-    }
+    }//</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="getTree">
     public JSONObject getTree(Material root) throws JSONException, SQLException {
         JSONObject obj = new JSONObject();
         Material item = root;
@@ -73,8 +81,9 @@ public class MaterialDaoHibernate extends GenericDaoHibernate<Material, Long> im
         obj.put("expand", true);
         obj.put("id", item.getId());
         return obj;
-    }
+    }//</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="getTreeView">
     @Override
     public JSONArray getTreeView(Long id) throws JSONException, SQLException {
         List<Material> roots = getListItem(id);
@@ -85,8 +94,9 @@ public class MaterialDaoHibernate extends GenericDaoHibernate<Material, Long> im
             treeview.put(tree);
         }
         return treeview;
-    }
+    }//</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="getList">
     @Override
     public Map getList(List<Integer> lstItemType, String code, String name, Integer start, Integer limit) {
         try {
@@ -125,8 +135,9 @@ public class MaterialDaoHibernate extends GenericDaoHibernate<Material, Long> im
             log.error("ERROR getList: ", ex);
             return null;
         }
-    }
+    }//</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="delete">
     @Override
     public Integer delete(List<Long> list) {
         try {
@@ -141,8 +152,9 @@ public class MaterialDaoHibernate extends GenericDaoHibernate<Material, Long> im
             log.error("ERROR delete: ", ex);
             return null;
         }
-    }
+    }//</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="checkUnique">
     @Override
     public Boolean checkUnique(Long id, String code) {
         Boolean rtn = null;
@@ -178,13 +190,14 @@ public class MaterialDaoHibernate extends GenericDaoHibernate<Material, Long> im
             return null;
         }
         return rtn;
-    }
+    }//</editor-fold>
 
     /**
      *
      * @param lstId
      * @return true neu duoc su dung
      */
+    //<editor-fold defaultstate="collapsed" desc="checkUse">
     @Override
     public Boolean checkUse(List<Long> lstId) {
         try {
@@ -202,8 +215,9 @@ public class MaterialDaoHibernate extends GenericDaoHibernate<Material, Long> im
             log.error("ERROR checkUse: ", ex);
             return null;
         }
-    }
+    }//</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="getQty">
     @Override
     public HashMap<Long, Integer> getQty(List<Long> lstId) {
         try {
@@ -230,5 +244,263 @@ public class MaterialDaoHibernate extends GenericDaoHibernate<Material, Long> im
             log.error("ERROR getQty: ", ex);
             return null;
         }
-    }
+    }//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="getList">
+    @Override
+    public HashMap<String, Long> getList(List<String> lstCode) {
+        try {
+            Query query;
+            if (lstCode == null || lstCode.isEmpty()) {
+                return new HashMap<String, Long>();
+            }
+            HashMap<String, Long> rtn = null;
+            String hql = "SELECT id,complete_code FROM material WHERE complete_code in :lstId";
+            query = getSession()
+                    .createSQLQuery(hql)
+                    .setParameterList("lstId", lstCode);
+
+            List<Object[]> list = query.list();
+            rtn = new HashMap<>();
+            if (list != null && !list.isEmpty()) {
+                for (Object[] obj : list) {
+                    rtn.put(String.valueOf(obj[1]), Long.valueOf(String.valueOf(obj[0])));
+                }
+            }
+
+            return rtn;
+        } catch (Exception ex) {
+            log.error("ERROR getList: ", ex);
+            return null;
+        }
+    }//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="insertList">
+    @Override
+    public void insertList(List<Material> listMat) {
+        Session session = null;
+        Transaction tx = null;
+        try {
+            session = getSession();
+            tx = session.beginTransaction();
+            int i = 0;
+            for (Material material : listMat) {
+                session.save(material);
+                if (i++ % BATCH_LIMIT == 0) { // Same as the JDBC batch size
+                    //flush a batch of inserts and release memory:
+                    session.flush();
+                    session.clear();
+                }
+            }
+            tx.commit();
+            session.close();
+        } catch (Exception ex) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            log.error("ERROR insertList: ", ex);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="insertListWithParentUseSql">
+    @Override
+    public Integer insertListWithParentUseSql(final List<MaterialObj> listMat) {
+        try {
+            return getSession().doReturningWork(new ReturningWork<Integer>() {
+                @Override
+                public Integer execute(Connection connection) throws SQLException {
+                    try {
+                        //Thuc hien insert
+                        String sql = "INSERT "
+                                + "    INTO "
+                                + "        material "
+                                + "        (code,complete_code, cost, name, unit, parent_id, item_type_id, quantity, location) "
+                                + "    VALUES "
+                                + "        (?,?,?,?,?,?,?,?,?)";
+                        connection.setAutoCommit(false);
+                        PreparedStatement ps = connection.prepareStatement(sql);
+                        int i = 1;
+                        int idx = 0;
+                        HashMap<String, String> hsmGet = new HashMap<>();
+                        for (MaterialObj material : listMat) {
+                            if (material.getParentId() <= 0 && !StringUtils.isBlank(material.getParentCode())) {
+                                hsmGet.put(material.getCompleteCode(), material.getCompleteCode());
+                                hsmGet.put(material.getParentCode(), material.getParentCode());
+                            }
+                            i = 1;
+                            ps.setString(i++, material.getCode());
+                            ps.setString(i++, material.getCompleteCode());
+                            ps.setFloat(i++, material.getCost());
+                            ps.setString(i++, material.getName());
+                            ps.setString(i++, material.getUnit());
+                            if (material.getParentId() == null) {
+                                ps.setNull(i++, java.sql.Types.BIGINT);
+                            } else {
+                                ps.setLong(i++, material.getParentId());
+                            }
+                            if (material.getItemTypeId() == null) {
+                                ps.setNull(i++, java.sql.Types.INTEGER);
+                            } else {
+                                ps.setInt(i++, material.getItemTypeId());
+                            }
+                            if (material.getQuantity() == null) {
+                                ps.setInt(i++, 0);
+                            } else {
+                                ps.setInt(i++, material.getQuantity());
+                            }
+                            ps.setString(i++, material.getLocation());
+                            ps.addBatch();
+                            idx++;
+                            if (idx % BATCH_LIMIT == 0) {
+                                ps.executeBatch();
+                                ps.clearBatch();
+                            }
+                        }
+                        if (idx % BATCH_LIMIT > 0) {
+                            ps.executeBatch();
+                        }
+                        connection.commit();
+
+                        //
+                        if (!hsmGet.isEmpty()) {
+                            StringBuffer sqlSelect = new StringBuffer();
+                            sqlSelect.setLength(0);
+                            sqlSelect.append("SELECT id,complete_code from material WHERE complete_code IN (");
+                            for (Map.Entry<String, String> entrySet : hsmGet.entrySet()) {
+                                String key = entrySet.getKey();
+                                sqlSelect.append("'").append(key).append("',");
+                            }
+                            sqlSelect = sqlSelect.deleteCharAt(sqlSelect.length() - 1);
+                            sqlSelect.append(")");
+
+                            log.info("------------sqlSelect: " + sqlSelect.toString());
+                            PreparedStatement psSelect = connection.prepareStatement(sqlSelect.toString());
+                            ResultSet rs = psSelect.executeQuery();
+
+                            HashMap<String, Long> lstMat = new HashMap<>();
+                            while (rs.next()) {
+                                log.info("--complete_code: " + rs.getString("complete_code") + " -: " + rs.getLong("id"));
+                                lstMat.put(rs.getString("complete_code"), rs.getLong("id"));
+                            }
+
+                            String sqlUpdateParent = "UPDATE material SET parent_id=? WHERE id=?";
+                            PreparedStatement psUpdate = connection.prepareStatement(sqlUpdateParent);
+                            Long parentId, matId;
+                            idx = 0;
+                            for (MaterialObj material : listMat) {
+                                if (material.getParentId() <= 0 && !StringUtils.isBlank(material.getParentCode())) {
+                                    matId = lstMat.get(material.getCompleteCode());
+                                    parentId = lstMat.get(material.getParentCode());
+                                    log.info("--------material.getCompleteCode(): " + material.getCompleteCode() + " - " + material.getParentCode() + ": " + matId + " - " + parentId);
+                                    if (matId != null && parentId != null) {
+                                        psUpdate.setLong(1, parentId);
+                                        psUpdate.setLong(2, matId);
+                                        psUpdate.addBatch();
+                                        idx++;
+                                        if (idx % BATCH_LIMIT == 0) {
+                                            psUpdate.executeBatch();
+                                            psUpdate.clearBatch();
+                                        }
+                                    }
+                                }
+                            }
+                            if (idx % BATCH_LIMIT > 0) {
+                                psUpdate.executeBatch();
+                            }
+                        }
+                        return idx;
+                    } catch (Exception ex) {
+                        log.error("ERROR aaa insertListWithParentUseSql: ", ex);
+                        connection.rollback();
+                        return null;
+                    } finally {
+                        try {
+                            // Make it back to default.
+                            connection.setAutoCommit(true);
+                        } catch (SQLException ex1) {
+                            log.error("ERROR insertListWithParentUseSql setAutoCommit: ", ex1);
+                        }
+
+                    }
+                }
+            });
+        } catch (Exception ex) {
+            log.error("ERROR insertListWithParentUseSql: ", ex);
+            return null;
+        }
+    }//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="insertListUseSql">
+    @Override
+    public Integer insertListUseSql(final List<MaterialObj> listMat) {
+        try {
+            return getSession().doReturningWork(new ReturningWork<Integer>() {
+                @Override
+                public Integer execute(Connection connection) throws SQLException {
+                    try {
+                        //Thuc hien insert
+                        String sql = "INSERT "
+                                + "    INTO "
+                                + "        material "
+                                + "        (code,complete_code, cost, name, unit, item_type_id, quantity, location) "
+                                + "    VALUES "
+                                + "        (?,?,?,?,?,?,?,?)";
+                        connection.setAutoCommit(false);
+                        PreparedStatement ps = connection.prepareStatement(sql);
+                        int i = 1;
+                        int idx = 0;
+                        for (MaterialObj material : listMat) {
+                            i = 1;
+                            ps.setString(i++, material.getCode());
+                            ps.setString(i++, material.getCompleteCode());
+                            ps.setFloat(i++, material.getCost());
+                            ps.setString(i++, material.getName());
+                            ps.setString(i++, material.getUnit());
+                            if (material.getItemTypeId() == null) {
+                                ps.setNull(i++, java.sql.Types.INTEGER);
+                            } else {
+                                ps.setInt(i++, material.getItemTypeId());
+                            }
+                            if (material.getQuantity() == null) {
+                                ps.setInt(i++, 0);
+                            } else {
+                                ps.setInt(i++, material.getQuantity());
+                            }
+                            ps.setString(i++, material.getLocation());
+                            ps.addBatch();
+                            idx++;
+                            if (idx % BATCH_LIMIT == 0) {
+                                ps.executeBatch();
+                                ps.clearBatch();
+                            }
+                        }
+                        if (idx % BATCH_LIMIT > 0) {
+                            ps.executeBatch();
+                        }
+                        connection.commit();
+                        return idx;
+                    } catch (Exception ex) {
+                        log.error("ERROR aaa insertListUseSql: ", ex);
+                        connection.rollback();
+                        return null;
+                    } finally {
+                        try {
+                            // Make it back to default.
+                            connection.setAutoCommit(true);
+                        } catch (SQLException ex1) {
+                            log.error("ERROR insertListUseSql setAutoCommit: ", ex1);
+                        }
+
+                    }
+                }
+            });
+        } catch (Exception ex) {
+            log.error("ERROR insertListUseSql: ", ex);
+            return null;
+        }
+    }//</editor-fold>
 }
