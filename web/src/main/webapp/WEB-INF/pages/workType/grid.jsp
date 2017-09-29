@@ -114,8 +114,8 @@
             {text: '<fmt:message key="workType.code"/>', dataIndex: 'code', flex: 0.5, },
             {text: '<fmt:message key="workType.name"/>', dataIndex: 'name', flex: 1.5, },
             {text: '<fmt:message key="work.enginnerGrp"/>', dataIndex: 'grpEngineerName', flex: 1.5, },
-            {text: '<fmt:message key="work.repeat"/>', dataIndex: 'isRepeat', flex: 1.5, },
-            {text: '<fmt:message key="work.interval"/>', dataIndex: 'interval', flex: 1.5, },
+            {text: '<fmt:message key="work.repeat"/>', dataIndex: 'isRepeat', flex: 0.5, },
+            {text: '<fmt:message key="work.interval"/>', dataIndex: 'interval', flex: 0.5, },
         ],
         viewConfig: {
             autoFit: true,

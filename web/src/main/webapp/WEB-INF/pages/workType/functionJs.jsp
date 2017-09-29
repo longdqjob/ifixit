@@ -20,9 +20,9 @@
         workTypeCode.setValue(data.get("code"));
         workTypeName.setValue(data.get("name"));
         
-        grpEngineerId.setValue("grpEngineerId");
-        grpEngineerName.setValue("grpEngineerName");
-        workTypeInterval.setValue("interval");
+        grpEngineerId.setValue(data.get("grpEngineerId"));
+        grpEngineerName.setValue(data.get("grpEngineerName"));
+        workTypeInterval.setValue(data.get("interval"));
         workTypeRepeat.setValue((data.get('isRepeat') == "1"));
         workTypeTask.setValue("task");
 

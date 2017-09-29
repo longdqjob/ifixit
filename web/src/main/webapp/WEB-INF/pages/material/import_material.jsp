@@ -103,8 +103,12 @@
                     if (this.rowspan) {
                         metaData.cellAttr = 'rowspan="' + this.rowspan + '"';
                     }
-                    if (record.get('errorCode') != '0') {
+                    if (record.get('errorCode') == '0') {
                         metaData.style = 'background-color: #e88971 !important;';
+                    } else if (record.get('errorCode') == '1') {
+                        metaData.style = 'background-color: #ffff99 !important;';
+                    } else if (record.get('errorCode') == '2') {
+                        metaData.style = 'background-color: #99FF99 !important;';
                     }
                     return ((store.currentPage - 1) * store.pageSize) + (rowIndex + 1);
                 }
@@ -128,7 +132,9 @@
             enableTextSelection: true,
             emptyText: '<div class="grid-data-empty"><div data-icon="/" class="empty-grid-icon"></div><div class="empty-grid-byline" style="text-align: center;"><fmt:message key="noRecord"/></div></div>',
             getRowClass: function (record, rowIndex, rowParams, store) {
-                if (record.get('errorCode') == '1') {
+                if (record.get('errorCode') == '0') {
+                    return 'success';
+                } else if (record.get('errorCode') == '1') {
                     return 'parentNotExits';
                 } else if (record.get('errorCode') == '2') {
                     return 'codeExits';

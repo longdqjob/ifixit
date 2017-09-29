@@ -55,7 +55,7 @@
         Ext.getCmp("btnChooseGrpEngineer").show();
         setReadOnlyForAll(workOrderForm, false, "workOrderId,mechanicId,mechanicName,workTypeName,grpEngineerName");
     }
-    
+
     function setReadOnlyWo() {
         Ext.getCmp("gridActionStock").hide();
         Ext.getCmp("gridActionMh").hide();
@@ -120,7 +120,7 @@
 //            }
             return false;
         }
-        
+
         if (hasUnicode(workOrderCode.getValue())) {
             workOrderCode.setActiveError('<fmt:message key="notUnicode"/>');
             alertError('<fmt:message key="notUnicode"/>');
@@ -259,8 +259,32 @@
     }
 
     function chooseWorkType(record) {
-        wWorkTypeName.setValue(record.get('name'));
-        wWorkTypeId.setValue(record.get('id'));
+        if ((grpEngineerId.getValue() != "" && grpEngineerId.getValue() != record.get('grpEngineerId'))
+                || (workOrderRepeat.getValue() != (record.get('isRepeat') == "1"))
+                || (workOrderInterval.getValue() != "" && workOrderInterval.getValue() != record.get('interval'))
+                || (workOrderTask.getValue() != "" && workOrderTask.getValue() != record.get('task'))) {
+            var msg = '<fmt:message key="changeWorkTypeConfirm"/>';
+            Ext.MessageBox.confirm('Confirm', msg, function (btn) {
+                if (btn == 'yes') {
+                    wWorkTypeName.setValue(record.get('name'));
+                    wWorkTypeId.setValue(record.get('id'));
+                    grpEngineerId.setValue(record.get('grpEngineerId'));
+                    grpEngineerName.setValue(record.get('grpEngineerName'));
+                    workOrderRepeat.setValue((record.get('isRepeat') == "1"));
+                    workOrderInterval.setValue(record.get('interval'));
+                    workOrderTask.setValue(record.get('task'));
+                }
+            });
+        } else {
+            wWorkTypeName.setValue(record.get('name'));
+            wWorkTypeId.setValue(record.get('id'));
+            grpEngineerId.setValue(record.get('grpEngineerId'));
+            grpEngineerName.setValue(record.get('grpEngineerName'));
+            workOrderRepeat.setValue((record.get('isRepeat') == "1"));
+            workOrderInterval.setValue(record.get('interval'));
+            workOrderTask.setValue(record.get('task'));
+        }
+
     }
 
 </script>
